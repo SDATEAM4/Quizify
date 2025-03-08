@@ -61,7 +61,7 @@ Quizify is a web-based application designed to make quizzes easy and engaging fo
 ## How to Run
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/your-repo-link.git
+   git clone https://github.com/Quizify.git
    ```
 2. Navigate to the project directory:  
    ```bash
