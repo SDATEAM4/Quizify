@@ -31,29 +31,29 @@ Quizify is a web-based application designed to make quizzes easy and engaging fo
 ## Contributors
 - **Team Leader: Muhammad Ahmed Butt**  
   - **Roll Number:** 23L-3059  
-  - **GitHub:** [![muhammadahmad0313]](https://github.com/muhammadahmad0313)
+  - **GitHub:** [muhammadahmad0313](https://github.com/muhammadahmad0313)
 
 ### Frontend Team
 - **Muhammad Zain Tahir**  
   - **Roll Number:** 23L-3078  
-  - **GitHub Username:** @Zain485576 
+  - **GitHub Username:** [Zain485576](https://github.com/Zain485576)
 - **Fatima Ijaz**  
   - **Roll Number:** 23L-3042 
-  - **GitHub Username:** @Fatima-Ijaz 
+  - **GitHub Username:** [Fatima-Ijaz](https://github.com/Fatima-Ijaz) 
 - **Shobaan Mohsin Abbasi**  
   - **Roll Number:** 23L-3009  
-  - **GitHub Username:** @shobiShinobi  
+  - **GitHub Username:** [shobiShinobi](https://github.com/shobiShinobi)  
 
 ### Backend Team
 - **Muhammad Ahmad Butt**  
   - **Roll Number:** 23L-3059 
-  - **GitHub Username:** @muhammadahmad0313
+  - **GitHub Username:** [muhammadahmad0313](https://github.com/muhammadahmad0313)
 - **Abdurehman Naeem**  
   - **Roll Number:** 23L-3105  
-  - **GitHub Username:** @A-noob-in-coding
+  - **GitHub Username:** [A-noob-in-coding](https://github.com/A-noob-in-coding)
 - **Ali Ahmed**  
   - **Roll Number:** 23L-3067 
-  - **GitHub Username:** @syed-ali3 
+  - **GitHub Username:** [syed-ali3](https://github.com/syed-ali3) 
 
 ## Project Material
 **Drive Link:** https://drive.google.com/drive/folders/1Fl-huGdVF2wPWnsZaSxzaZMgddv0iddz?usp=drive_link
