@@ -31,8 +31,7 @@ Quizify is a web-based application designed to make quizzes easy and engaging fo
 ## Contributors
 - **Team Leader: Muhammad Ahmed Butt**  
   - **Roll Number:** 23L-3059  
-  - **GitHub: [![GitHub Profile]](https://github.com/muhammadahmad0313)
-** 
+  - **GitHub:** [![muhammadahmad0313]](https://github.com/muhammadahmad0313)
 
 ### Frontend Team
 - **Muhammad Zain Tahir**  
