@@ -10,7 +10,7 @@ Quizify is a web-based application designed to make quizzes easy and engaging fo
 **Instructor:** Dr. Ali Afzal Malik  
 
 ## Tech Stack
-- **Frontend:** Vite + ReactJs
+- **Frontend:** React
 - **Backend:** Spring Boot
 - **Primary Language:** Java
 
@@ -34,26 +34,27 @@ Quizify is a web-based application designed to make quizzes easy and engaging fo
   - **GitHub:** [muhammadahmad0313](https://github.com/muhammadahmad0313)
 
 ### Frontend Team
-- **Muhammad Zain Tahir**  
-  - **Roll Number:** 23L-3078  
-  - **GitHub Username:** [Zain485576](https://github.com/Zain485576)
-- **Fatima Ijaz**  
-  - **Roll Number:** 23L-3042 
-  - **GitHub Username:** [Fatima-Ijaz](https://github.com/Fatima-Ijaz) 
-- **Shobaan Mohsin Abbasi**  
-  - **Roll Number:** 23L-3009  
-  - **GitHub Username:** [shobiShinobi](https://github.com/shobiShinobi)  
-
-### Backend Team
-- **Muhammad Ahmad Butt**  
-  - **Roll Number:** 23L-3059 
-  - **GitHub Username:** [muhammadahmad0313](https://github.com/muhammadahmad0313)
 - **Abdurehman Naeem**  
   - **Roll Number:** 23L-3105  
   - **GitHub Username:** [A-noob-in-coding](https://github.com/A-noob-in-coding)
 - **Ali Ahmed**  
   - **Roll Number:** 23L-3067 
   - **GitHub Username:** [syed-ali3](https://github.com/syed-ali3) 
+- **Muhammad Zain Tahir**  
+  - **Roll Number:** 23L-3078  
+  - **GitHub Username:** [Zain485576](https://github.com/Zain485576)
+
+
+### Backend Team
+- **Muhammad Ahmad Butt**  
+  - **Roll Number:** 23L-3059 
+  - **GitHub Username:** [muhammadahmad0313](https://github.com/muhammadahmad0313)
+- **Fatima Ijaz**  
+  - **Roll Number:** 23L-3042 
+  - **GitHub Username:** [Fatima-Ijaz](https://github.com/Fatima-Ijaz) 
+- **Shobaan Mohsin Abbasi**  
+  - **Roll Number:** 23L-3009  
+  - **GitHub Username:** [shobiShinobi](https://github.com/shobiShinobi)  
 
 ## Project Material
 **Drive Link:** https://drive.google.com/drive/folders/1Fl-huGdVF2wPWnsZaSxzaZMgddv0iddz?usp=drive_link
@@ -69,10 +70,10 @@ Quizify is a web-based application designed to make quizzes easy and engaging fo
    ```
 3. Build and run the backend using Spring Boot:  
    ```bash
-   mvn spring-boot:run
+   ./mvnw spring-boot:run
    ```
 4. Start the frontend using Vaadin:  
    ```bash
-   mvn jetty:run
+   npm run dev
    ```
 5. Open the application in the browser.
