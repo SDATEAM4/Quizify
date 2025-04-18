@@ -10,7 +10,7 @@ Quizify is a web-based application designed to make quizzes easy and engaging fo
 **Instructor:** Dr. Ali Afzal Malik  
 
 ## Tech Stack
-- **Frontend:** Vaadin
+- **Frontend:** Vite + ReactJs
 - **Backend:** Spring Boot
 - **Primary Language:** Java
 

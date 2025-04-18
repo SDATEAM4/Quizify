@@ -1,0 +1,23 @@
+{
+  "name": "quizify",
+  "version": "1.0.0",
+  "description": "## Project Overview Quizify is a web-based application designed to make quizzes easy and engaging for both teachers and students. This platform helps teachers create, edit, and manage quizzes efficiently while allowing students to participate, track progress, and improve their learning experience.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SDATEAM4/Quizify.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SDATEAM4/Quizify/issues"
+  },
+  "homepage": "https://github.com/SDATEAM4/Quizify#readme",
+  "dependencies": {
+    "vite": "^6.3.2"
+  }
+}
