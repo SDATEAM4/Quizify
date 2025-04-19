@@ -148,7 +148,7 @@ public class AdminController {
             updatedUserData.setPassword(password); // If null, handled in service
             updatedUserData.setEmail(existingUser.getEmail()); // Email cannot be changed with this endpoint
             updatedUserData.setRole(existingUser.getRole()); // Role cannot be changed with this endpoint
-            updatedUserData.setBio(bio != null ? bio : existingUser.getBio());            // Handle profile image - similar to how addUser method works
+            updatedUserData.setBio(bio != null ? bio : existingUser.getBio());    // Handle profile image 
             try {
                 if (profileImage != null && !profileImage.isEmpty()) {
                     // Upload new image and set the URL
@@ -177,7 +177,9 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to update user: " + e.getMessage()));
         }
-    }    // REGISTER NEW STUDENT USER WITH ENROLLED SUBJECTS
+    }   
+    
+    // REGISTER NEW STUDENT USER WITH ENROLLED SUBJECTS
     @PostMapping("/user/addStudent")
     public ResponseEntity<?> addStudentWithSubjects(
             @RequestParam("fname") String fname,
@@ -356,7 +358,7 @@ public class AdminController {
                             .body(Map.of("error", "Failed to upload profile image: " + e.getMessage()));
                 }
             }
-            // If profileImage is null or empty, we keep the existing image URL (no change)
+            // If profileImage is null or empty, I keep the existing image URL (no change)
             
             // Save the updated user
             User updatedUser = userService.saveUser(existingUser);
@@ -385,4 +387,271 @@ public class AdminController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
     
+    // ADD ENROLLED SUBJECTS TO STUDENT
+    @PostMapping("/student/{studentId}/addSubjects")
+    public ResponseEntity<?> addEnrolledSubjectsToStudent(
+            @PathVariable Long studentId,
+            @RequestParam("subjectsToAdd") String subjectsToAddStr) {
+        try {
+            // Get the student by ID
+            Student student = studentService.getStudentByStudentId(studentId);
+            if (student == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Student not found with id: " + studentId));
+            }
+            
+            // Parse the new subjects to add
+            Integer[] subjectsToAdd;
+            if (subjectsToAddStr != null && !subjectsToAddStr.isEmpty()) {
+                String[] subjectStrings = subjectsToAddStr.split(",");
+                subjectsToAdd = new Integer[subjectStrings.length];
+                for (int i = 0; i < subjectStrings.length; i++) {
+                    subjectsToAdd[i] = Integer.parseInt(subjectStrings[i].trim());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "No subjects specified to add"));
+            }
+            
+            // Get current enrolled subjects
+            Integer[] currentSubjects = student.getEnrolledSubjects();
+            
+            // Create a list to store unique subjects
+            List<Integer> updatedSubjects = new ArrayList<>();
+            
+            // Add existing subjects to the list
+            if (currentSubjects != null && currentSubjects.length > 0) {
+                for (Integer subjectId : currentSubjects) {
+                    updatedSubjects.add(subjectId);
+                }
+            }
+            
+            // Add new subjects, avoiding duplicates
+            for (Integer subjectId : subjectsToAdd) {
+                if (!updatedSubjects.contains(subjectId)) {
+                    updatedSubjects.add(subjectId);
+                }
+            }
+            
+            // Update the student's enrolled subjects
+            student.setEnrolledSubjects(updatedSubjects.toArray(new Integer[0]));
+            
+            // Save the updated student record
+            Student updatedStudent = studentService.updateStudent(student);
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Enrolled subjects updated successfully",
+                "student", updatedStudent
+            ));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Invalid subject ID format. Please provide comma-separated integers."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to update enrolled subjects: " + e.getMessage()));
+        }
+    }
+    
+    // ADD SUBJECTS TAUGHT TO TEACHER
+    @PostMapping("/teacher/{teacherId}/addSubjects")
+    public ResponseEntity<?> addSubjectsTaughtToTeacher(
+            @PathVariable Long teacherId,
+            @RequestParam("subjectsToAdd") String subjectsToAddStr) {
+        try {
+            // Get the teacher by ID
+            Teacher teacher = teacherService.getTeacherByTeacherId(teacherId);
+            if (teacher == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Teacher not found with id: " + teacherId));
+            }
+            
+            // Parse the new subjects to add
+            Integer[] subjectsToAdd;
+            if (subjectsToAddStr != null && !subjectsToAddStr.isEmpty()) {
+                String[] subjectStrings = subjectsToAddStr.split(",");
+                subjectsToAdd = new Integer[subjectStrings.length];
+                for (int i = 0; i < subjectStrings.length; i++) {
+                    subjectsToAdd[i] = Integer.parseInt(subjectStrings[i].trim());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "No subjects specified to add"));
+            }
+            
+            // Get current subjects taught
+            Integer[] currentSubjects = teacher.getSubjectTaught();
+            
+            // Create a list to store unique subjects
+            List<Integer> updatedSubjects = new ArrayList<>();
+            
+            // Add existing subjects to the list
+            if (currentSubjects != null && currentSubjects.length > 0) {
+                for (Integer subjectId : currentSubjects) {
+                    updatedSubjects.add(subjectId);
+                }
+            }
+            
+            // Add new subjects, avoiding duplicates
+            for (Integer subjectId : subjectsToAdd) {
+                if (!updatedSubjects.contains(subjectId)) {
+                    updatedSubjects.add(subjectId);
+                }
+            }
+            
+            // Update the teacher's subjects taught
+            teacher.setSubjectTaught(updatedSubjects.toArray(new Integer[0]));
+            
+            // Save the updated teacher record
+            Teacher updatedTeacher = teacherService.updateTeacher(teacher);
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Subjects taught updated successfully",
+                "teacher", updatedTeacher
+            ));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Invalid subject ID format. Please provide comma-separated integers."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to update subjects taught: " + e.getMessage()));
+        }
+    }
+    
+    // REMOVE ENROLLED SUBJECTS FROM STUDENT
+    @PostMapping("/student/{studentId}/removeSubjects")
+    public ResponseEntity<?> removeEnrolledSubjectsFromStudent(
+            @PathVariable Long studentId,
+            @RequestParam("subjectsToRemove") String subjectsToRemoveStr) {
+        try {
+            // Get the student by ID
+            Student student = studentService.getStudentByStudentId(studentId);
+            if (student == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Student not found with id: " + studentId));
+            }
+            
+            // Parse the subjects to remove
+            Integer[] subjectsToRemove;
+            if (subjectsToRemoveStr != null && !subjectsToRemoveStr.isEmpty()) {
+                String[] subjectStrings = subjectsToRemoveStr.split(",");
+                subjectsToRemove = new Integer[subjectStrings.length];
+                for (int i = 0; i < subjectStrings.length; i++) {
+                    subjectsToRemove[i] = Integer.parseInt(subjectStrings[i].trim());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "No subjects specified to remove"));
+            }
+            
+            // Get current enrolled subjects
+            Integer[] currentSubjects = student.getEnrolledSubjects();
+            if (currentSubjects == null || currentSubjects.length == 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Student has no enrolled subjects to remove"));
+            }
+            
+            // Create a list to store subjects after removal
+            List<Integer> updatedSubjects = new ArrayList<>();
+            
+            // Add existing subjects to the list except those to be removed
+            for (Integer subjectId : currentSubjects) {
+                boolean shouldRemove = false;
+                for (Integer removeId : subjectsToRemove) {
+                    if (subjectId.equals(removeId)) {
+                        shouldRemove = true;
+                        break;
+                    }
+                }
+                if (!shouldRemove) {
+                    updatedSubjects.add(subjectId);
+                }
+            }
+            
+            // Update the student's enrolled subjects
+            student.setEnrolledSubjects(updatedSubjects.toArray(new Integer[0]));
+            
+            // Save the updated student record
+            Student updatedStudent = studentService.updateStudent(student);
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Enrolled subjects updated successfully",
+                "student", updatedStudent
+            ));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Invalid subject ID format. Please provide comma-separated integers."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to remove enrolled subjects: " + e.getMessage()));
+        }
+    }
+    
+    // REMOVE SUBJECTS TAUGHT BY TEACHER
+    @PostMapping("/teacher/{teacherId}/removeSubjects")
+    public ResponseEntity<?> removeSubjectsTaughtByTeacher(
+            @PathVariable Long teacherId,
+            @RequestParam("subjectsToRemove") String subjectsToRemoveStr) {
+        try {
+            // Get the teacher by ID
+            Teacher teacher = teacherService.getTeacherByTeacherId(teacherId);
+            if (teacher == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Teacher not found with id: " + teacherId));
+            }
+            
+            // Parse the subjects to remove
+            Integer[] subjectsToRemove;
+            if (subjectsToRemoveStr != null && !subjectsToRemoveStr.isEmpty()) {
+                String[] subjectStrings = subjectsToRemoveStr.split(",");
+                subjectsToRemove = new Integer[subjectStrings.length];
+                for (int i = 0; i < subjectStrings.length; i++) {
+                    subjectsToRemove[i] = Integer.parseInt(subjectStrings[i].trim());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "No subjects specified to remove"));
+            }
+            
+            // Get current subjects taught
+            Integer[] currentSubjects = teacher.getSubjectTaught();
+            if (currentSubjects == null || currentSubjects.length == 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Teacher has no subjects taught to remove"));
+            }
+            
+            // Create a list to store subjects after removal
+            List<Integer> updatedSubjects = new ArrayList<>();
+            
+            // Add existing subjects to the list except those to be removed
+            for (Integer subjectId : currentSubjects) {
+                boolean shouldRemove = false;
+                for (Integer removeId : subjectsToRemove) {
+                    if (subjectId.equals(removeId)) {
+                        shouldRemove = true;
+                        break;
+                    }
+                }
+                if (!shouldRemove) {
+                    updatedSubjects.add(subjectId);
+                }
+            }
+            
+            // Update the teacher's subjects taught
+            teacher.setSubjectTaught(updatedSubjects.toArray(new Integer[0]));
+            
+            // Save the updated teacher record
+            Teacher updatedTeacher = teacherService.updateTeacher(teacher);
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Subjects taught updated successfully",
+                "teacher", updatedTeacher
+            ));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Invalid subject ID format. Please provide comma-separated integers."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to remove subjects taught: " + e.getMessage()));
+        }
+    }
 }

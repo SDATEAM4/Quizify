@@ -6,5 +6,4 @@ import team4.quizify.entity.Subject;
 
 @Repository
 public interface SubjectRepository extends JpaRepository<Subject, Integer> {
-    // Basic CRUD operations are automatically provided by JpaRepository
 }

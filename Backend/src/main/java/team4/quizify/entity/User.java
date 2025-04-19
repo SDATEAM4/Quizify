@@ -40,10 +40,7 @@ public class User {
     @Column
     private String bio;
     
-    // Default constructor and constructors with fields are provided by Lombok
-    
-    // Custom constructor without id for creating new users
-    public User(String fname, String lname, String username, String password, String email, String role, String profileImageUrl) {
+        public User(String fname, String lname, String username, String password, String email, String role, String profileImageUrl) {
         this.fname = fname;
         this.lname = lname;
         this.username = username;

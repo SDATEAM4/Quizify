@@ -25,9 +25,6 @@ public class StudentService {
     @Autowired
     private CloudinaryService cloudinaryService;
     
-    /**
-     * Add a new student - creates a user first, then adds student record
-     */
     public Student addStudent(String fname, String lname, String username, String password, 
                         String email, Integer[] enrolledSubjects, MultipartFile profileImage) {
         
@@ -71,10 +68,6 @@ public class StudentService {
         return studentRepository.save(student);
     }
     
-    /**
-     * Deletes a student record associated with the specified user ID
-     * @param userId The ID of the user whose student record should be deleted
-     */
     public void deleteByUserId(Long userId) {
         Student student = studentRepository.findByUserId(userId);
         if (student != null) {

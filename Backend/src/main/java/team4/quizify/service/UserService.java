@@ -54,13 +54,9 @@ public class UserService {    @Autowired
             return true;
         }
         return false;
-    }    /**
-     * Deletes a user with cascade delete to ensure all related records are also deleted.
-     * This method manually handles the deletion of related records in the correct order.
-     * 
-     * @param userId the ID of the user to delete
-     * @return true if deletion was successful, false if user wasn't found
-     */
+    }   
+
+
     public boolean deleteUserWithCascade(Long userId) {
         // First check if the user exists
         if (!userRepository.existsById(userId)) {
@@ -78,14 +74,7 @@ public class UserService {    @Autowired
             try {
                 jdbcTemplate.update("DELETE FROM quiz_attempt WHERE user_id = ?", userId);
             } catch (Exception e) {
-                // Table might not exist, ignore this step
-            }
-            
-            // Delete any notifications related to this user (if applicable)
-            try {
-                jdbcTemplate.update("DELETE FROM notification WHERE user_id = ?", userId);
-            } catch (Exception e) {
-                // Table might not exist, ignore this step
+               
             }
             
             // Delete related teacher records if any
@@ -93,6 +82,9 @@ public class UserService {    @Autowired
             
             // Delete related student records if any
             jdbcTemplate.update("DELETE FROM student WHERE user_id = ?", userId);
+
+            // Delete related quiz records if any
+            jdbcTemplate.update("DELETE FROM report WHERE user_id = ?", userId);
             
             // Finally delete the user
             jdbcTemplate.update("DELETE FROM users WHERE id = ?", userId);
@@ -109,7 +101,6 @@ public class UserService {    @Autowired
             // Update user properties
             user.setFname(updatedUser.getFname());
             user.setLname(updatedUser.getLname());
-            // Don't update username as we're finding by username
             
             // Only update password if it's not null or empty
             if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {

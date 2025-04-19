@@ -12,7 +12,7 @@ import team4.quizify.service.QuizService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/Quizify")
 public class QuizController {
       @Autowired
     private QuizService quizService;
