@@ -319,12 +319,11 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to remove subject: " + e.getMessage()));
         }
-    }
-      // DELETE STUDENT USER AND STUDENT RECORD
-    @DeleteMapping("/deleteStudent/{userId}")
-    public ResponseEntity<?> deleteStudentAndUser(@PathVariable Long userId) {
+    }    // DELETE USER WITH CASCADE - Works for both Teacher and Student
+    @DeleteMapping("/deleteUser/{userId}")
+    public ResponseEntity<?> deleteUserWithCascade(@PathVariable Long userId) {
         try {
-            // Check if the user exists and is a student
+            // Check if the user exists
             Optional<User> userOpt = userService.getUserById(userId);
             if (userOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -332,85 +331,30 @@ public class AdminController {
             }
             
             User user = userOpt.get();
-            if (!"Student".equalsIgnoreCase(user.getRole())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("error", "User is not a student. User role: " + user.getRole()));
-            }
-            
-            // Get student record
-            Student student = studentService.getStudentByUserId(userId);
             
             // Create response with details
             Map<String, Object> response = new HashMap<>();
             response.put("userId", userId);
             response.put("username", user.getUsername());
+            response.put("role", user.getRole());
             
-            // Delete student record if exists
-            if (student != null) {
-                response.put("studentId", student.getStudent_id());
-                studentService.deleteByUserId(userId);
-                response.put("studentDeleted", true);
+            // Execute cascade delete
+            boolean deleted = userService.deleteUserWithCascade(userId);
+            
+            if (deleted) {
+                response.put("success", true);
+                response.put("message", "User and all associated records deleted successfully");
             } else {
-                response.put("studentDeleted", false);
-                response.put("message", "No student record found to delete");
+                response.put("success", false);
+                response.put("message", "Failed to delete user");
             }
-            
-            // Delete user
-            userService.deleteUser(userId);
-            response.put("userDeleted", true);
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to delete student: " + e.getMessage()));
+                    .body(Map.of("error", "Failed to delete user: " + e.getMessage()));
         }
-    }
-    
-    // DELETE TEACHER USER AND TEACHER RECORD
-    @DeleteMapping("/deleteTeacher/{userId}")
-    public ResponseEntity<?> deleteTeacherAndUser(@PathVariable Long userId) {
-        try {
-            // Check if the user exists and is a teacher
-            Optional<User> userOpt = userService.getUserById(userId);
-            if (userOpt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "User not found with id: " + userId));
-            }
-            
-            User user = userOpt.get();
-            if (!"Teacher".equalsIgnoreCase(user.getRole())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("error", "User is not a teacher. User role: " + user.getRole()));
-            }
-            
-            // Get teacher record
-            Teacher teacher = teacherService.getTeacherByUserId(userId);
-            
-            // Create response with details
-            Map<String, Object> response = new HashMap<>();
-            response.put("userId", userId);
-            response.put("username", user.getUsername());
-            
-            // Delete teacher record if exists
-            if (teacher != null) {
-                response.put("teacherId", teacher.getTeacher_id());
-                teacherService.deleteByUserId(userId);
-                response.put("teacherDeleted", true);
-            } else {
-                response.put("teacherDeleted", false);
-                response.put("message", "No teacher record found to delete");
-            }
-            
-            // Delete user
-            userService.deleteUser(userId);
-            response.put("userDeleted", true);
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to delete teacher: " + e.getMessage()));
-        }
-    }    // Removed unnecessary delete endpoints    // UPDATE USER PROFILE BASED ON USER ID - Update only fname, lname, profile, bio, password
+    }// UPDATE USER PROFILE BASED ON USER ID - Update only fname, lname, profile, bio, password
     @PutMapping("/user/{userId}")
     public ResponseEntity<?> updateUserProfile(
             @PathVariable Long userId,

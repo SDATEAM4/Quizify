@@ -2,6 +2,7 @@ package team4.quizify.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.jdbc.core.JdbcTemplate;
 import team4.quizify.entity.User;
 import team4.quizify.repository.UserRepository;
 
@@ -9,10 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
-
-    @Autowired
+public class UserService {    @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -45,17 +47,62 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
-    
-    public boolean deleteUserByUsername(String username) {
+      public boolean deleteUserByUsername(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isPresent()) {
             userRepository.deleteById(user.get().getId());
             return true;
         }
         return false;
+    }    /**
+     * Deletes a user with cascade delete to ensure all related records are also deleted.
+     * This method manually handles the deletion of related records in the correct order.
+     * 
+     * @param userId the ID of the user to delete
+     * @return true if deletion was successful, false if user wasn't found
+     */
+    public boolean deleteUserWithCascade(Long userId) {
+        // First check if the user exists
+        if (!userRepository.existsById(userId)) {
+            return false;
+        }
+        
+        try {
+            // Delete query records where this user is receiver or sender
+            jdbcTemplate.update("DELETE FROM query WHERE sender_id = ? OR receiver_id = ?", userId, userId);
+            
+            // Delete chat messages related to this user (both as sender and receiver)
+            jdbcTemplate.update("DELETE FROM chat WHERE sender_id = ? OR receiver_id = ?", userId, userId);
+            
+            // Delete any quiz attempts related to this user (if applicable)
+            try {
+                jdbcTemplate.update("DELETE FROM quiz_attempt WHERE user_id = ?", userId);
+            } catch (Exception e) {
+                // Table might not exist, ignore this step
+            }
+            
+            // Delete any notifications related to this user (if applicable)
+            try {
+                jdbcTemplate.update("DELETE FROM notification WHERE user_id = ?", userId);
+            } catch (Exception e) {
+                // Table might not exist, ignore this step
+            }
+            
+            // Delete related teacher records if any
+            jdbcTemplate.update("DELETE FROM teacher WHERE user_id = ?", userId);
+            
+            // Delete related student records if any
+            jdbcTemplate.update("DELETE FROM student WHERE user_id = ?", userId);
+            
+            // Finally delete the user
+            jdbcTemplate.update("DELETE FROM users WHERE id = ?", userId);
+            
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting user with ID " + userId + ": " + e.getMessage(), e);
+        }
     }
-    
-    public Optional<User> updateUserByUsername(String username, User updatedUser) {
+      public Optional<User> updateUserByUsername(String username, User updatedUser) {
         Optional<User> existingUser = userRepository.findByUsername(username);
         if (existingUser.isPresent()) {
             User user = existingUser.get();
@@ -72,11 +119,11 @@ public class UserService {
             
             user.setEmail(updatedUser.getEmail());
             user.setRole(updatedUser.getRole());
+              // Update bio
+            user.setBio(updatedUser.getBio());
             
-            // Only update profile image URL if it's not null
-            if (updatedUser.getProfileImageUrl() != null) {
-                user.setProfileImageUrl(updatedUser.getProfileImageUrl());
-            }
+            // Always update profile image URL whether it's null or not
+            user.setProfileImageUrl(updatedUser.getProfileImageUrl());
             
             return Optional.of(userRepository.save(user));
         }
