@@ -119,7 +119,6 @@ public class QuizService {
             
             // Parse the JSON string to a list of Quiz objects
             quizzes = objectMapper.readValue(content, new TypeReference<List<Quiz>>() {});
-            // logger.info("Successfully parsed {} quiz questions", quizzes.size());
         } catch (JsonProcessingException e) {
         } catch (Exception e) {
             logger.error("Error parsing quiz response", e);
