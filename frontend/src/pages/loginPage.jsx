@@ -23,32 +23,35 @@ export const LoginPage = () => {
 
   const handleOtpVerified = () => {
     console.log("OTP verified successfully");
-    // For now, just go back to login
     setCurrentView("login");
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
+    <div className="relative min-h-screen flex justify-center items-center bg-gray-50 overflow-hidden">
+      {/* Background Typography */}
       <BackgroundTypography />
-      
-      {currentView === "login" && (
-        <LoginForm onForgotPasswordClick={handleShowForgotPassword} />
-      )}
-      
-      {currentView === "forgotPassword" && (
-        <ForgotPassword 
-          onOtpSent={handleOtpSent} 
-          onBackToLogin={handleBackToLogin} 
-        />
-      )}
-      
-      {currentView === "otpVerification" && (
-        <OTPVerification 
-          email={email} 
-          onVerified={handleOtpVerified}
-          onBackToLogin={handleBackToLogin}
-        />
-      )}
+
+      {/* Main Content */}
+      <div className="relative z-10">
+        {currentView === "login" && (
+          <LoginForm onForgotPasswordClick={handleShowForgotPassword} />
+        )}
+
+        {currentView === "forgotPassword" && (
+          <ForgotPassword
+            onOtpSent={handleOtpSent}
+            onBackToLogin={handleBackToLogin}
+          />
+        )}
+
+        {currentView === "otpVerification" && (
+          <OTPVerification
+            email={email}
+            onVerified={handleOtpVerified}
+            onBackToLogin={handleBackToLogin}
+          />
+        )}
+      </div>
     </div>
   );
 };

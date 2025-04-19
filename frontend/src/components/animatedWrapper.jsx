@@ -1,12 +1,12 @@
 export default function AnimatedWrapper() {
   return (
-    <>
-    <div className="text-[20vw] font-black text-black/9 pb-11 leading-none whitespace-nowrap tracking-wider transform -rotate-6 animate-marquee">
-                    QUIZIFY QUIZIFY QUIZIFY QUIZIFY
-                  </div>
-    <div className="text-[15vw] font-black text-black/9 leading-none whitespace-nowrap mt-[-5vw] tracking-wider transform -rotate-6 animate-marquee-reverse">
-      FAST NUCES FAST NUCES
+    <div className="relative w-full h-full overflow-hidden">
+      <div className="absolute whitespace-nowrap animate-marquee text-[20vw] font-black text-black/10 leading-none tracking-wider">
+        QUIZIFY QUIZIFY QUIZIFY QUIZIFY QUIZIFY
+      </div>
+      <div className="absolute whitespace-nowrap animate-marquee-reverse text-[15vw] font-black text-black/10 leading-none tracking-wider mt-[10vw]">
+        FAST NUCES FAST NUCES FAST NUCES FAST NUCES
+      </div>
     </div>
-    </>
   );
 }
