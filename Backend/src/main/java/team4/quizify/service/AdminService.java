@@ -17,6 +17,12 @@ public class AdminService {
     
     @Autowired
     private CloudinaryService cloudinaryService;
+    
+    @Autowired
+    private StudentService studentService;
+    
+    @Autowired
+    private TeacherService teacherService;
 
     public User addUser(String fname, String lname, String username, String password, 
                         String email, String role, MultipartFile profileImage) {
@@ -40,8 +46,22 @@ public class AdminService {
         User newUser = new User(fname, lname, username, password, email, role, profileImageUrl);
         return userService.saveUser(newUser);
     }
-    
-    public void removeUser(Long userId) {
+      public void removeUser(Long userId) {
+        // First check if the user exists
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+        
+        // Delete associated student record if user is a student
+        if ("Student".equals(user.getRole())) {
+            studentService.deleteByUserId(userId);
+        }
+        
+        // Delete associated teacher record if user is a teacher
+        if ("Teacher".equals(user.getRole())) {
+            teacherService.deleteByUserId(userId);
+        }
+        
+        // Delete the user
         userService.deleteUser(userId);
     }
     

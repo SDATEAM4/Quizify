@@ -71,7 +71,14 @@ public class TeacherService {
         return teacherRepository.save(teacher);
     }
     
-    public void deleteTeacher(Long teacherId) {
-        teacherRepository.deleteById(teacherId);
+    /**
+     * Deletes a teacher record associated with the specified user ID
+     * @param userId The ID of the user whose teacher record should be deleted
+     */
+    public void deleteByUserId(Long userId) {
+        Teacher teacher = teacherRepository.findByUserId(userId);
+        if (teacher != null) {
+            teacherRepository.delete(teacher);
+        }
     }
 }
