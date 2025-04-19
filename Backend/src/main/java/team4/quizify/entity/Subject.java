@@ -1,0 +1,30 @@
+package team4.quizify.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "subject")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Subject {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer subject_id;
+    
+    @Column(nullable = false)
+    private String name;
+    
+    @Column(name = "teachers_id", columnDefinition = "integer[]")
+    private Integer[] teachersId;
+    
+    @Column
+    private String imageUrl;
+    
+    @Column
+    private String description;
+}
