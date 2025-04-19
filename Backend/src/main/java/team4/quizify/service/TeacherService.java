@@ -8,7 +8,11 @@ import team4.quizify.entity.User;
 import team4.quizify.repository.TeacherRepository;
 import team4.quizify.repository.UserRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TeacherService {
@@ -80,5 +84,35 @@ public class TeacherService {
         if (teacher != null) {
             teacherRepository.delete(teacher);
         }
+    }
+    
+    /**
+     * Removes a specific subject from a teacher's list of taught subjects
+     * @param teacherId The ID of the teacher
+     * @param subjectId The ID of the subject to remove
+     * @return The updated Teacher object, or null if the teacher was not found
+     */
+    public Teacher removeSubjectTaught(Long teacherId, Integer subjectId) {
+        Teacher teacher = getTeacherByTeacherId(teacherId);
+        if (teacher == null) {
+            return null;
+        }
+        
+        // Get current subjects taught
+        Integer[] currentSubjects = teacher.getSubjectTaught();
+        if (currentSubjects == null || currentSubjects.length == 0) {
+            return teacher; // No subjects to remove
+        }
+        
+        // Filter out the subject ID to be removed
+        List<Integer> updatedSubjects = Arrays.stream(currentSubjects)
+            .filter(subject -> !subject.equals(subjectId))
+            .collect(Collectors.toList());
+        
+        // Update the teacher entity with the new subjects array
+        teacher.setSubjectTaught(updatedSubjects.toArray(new Integer[0]));
+        
+        // Save and return the updated teacher
+        return teacherRepository.save(teacher);
     }
 }

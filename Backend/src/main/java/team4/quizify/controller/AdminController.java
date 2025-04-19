@@ -16,6 +16,7 @@ import team4.quizify.service.SubjectService;
 import team4.quizify.service.TeacherService;
 import team4.quizify.service.UserService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,14 +148,19 @@ public class AdminController {
             updatedUserData.setPassword(password); // If null, handled in service
             updatedUserData.setEmail(existingUser.getEmail()); // Email cannot be changed with this endpoint
             updatedUserData.setRole(existingUser.getRole()); // Role cannot be changed with this endpoint
-            updatedUserData.setBio(bio != null ? bio : existingUser.getBio());
-            
-            // Copy the existing profile image URL if no new image is provided
-            if (profileImage != null && !profileImage.isEmpty()) {
-                String profileImageUrl = cloudinaryService.uploadFile(profileImage);
-                updatedUserData.setProfileImageUrl(profileImageUrl);
-            } else {
-                updatedUserData.setProfileImageUrl(existingUser.getProfileImageUrl());
+            updatedUserData.setBio(bio != null ? bio : existingUser.getBio());            // Handle profile image - similar to how addUser method works
+            try {
+                if (profileImage != null && !profileImage.isEmpty()) {
+                    // Upload new image and set the URL
+                    String profileImageUrl = cloudinaryService.uploadFile(profileImage);
+                    updatedUserData.setProfileImageUrl(profileImageUrl);
+                } else {
+                    // Explicitly keep the existing profile image URL (not null)
+                    updatedUserData.setProfileImageUrl(existingUser.getProfileImageUrl());
+                }
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "Failed to process profile image: " + e.getMessage()));
             }
             
             // Update the user
@@ -171,9 +177,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to update user: " + e.getMessage()));
         }
-    }
-
-    // REGISTER NEW STUDENT USER WITH ENROLLED SUBJECTS - COMBINED ENDPOINT
+    }    // REGISTER NEW STUDENT USER WITH ENROLLED SUBJECTS
     @PostMapping("/user/addStudent")
     public ResponseEntity<?> addStudentWithSubjects(
             @RequestParam("fname") String fname,
@@ -191,7 +195,7 @@ public class AdminController {
             // Parse enrolled subjects from string to Integer array
             Integer[] enrolledSubjects;
             if (enrolledSubjectsStr != null && !enrolledSubjectsStr.isEmpty()) {
-                String[] subjectStrings = enrolledSubjectsStr.replace("{", "").replace("}", "").split(",");
+                String[] subjectStrings = enrolledSubjectsStr.split(",");
                 enrolledSubjects = new Integer[subjectStrings.length];
                 for (int i = 0; i < subjectStrings.length; i++) {
                     enrolledSubjects[i] = Integer.parseInt(subjectStrings[i].trim());
@@ -221,7 +225,7 @@ public class AdminController {
         }
     }
     
-    // REGISTER NEW TEACHER USER WITH SUBJECTS TAUGHT - COMBINED ENDPOINT
+    // REGISTER NEW TEACHER USER WITH SUBJECTS TAUGHT
     @PostMapping("/user/addTeacher")
     public ResponseEntity<?> addTeacherWithSubjects(
             @RequestParam("fname") String fname,
@@ -239,7 +243,7 @@ public class AdminController {
             // Parse subjects taught from string to Integer array
             Integer[] subjectTaught;
             if (subjectTaughtStr != null && !subjectTaughtStr.isEmpty()) {
-                String[] subjectStrings = subjectTaughtStr.replace("{", "").replace("}", "").split(",");
+                String[] subjectStrings = subjectTaughtStr.split(",");
                 subjectTaught = new Integer[subjectStrings.length];
                 for (int i = 0; i < subjectStrings.length; i++) {
                     subjectTaught[i] = Integer.parseInt(subjectStrings[i].trim());
@@ -267,59 +271,9 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to add teacher user: " + e.getMessage()));
         }
-    }
-
+    }    
     
-    // REMOVE SUBJECT FROM TEACHER SUBJECTS TAUGHT
-    @DeleteMapping("/user/teacher/{userId}/remove-subject/{subjectId}")
-    public ResponseEntity<?> removeTeacherSubjectTaught(
-            @PathVariable Long userId,
-            @PathVariable Integer subjectId) {
-        
-        try {
-            // Find existing teacher record
-            Teacher teacher = teacherService.getTeacherByUserId(userId);
-            if (teacher == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Teacher record not found for user id: " + userId));
-            }
-            
-            // Get current subjects and remove the specified one
-            Integer[] currentSubjects = teacher.getSubjectTaught();
-            
-            // Check if subject exists and create a new array without it
-            boolean found = false;
-            Integer[] updatedSubjects = new Integer[currentSubjects.length - 1];
-            int j = 0;
-            
-            for (Integer subject : currentSubjects) {
-                if (!subject.equals(subjectId)) {
-                    if (j < updatedSubjects.length) {
-                        updatedSubjects[j++] = subject;
-                    }
-                } else {
-                    found = true;
-                }
-            }
-            
-            if (!found) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Subject not found in teacher's subjects taught"));
-            }
-            
-            // Update teacher record
-            teacher.setSubjectTaught(updatedSubjects);
-            Teacher updatedTeacher = teacherService.updateTeacher(teacher);
-            
-            return ResponseEntity.ok(Map.of(
-                "message", "Subject removed successfully",
-                "teacher", updatedTeacher
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to remove subject: " + e.getMessage()));
-        }
-    }    // DELETE USER WITH CASCADE - Works for both Teacher and Student
+    // DELETE USER WITH CASCADE - Works for both Teacher and Student
     @DeleteMapping("/deleteUser/{userId}")
     public ResponseEntity<?> deleteUserWithCascade(@PathVariable Long userId) {
         try {
@@ -354,7 +308,9 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to delete user: " + e.getMessage()));
         }
-    }// UPDATE USER PROFILE BASED ON USER ID - Update only fname, lname, profile, bio, password
+    }
+    
+    // UPDATE USER PROFILE BASED ON USER ID - Update only fname, lname, profile, bio, password
     @PutMapping("/user/{userId}")
     public ResponseEntity<?> updateUserProfile(
             @PathVariable Long userId,
@@ -390,12 +346,17 @@ public class AdminController {
             if (password != null && !password.isEmpty()) {
                 existingUser.setPassword(password);
             }
-            
-            // Upload and update profile image if provided
+              // Upload and update profile image if provided and not empty
             if (profileImage != null && !profileImage.isEmpty()) {
-                String profileImageUrl = cloudinaryService.uploadFile(profileImage);
-                existingUser.setProfileImageUrl(profileImageUrl);
+                try {
+                    String profileImageUrl = cloudinaryService.uploadFile(profileImage);
+                    existingUser.setProfileImageUrl(profileImageUrl);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(Map.of("error", "Failed to upload profile image: " + e.getMessage()));
+                }
             }
+            // If profileImage is null or empty, we keep the existing image URL (no change)
             
             // Save the updated user
             User updatedUser = userService.saveUser(existingUser);
@@ -423,4 +384,5 @@ public class AdminController {
                 .map(subject -> ResponseEntity.ok(subject))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+    
 }

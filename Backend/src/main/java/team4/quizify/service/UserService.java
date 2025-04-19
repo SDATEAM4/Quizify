@@ -101,8 +101,7 @@ public class UserService {    @Autowired
         } catch (Exception e) {
             throw new RuntimeException("Error deleting user with ID " + userId + ": " + e.getMessage(), e);
         }
-    }
-      public Optional<User> updateUserByUsername(String username, User updatedUser) {
+    }      public Optional<User> updateUserByUsername(String username, User updatedUser) {
         Optional<User> existingUser = userRepository.findByUsername(username);
         if (existingUser.isPresent()) {
             User user = existingUser.get();
@@ -119,10 +118,11 @@ public class UserService {    @Autowired
             
             user.setEmail(updatedUser.getEmail());
             user.setRole(updatedUser.getRole());
-              // Update bio
+            // Update bio
             user.setBio(updatedUser.getBio());
             
-            // Always update profile image URL whether it's null or not
+            // Always update the profile image URL with whatever value was provided
+            // This ensures if a new image was uploaded, the URL gets updated
             user.setProfileImageUrl(updatedUser.getProfileImageUrl());
             
             return Optional.of(userRepository.save(user));
