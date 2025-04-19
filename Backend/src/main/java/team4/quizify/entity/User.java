@@ -37,6 +37,9 @@ public class User {
     @Column
     private String profileImageUrl;
     
+    @Column
+    private String bio;
+    
     // Default constructor and constructors with fields are provided by Lombok
     
     // Custom constructor without id for creating new users
