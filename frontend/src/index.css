@@ -1,2 +1,11 @@
 
 @import "tailwindcss";
+
+@layer components {
+  .hover-underline-animation {
+    @apply absolute bottom-0 left-0 h-[1.5px] w-full scale-x-0 bg-white transition-transform duration-300 origin-left;
+  }
+  .group:hover .hover-underline-animation {
+    @apply scale-x-100;
+  }
+}

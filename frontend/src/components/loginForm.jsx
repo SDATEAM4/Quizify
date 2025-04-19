@@ -114,7 +114,7 @@ export const LoginForm = ({ onForgotPasswordClick }) => {
             onClick={onForgotPasswordClick}
           >
             Forgot Password?
-            <span className="absolute bottom-0 left-0 h-[1.5px] w-full scale-x-0 bg-gray-900 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+            <span className="hover-underline-animation"></span>
           </a>
         </div>
 
