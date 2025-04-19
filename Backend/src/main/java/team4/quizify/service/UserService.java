@@ -71,11 +71,6 @@ public class UserService {    @Autowired
             jdbcTemplate.update("DELETE FROM chat WHERE sender_id = ? OR receiver_id = ?", userId, userId);
             
             // Delete any quiz attempts related to this user (if applicable)
-            try {
-                jdbcTemplate.update("DELETE FROM quiz_attempt WHERE user_id = ?", userId);
-            } catch (Exception e) {
-               
-            }
             
             // Delete related teacher records if any
             jdbcTemplate.update("DELETE FROM teacher WHERE user_id = ?", userId);
