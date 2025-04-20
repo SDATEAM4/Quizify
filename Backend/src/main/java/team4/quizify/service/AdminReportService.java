@@ -1,4 +1,4 @@
-package team4.quizify.service.report;
+package team4.quizify.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,13 +9,11 @@ import team4.quizify.entity.User;
 import team4.quizify.repository.StudentRepository;
 import team4.quizify.repository.SubjectRepository;
 import team4.quizify.repository.TeacherRepository;
-import team4.quizify.repository.UserRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
-public class AdminReport implements Report {
+public class AdminReportService implements Report {
     
     @Autowired
     private SubjectRepository subjectRepository;
@@ -26,8 +24,6 @@ public class AdminReport implements Report {
     @Autowired
     private StudentRepository studentRepository;
     
-    @Autowired
-    private UserRepository userRepository;
     
     @Override
     public List<Map<String, Object>> generateSubjectTeacherStudentReport() {
@@ -77,9 +73,8 @@ public class AdminReport implements Report {
         return reportData;
     }
     
-    /**
-     * Helper method to check if an Integer array contains a specific Integer value
-     */
+    
+     // Helper method to check if an Integer array contains a specific Integer value 
     private boolean containsId(Integer[] array, Integer id) {
         if (array == null || array.length == 0) {
             return false;

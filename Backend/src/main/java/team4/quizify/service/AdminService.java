@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import team4.quizify.entity.User;
-import team4.quizify.repository.UserRepository;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class AdminService {

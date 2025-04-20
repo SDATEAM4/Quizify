@@ -6,18 +6,13 @@ import org.springframework.web.multipart.MultipartFile;
 import team4.quizify.entity.Student;
 import team4.quizify.entity.User;
 import team4.quizify.repository.StudentRepository;
-import team4.quizify.repository.UserRepository;
 
-import java.util.Optional;
 
 @Service
 public class StudentService {
 
     @Autowired
     private StudentRepository studentRepository;
-    
-    @Autowired
-    private UserRepository userRepository;
     
     @Autowired
     private UserService userService;

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import team4.quizify.entity.Quiz;
+import team4.quizify.entity.PracticeQuiz;
 
 @Service
 public class QuizService {
@@ -29,7 +29,7 @@ public class QuizService {
     private String apiKey;    private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
     
-    public List<Quiz> generateQuiz(String subject, String level, int numQuestions) {
+    public List<PracticeQuiz> generateQuiz(String subject, String level, int numQuestions) {
         String url = "https://openrouter.ai/api/v1/chat/completions";
                 
         // Creating headers
@@ -62,7 +62,7 @@ public class QuizService {
             Map<String, Object> response = restTemplate.postForObject(url, requestEntity, Map.class);
             
             // Process the response
-            List<Quiz> quizzes = parseQuizResponse(response);
+            List<PracticeQuiz> quizzes = parseQuizResponse(response);
             
             // Limit the number of questions if we got more than requested
             if (quizzes.size() > numQuestions) {
@@ -86,8 +86,8 @@ public class QuizService {
                "and answer (the correct option's key, like \"a\"). " +
                "This is for a project, so do not include any text like \"Here are your MCQs\" or \"Qx may need more clarification.\" " +
                "Just return the raw JSON.";
-    }      private List<Quiz> parseQuizResponse(Map<String, Object> response) {
-        List<Quiz> quizzes = new ArrayList<>();
+    }      private List<PracticeQuiz> parseQuizResponse(Map<String, Object> response) {
+        List<PracticeQuiz> quizzes = new ArrayList<>();
                 
         try {
             // Extracting the content from the response
@@ -118,7 +118,7 @@ public class QuizService {
             content = cleanJsonContent(content);
             
             // Parse the JSON string to a list of Quiz objects
-            quizzes = objectMapper.readValue(content, new TypeReference<List<Quiz>>() {});
+            quizzes = objectMapper.readValue(content, new TypeReference<List<PracticeQuiz>>() {});
         } catch (JsonProcessingException e) {
         } catch (Exception e) {
             logger.error("Error parsing quiz response", e);
