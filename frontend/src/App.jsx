@@ -4,6 +4,7 @@ import { HomePage } from './pages/homePage';
 import { LoginPage } from "./pages/loginPage";
 import { AttemptQuizPage } from "./pages/attemptQuizPage"; 
 import { AdminAddUserPage } from './pages/adminAddUser';
+import {QuizGenerator} from './pages/QuizGenerator';
 
 function App() {
   return (
@@ -12,6 +13,8 @@ function App() {
       <Route path='/home' element={<HomePage />} />
       <Route path='/attemptQuiz' element={<AttemptQuizPage />} /> {/* Fixed usage */}
   <Route path='/admin/addUser' element={<AdminAddUserPage/>}/>
+  <Route path='/quizGenerator' element={<QuizGenerator/>}/> {/* Fixed usage */}
+      
     </Routes>
   );
 }
