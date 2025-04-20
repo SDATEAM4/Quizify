@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { FaChartBar, FaSignOutAlt, FaUserCog, FaUserPlus } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export const AdminNavBar = () => {
-  const [activeTab, setActiveTab] = useState("home");
-  
+  const [activeTab, setActiveTab] = useState("addUser");
+  const navigate = useNavigate();  
   // This would be your navigation handler with useNavigate
-  const handleNavigation = (route) => {
-    setActiveTab(route);
-    // navigate(`/${route}`); // You would uncomment this when using react-router
-  };
+  
 
   return (
     <header className="bg-black text-white shadow-md">
@@ -19,7 +17,10 @@ export const AdminNavBar = () => {
             className={`cursor-pointer py-2 flex items-center relative group ${
               activeTab === "home" ? "border-b-2 border-white" : ""
             }`}
-            onClick={() => handleNavigation("home")}
+            onClick={() => {
+              setActiveTab('addUser')
+              navigate('/admin/addUser')
+            }}
           >
             <FaUserPlus className="mr-2" /> Add User
             {activeTab !== "home" && <span className="hover-underline-animation"></span>}
@@ -29,7 +30,10 @@ export const AdminNavBar = () => {
             className={`cursor-pointer py-2 flex items-center relative group ${
               activeTab === "quiz" ? "border-b-2 border-white" : ""
             }`}
-            onClick={() => handleNavigation("quiz")}
+            onClick={() => {
+              setActiveTab('manageUser')
+              navigate('/admin/manageUser')
+            }}
           >
             <FaUserCog className="mr-2" /> Manage User
             {activeTab !== "quiz" && <span className="hover-underline-animation"></span>}
@@ -39,7 +43,10 @@ export const AdminNavBar = () => {
             className={`cursor-pointer py-2 flex items-center relative group ${
               activeTab === "queries" ? "border-b-2 border-white" : ""
             }`}
-            onClick={() => handleNavigation("queries")}
+            onClick={() => {
+              setActiveTab('viewReports')
+              navigate('/admin/viewReports')
+            }}
           >
             <FaChartBar className="mr-2" /> View Reports
             {activeTab !== "queries" && <span className="hover-underline-animation"></span>}
