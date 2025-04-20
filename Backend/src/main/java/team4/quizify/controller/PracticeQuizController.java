@@ -6,19 +6,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import team4.quizify.entity.Quiz;
+import team4.quizify.entity.PracticeQuiz;
 import team4.quizify.service.QuizService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/Quizify")
-public class QuizController {
+public class PracticeQuizController {
       @Autowired
     private QuizService quizService;
     
     @GetMapping("/practiceQuiz")
-    public List<Quiz> getPracticeQuiz(
+    public List<PracticeQuiz> getPracticeQuiz(
             @RequestParam String subject,
             @RequestParam(required = false, defaultValue = "mix") String level,
             @RequestParam(required = false, defaultValue = "5") int numQuestions) {
