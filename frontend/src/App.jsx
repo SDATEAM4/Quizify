@@ -6,7 +6,7 @@ import { AttemptQuizPage } from "./pages/attemptQuizPage";
 import { AdminAddUserPage } from './pages/adminAddUser';
 import {QuizGenerator} from './pages/QuizGenerator';
 import ManageUserComponent from './pages/manageUser';
-
+import ViewReportsAdmin from './pages/adminViewReports';
 function App() {
   return (
     <Routes>
@@ -16,6 +16,7 @@ function App() {
   <Route path='/admin/addUser' element={<AdminAddUserPage/>}/>
   <Route path='/quizGenerator' element={<QuizGenerator/>}/> {/* Fixed usage */}
   <Route path='/admin/manageUser' element={<ManageUserComponent/>}/>
+  <Route path='/admin/viewReports' element={<ViewReportsAdmin/>}/>
     </Routes>
   );
 }
