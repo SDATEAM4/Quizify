@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search } from 'lucide-react';
-
+import { AdminNavBar } from '../components/adminNavbar';
 export default function ViewReports() {
   // Using the data format provided
   const subjectsData = [
@@ -118,6 +118,9 @@ export default function ViewReports() {
   };
 
   return (
+    <div>
+      <AdminNavBar/>
+    
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">View Reports</h1>
@@ -196,6 +199,7 @@ export default function ViewReports() {
           </div>
         ))}
       </div>
+    </div>
     </div>
   );
 }
