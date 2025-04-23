@@ -12,6 +12,7 @@ import { TeacherHomePage } from './pages/teacherHomePage';
 import AddNewQuestion from './pages/teacherAddNewQuestion';
 import TeacherAddQuiz from './pages/teacherAddQuiz';
 import { TeacherEditQuiz } from './pages/teacherEditQuizPage';
+import CustomizeProfile from './pages/customizeProfile';
 function App() {
   return (
     <Routes>
@@ -25,8 +26,11 @@ function App() {
   <Route path='/teacher/viewReports' element={<TeacherReports/>}/>
   <Route path='/teacher/addQuestion' element={<AddNewQuestion/>}/>
   <Route path='/teacher/editQuiz' element={<TeacherEditQuiz/>}/>
+
   <Route path='/teacher/home' element={<TeacherHomePage/>}/>
   <Route path='/teacher/createQuiz' element={<TeacherAddQuiz/>}/>
+  <Route path='/customizeProfile' element={<CustomizeProfile/>}/>
+
     </Routes>
   );
 }
