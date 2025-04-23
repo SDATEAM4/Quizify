@@ -10,6 +10,7 @@ import ViewReportsAdmin from './pages/adminViewReports';
 import TeacherReports from './pages/teacherViewReports';
 import AddNewQuestion from './pages/teacherAddNewQuestion';
 import { TeacherEditQuiz } from './pages/teacherEditQuizPage';
+import CustomizeProfile from './pages/customizeProfile';
 function App() {
   return (
     <Routes>
@@ -23,6 +24,7 @@ function App() {
   <Route path='/teacher/viewReports' element={<TeacherReports/>}/>
   <Route path='/teacher/addQuestion' element={<AddNewQuestion/>}/>
   <Route path='/teacher/editQuiz' element={<TeacherEditQuiz/>}/>
+  <Route path='/customizeProfile' element={<CustomizeProfile/>}/>
     </Routes>
   );
 }
