@@ -1,91 +1,82 @@
 package team4.quizify.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import org.springframework.stereotype.Service;
-import team4.quizify.entity.Student;
-import team4.quizify.entity.Subject;
-import team4.quizify.entity.Teacher;
-import team4.quizify.entity.User;
-import team4.quizify.repository.StudentRepository;
-import team4.quizify.repository.SubjectRepository;
-import team4.quizify.repository.TeacherRepository;
 
 import java.util.*;
 
 @Service
 public class AdminReportService implements Report {
-    
-    @Autowired
-    private SubjectRepository subjectRepository;
-    
-    @Autowired
-    private TeacherRepository teacherRepository;
-    
-    @Autowired
-    private StudentRepository studentRepository;
-    
-    
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @SuppressWarnings("unchecked")
     @Override
     public List<Map<String, Object>> generateSubjectTeacherStudentReport() {
         List<Map<String, Object>> reportData = new ArrayList<>();
-        
-        // Get all subjects
-        List<Subject> subjects = subjectRepository.findAll();
-        
-        // Get all teachers and students for efficiency
-        List<Teacher> allTeachers = teacherRepository.findAll();
-        List<Student> allStudents = studentRepository.findAll();
-        
+
+        // Custom query to fetch subjects
+        Query subjectQuery = entityManager.createNativeQuery("SELECT subject_id, name FROM subject");
+        List<Object[]> subjects = (List<Object[]>) subjectQuery.getResultList();
+
+        // Custom query to fetch teachers with names
+        Query teacherQuery = entityManager.createNativeQuery(
+            "SELECT t.teacher_id, t.user_id, t.subject_taught, u.fname, u.lname " +
+            "FROM teacher t " +
+            "JOIN users u ON t.user_id = u.user_id"
+        );
+        List<Object[]> teachers = (List<Object[]>) teacherQuery.getResultList();
+
+        // Custom query to fetch students
+        Query studentQuery = entityManager.createNativeQuery("SELECT student_id, enrolled_subjects FROM student");
+        List<Object[]> students = (List<Object[]>) studentQuery.getResultList();
+
         // Process each subject
-        for (Subject subject : subjects) {
+        for (Object[] subjectRow : subjects) {
+            Integer subjectId = ((Number) subjectRow[0]).intValue();
+            String subjectName = (String) subjectRow[1];
+
             Map<String, Object> subjectReport = new HashMap<>();
-            
-            // Basic subject info
-            subjectReport.put("subjectId", subject.getSubject_id());
-            subjectReport.put("subjectName", subject.getName());
-            
-            // Find teachers who teach this subject
+            subjectReport.put("subjectId", subjectId);
+            subjectReport.put("subjectName", subjectName);
+
+            // Find teachers for this subject
             List<Map<String, Object>> teachersList = new ArrayList<>();
-            for (Teacher teacher : allTeachers) {
-                if (teacher.getSubjectTaught() != null && containsId(teacher.getSubjectTaught(), subject.getSubject_id())) {                    User user = teacher.getUser();
+            for (Object[] teacherRow : teachers) {
+                Integer teacherId = ((Number) teacherRow[0]).intValue();
+                Integer userId = ((Number) teacherRow[1]).intValue();
+                Integer[] subjectTaught = (Integer[]) teacherRow[2];
+                String firstName = (String) teacherRow[3];
+                String lastName = (String) teacherRow[4];
+
+                if (subjectTaught != null && Arrays.asList(subjectTaught).contains(subjectId)) {
                     Map<String, Object> teacherInfo = new HashMap<>();
-                    teacherInfo.put("teacherId", teacher.getTeacher_id());
-                    teacherInfo.put("name", user.getFname() + " " + user.getLname());
+                    teacherInfo.put("teacherId", teacherId);
+                    teacherInfo.put("userId", userId);
+                    teacherInfo.put("name", firstName + " " + lastName);
                     teachersList.add(teacherInfo);
                 }
             }
             subjectReport.put("teachers", teachersList);
             subjectReport.put("teacherCount", teachersList.size());
-            
+
             // Count students enrolled in this subject
             int studentCount = 0;
-            for (Student student : allStudents) {
-                if (student.getEnrolledSubjects() != null && containsId(student.getEnrolledSubjects(), subject.getSubject_id())) {
+            for (Object[] studentRow : students) {
+                Integer[] enrolledSubjects = (Integer[]) studentRow[1];
+                if (enrolledSubjects != null && Arrays.asList(enrolledSubjects).contains(subjectId)) {
                     studentCount++;
                 }
             }
             subjectReport.put("studentCount", studentCount);
-            
+
             // Add to report data
             reportData.add(subjectReport);
         }
-        
+
         return reportData;
-    }
-    
-    
-     // Helper method to check if an Integer array contains a specific Integer value 
-    private boolean containsId(Integer[] array, Integer id) {
-        if (array == null || array.length == 0) {
-            return false;
-        }
-        
-        for (Integer item : array) {
-            if (item != null && item.equals(id)) {
-                return true;
-            }
-        }
-        
-        return false;
     }
 }
