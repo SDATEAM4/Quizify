@@ -9,10 +9,9 @@ import team4.quizify.repository.ReportRepository;
 
 import java.util.*;
 
-
 @Service
 public class TeacherReportService {
-      @Autowired
+    @Autowired
     private ReportRepository reportRepository;
     
     @Autowired
@@ -22,7 +21,7 @@ public class TeacherReportService {
         return new ArrayList<>();
     }
     
-    // Method to generate a report for a specific quiz taken by a student
+    // Method to generate a report for a specific quiz
     public Map<String, Object> generateQuizStatistics(Integer quizId) {
         Map<String, Object> statistics = new HashMap<>();
         

@@ -12,15 +12,12 @@ import java.util.Optional;
 @Service
 public class UserService {    @Autowired
     private UserRepository userRepository;
-    
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Long id) {
+    public Optional<User> getUserById(Integer id) {
         return userRepository.findById(id);
     }
 
@@ -44,75 +41,27 @@ public class UserService {    @Autowired
         return userRepository.save(user);
     }
 
-    public void deleteUser(Long id) {
+    public void deleteUser(Integer id) {
         userRepository.deleteById(id);
     }
-      public boolean deleteUserByUsername(String username) {
+    
+    public boolean deleteUserByUsername(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isPresent()) {
-            userRepository.deleteById(user.get().getId());
+            userRepository.delete(user.get());
             return true;
         }
-        return false;
-    }   
-
-
-    public boolean deleteUserWithCascade(Long userId) {
-        // First check if the user exists
-        if (!userRepository.existsById(userId)) {
-            return false;
-        }
-        
-        try {
-            // Delete query records where this user is receiver or sender
-            jdbcTemplate.update("DELETE FROM query WHERE sender_id = ? OR receiver_id = ?", userId, userId);
-            
-            // Delete chat messages related to this user (both as sender and receiver)
-            jdbcTemplate.update("DELETE FROM chat WHERE sender_id = ? OR receiver_id = ?", userId, userId);
-            
-            // Delete any quiz attempts related to this user (if applicable)
-            
-            // Delete related teacher records if any
-            jdbcTemplate.update("DELETE FROM teacher WHERE user_id = ?", userId);
-            
-            // Delete related student records if any
-            jdbcTemplate.update("DELETE FROM student WHERE user_id = ?", userId);
-
-            // Delete related quiz records if any
-            jdbcTemplate.update("DELETE FROM report WHERE user_id = ?", userId);
-            
-            // Finally delete the user
-            jdbcTemplate.update("DELETE FROM users WHERE id = ?", userId);
-            
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException("Error deleting user with ID " + userId + ": " + e.getMessage(), e);
-        }
-    }      public Optional<User> updateUserByUsername(String username, User updatedUser) {
-        Optional<User> existingUser = userRepository.findByUsername(username);
-        if (existingUser.isPresent()) {
-            User user = existingUser.get();
-            
-            // Update user properties
-            user.setFname(updatedUser.getFname());
-            user.setLname(updatedUser.getLname());
-            
-            // Only update password if it's not null or empty
-            if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
-                user.setPassword(updatedUser.getPassword());
-            }
-            
-            user.setEmail(updatedUser.getEmail());
-            user.setRole(updatedUser.getRole());
-            // Update bio
-            user.setBio(updatedUser.getBio());
-            
-            // Always update the profile image URL with whatever value was provided
-            // This ensures if a new image was uploaded, the URL gets updated
-            user.setProfileImageUrl(updatedUser.getProfileImageUrl());
-            
-            return Optional.of(userRepository.save(user));
-        }
-        return Optional.empty();
+        return false;    }
+    
+    public Optional<User> updateUserByUsername(String username, User updatedUser) {
+        return userRepository.findByUsername(username)
+            .map(existingUser -> {
+                if (updatedUser.getFname() != null) existingUser.setFname(updatedUser.getFname());
+                if (updatedUser.getLname() != null) existingUser.setLname(updatedUser.getLname());
+                if (updatedUser.getPassword() != null) existingUser.setPassword(updatedUser.getPassword());
+                if (updatedUser.getBio() != null) existingUser.setBio(updatedUser.getBio());
+                if (updatedUser.getProfileImageUrl() != null) existingUser.setProfileImageUrl(updatedUser.getProfileImageUrl());
+                return userRepository.save(existingUser);
+            });
     }
 }

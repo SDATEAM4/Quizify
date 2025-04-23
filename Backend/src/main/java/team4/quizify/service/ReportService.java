@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Service
 public class ReportService {
-      @Autowired
+    @Autowired
     private ReportRepository reportRepository;
     
     @Autowired

@@ -7,7 +7,6 @@ import team4.quizify.entity.Student;
 import team4.quizify.entity.User;
 import team4.quizify.repository.StudentRepository;
 
-
 @Service
 public class StudentService {
 
@@ -22,7 +21,6 @@ public class StudentService {
     
     public Student addStudent(String fname, String lname, String username, String password, 
                         String email, Integer[] enrolledSubjects, MultipartFile profileImage) {
-        
         // First create the user with role "student"
         if (userService.isUsernameExists(username)) {
             throw new IllegalArgumentException("Username already exists");
@@ -51,20 +49,20 @@ public class StudentService {
         return studentRepository.save(student);
     }
     
-    public Student getStudentByStudentId(Long studentId) {
+    public Student getStudentByStudentId(Integer studentId) {
         return studentRepository.findById(studentId).orElse(null);
     }
     
-    public Student getStudentByUserId(Long userId) {
-        return studentRepository.findByUserId(userId);
+    public Student getStudentByUserId(Integer userId) {
+        return studentRepository.findByUser_UserId(userId);
     }
     
     public Student updateStudent(Student student) {
         return studentRepository.save(student);
     }
     
-    public void deleteByUserId(Long userId) {
-        Student student = studentRepository.findByUserId(userId);
+    public void deleteByUserId(Integer userId) {
+        Student student = studentRepository.findByUser_UserId(userId);
         if (student != null) {
             studentRepository.delete(student);
         }

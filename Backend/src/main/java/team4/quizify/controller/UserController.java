@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
 import team4.quizify.entity.User;
 import team4.quizify.service.CloudinaryService;
 import team4.quizify.service.UserService;
@@ -23,73 +24,95 @@ public class UserController {
     @Autowired
     private CloudinaryService cloudinaryService;
     
-    // Customize user profile - Only change bio, password, fname, lname, profile
-    @PutMapping("/customizeProfile/{username}")
-    public ResponseEntity<?> customizeProfile(
-            @PathVariable String username,
-            @RequestParam(value = "fname", required = false) String fname,
-            @RequestParam(value = "lname", required = false) String lname,
-            @RequestParam(value = "bio", required = false) String bio,
-            @RequestParam(value = "password", required = false) String password,
+    // Get user by ID
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getUserById(@PathVariable Integer userId) {
+        Optional<User> user = userService.getUserById(userId);
+        if (user.isPresent()) {
+            return ResponseEntity.ok(user.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User not found with id: " + userId));
+        }
+    }
+    
+    // Get user by username
+    @GetMapping("/username/{username}")
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
+        Optional<User> user = userService.getUserByUsername(username);
+        if (user.isPresent()) {
+            return ResponseEntity.ok(user.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User not found with username: " + username));
+        }
+    }
+    
+    private boolean isValidImageFile(MultipartFile file) {
+        String contentType = file.getContentType();
+        return contentType != null && (
+            contentType.equals("image/jpeg") ||
+            contentType.equals("image/png") ||
+            contentType.equals("image/jpg") ||
+            contentType.equals("image/webp")
+        );
+    }
+
+    @PutMapping(value = "customizeProfile/{userId}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<?> updateUser(
+            @PathVariable Integer userId,
+            @RequestParam(required = false) String fname,
+            @RequestParam(required = false) String lname,
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String password,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String bio,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
-        
         try {
-            // First check if the user exists
-            Optional<User> existingUserOpt = userService.getUserByUsername(username);
-            if (existingUserOpt.isEmpty()) {
+            Optional<User> existingUser = userService.getUserById(userId);
+            if (existingUser.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "User not found with username: " + username));
+                        .body(Map.of("error", "User not found with id: " + userId));
             }
             
-            User existingUser = existingUserOpt.get();
+            User user = existingUser.get();
             
-            // Create user object with updated fields, keeping existing values if new ones aren't provided
-            User updatedUserData = new User();
-            updatedUserData.setFname(fname != null ? fname : existingUser.getFname());
-            updatedUserData.setLname(lname != null ? lname : existingUser.getLname());
-            updatedUserData.setUsername(username); // Keep the same username
-            updatedUserData.setPassword(password); // If null, handled in service
-            updatedUserData.setEmail(existingUser.getEmail()); // Email cannot be changed with this endpoint
-            updatedUserData.setRole(existingUser.getRole()); // Role cannot be changed with this endpoint
-            updatedUserData.setBio(bio != null ? bio : existingUser.getBio());    
-            
-            // Handle profile image 
-            try {
-                if (profileImage != null && !profileImage.isEmpty()) {
-                    // Upload new image and set the URL
-                    String profileImageUrl = cloudinaryService.uploadFile(profileImage);
-                    updatedUserData.setProfileImageUrl(profileImageUrl);
-                } else {
-                    // Explicitly keep the existing profile image URL (not null)
-                    updatedUserData.setProfileImageUrl(existingUser.getProfileImageUrl());
+            // Update fields if provided
+            if (fname != null) user.setFname(fname);
+            if (lname != null) user.setLname(lname);
+            if (username != null && !username.equals(user.getUsername())) {
+                if (userService.isUsernameExists(username)) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(Map.of("error", "Username already exists"));
                 }
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Map.of("error", "Failed to process profile image: " + e.getMessage()));
+                user.setUsername(username);
+            }
+            if (password != null) user.setPassword(password);
+            if (email != null && !email.equals(user.getEmail())) {
+                if (userService.isEmailExists(email)) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(Map.of("error", "Email already exists"));
+                }
+                user.setEmail(email);
+            }
+            if (bio != null) user.setBio(bio);
+            
+            // Handle profile image upload with validation
+            if (profileImage != null && !profileImage.isEmpty()) {
+                if (!isValidImageFile(profileImage)) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(Map.of("error", "Invalid file type. Only JPEG, PNG, and WebP images are allowed."));
+                }
+                String imageUrl = cloudinaryService.uploadFile(profileImage);
+                user.setProfileImageUrl(imageUrl);
             }
             
-            // Update the user
-            Optional<User> updatedUser = userService.updateUserByUsername(username, updatedUserData);
-            
-            if (updatedUser.isPresent()) {
-                return ResponseEntity.ok(updatedUser.get());
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Map.of("error", "Failed to update user"));
-            }
+            User updatedUser = userService.saveUser(user);
+            return ResponseEntity.ok(updatedUser);
             
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to update user: " + e.getMessage()));
         }
-    }
-    
-    // Get user profile by username
-    @GetMapping("/profile/{username}")
-    public ResponseEntity<?> getUserProfile(@PathVariable String username) {
-        return userService.getUserByUsername(username)
-                .map(user -> ResponseEntity.ok(user))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .<User>body(null));
     }
 }

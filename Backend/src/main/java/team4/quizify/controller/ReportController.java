@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import team4.quizify.service.AdminReportService;
 import team4.quizify.service.StudentReportService;
+import team4.quizify.service.TeacherReportService;
 
 import java.util.List;
 import java.util.Map;
@@ -16,14 +17,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/Quizify/reports")
 public class ReportController {
-      @Autowired
+    @Autowired
     private AdminReportService adminReport;
     
     @Autowired
     private StudentReportService studentReport;
     
     @Autowired
-    private team4.quizify.service.TeacherReportService teacherReport;
+    private TeacherReportService teacherReport;
     
     //ADMIN REPORT NAMES OF TEACHERS AND NO OF STUDENTS BASED ON SUBJECT
     @GetMapping("/admin/subject-teacher-student")
@@ -31,21 +32,21 @@ public class ReportController {
         return ResponseEntity.ok(adminReport.generateSubjectTeacherStudentReport());
     }
     
-  //ALL STUDENTS REPORT BASED ON QUIZ ID
+    //ALL STUDENTS REPORT BASED ON QUIZ ID
     @GetMapping("/student/{userId}/quiz/{quizId}")
     public ResponseEntity<Map<String, Object>> getStudentQuizReport(
             @PathVariable Integer quizId, 
-            @PathVariable Long userId) {
+            @PathVariable Integer userId) {
         return ResponseEntity.ok(studentReport.generateStudentQuizReport(quizId, userId));
     }
     
     //STUDENT REPORT BASED ON USER ID
     @GetMapping("/student/{userId}")
     public ResponseEntity<List<Map<String, Object>>> getStudentAllQuizzesReport(
-            @PathVariable Long userId) {
+            @PathVariable Integer userId) {
         return ResponseEntity.ok(studentReport.generateStudentAllQuizzesReport(userId));
     }
-      
+    
     //QUIZ REPORT BASED ON QUIZ ID
     @GetMapping("/quiz/{quizId}")
     public ResponseEntity<Map<String, Object>> getQuizReport(
@@ -53,7 +54,7 @@ public class ReportController {
         return ResponseEntity.ok(studentReport.generateQuizReport(quizId));
     }
     
-   //TEACHER REPORT BASED ON QUIZ ID
+    //TEACHER REPORT BASED ON QUIZ ID
     @GetMapping("/teacher/quiz/{quizId}")
     public ResponseEntity<Map<String, Object>> getTeacherQuizStatistics(
             @PathVariable Integer quizId) {
