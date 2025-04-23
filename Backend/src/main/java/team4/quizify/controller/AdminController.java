@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import team4.quizify.entity.Report;
 import team4.quizify.entity.Student;
 import team4.quizify.entity.Subject;
 import team4.quizify.entity.Teacher;
@@ -15,6 +16,7 @@ import team4.quizify.service.StudentService;
 import team4.quizify.service.SubjectService;
 import team4.quizify.service.TeacherService;
 import team4.quizify.service.UserService;
+import team4.quizify.repository.ReportRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,16 +47,18 @@ public class AdminController {
     @Autowired
     private SubjectService subjectService;
 
+    @Autowired
+    private ReportRepository reportRepository;
+
     //GET ALL USERS
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(userService.getAllUsers());
     }
     
     //GET USER BY ID
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<?> getUserById(@PathVariable Integer userId) {
         return userService.getUserById(userId)
                 .map(user -> ResponseEntity.ok(user))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
@@ -65,18 +69,16 @@ public class AdminController {
     public ResponseEntity<?> isDuplicateValue(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String email) {
+        Map<String, Boolean> response = new HashMap<>();
         
-        Map<String, Boolean> result = new HashMap<>();
-        
-        if (username != null && !username.isEmpty()) {
-            result.put("usernameExists", userService.isUsernameExists(username));
+        if (username != null) {
+            response.put("username", userService.isUsernameExists(username));
+        }
+        if (email != null) {
+            response.put("email", userService.isEmailExists(email));
         }
         
-        if (email != null && !email.isEmpty()) {
-            result.put("emailExists", userService.isEmailExists(email));
-        }
-        
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(response);
     }
     
     //GET USER BY USERNAME
@@ -86,19 +88,18 @@ public class AdminController {
                 .map(user -> ResponseEntity.ok(user))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
-
+    
     //GET USER BY EMAIL
-      @GetMapping("/user/email/{email}")
+    @GetMapping("/user/email/{email}")
     public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
         return userService.getUserByEmail(email)
                 .map(user -> ResponseEntity.ok(user))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
     
-
     //GET STUDENT BY ID
     @GetMapping("/student/{studentId}")
-    public ResponseEntity<?> getStudentById(@PathVariable Long studentId) {
+    public ResponseEntity<?> getStudentById(@PathVariable Integer studentId) {
         Student student = studentService.getStudentByStudentId(studentId);
         if (student != null) {
             return ResponseEntity.ok(student);
@@ -110,7 +111,7 @@ public class AdminController {
     
     //GET TEACHER BY ID
     @GetMapping("/teacher/{teacherId}")
-    public ResponseEntity<?> getTeacherById(@PathVariable Long teacherId) {
+    public ResponseEntity<?> getTeacherById(@PathVariable Integer teacherId) {
         Teacher teacher = teacherService.getTeacherByTeacherId(teacherId);
         if (teacher != null) {
             return ResponseEntity.ok(teacher);
@@ -120,8 +121,8 @@ public class AdminController {
         }
     }
 
-     //UPDATE USER BY USERNAME - Only change bio, password, fname, lname, profile
-      @PutMapping("/user/username/{username}")
+    //UPDATE USER BY USERNAME - Only change bio, password, fname, lname, profile
+    @PutMapping("/user/username/{username}")
     public ResponseEntity<?> updateUserByUsername(
             @PathVariable String username,
             @RequestParam(value = "fname", required = false) String fname,
@@ -129,9 +130,8 @@ public class AdminController {
             @RequestParam(value = "bio", required = false) String bio,
             @RequestParam(value = "password", required = false) String password,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
-        
         try {
-            // First check if the user exists
+            // Get existing user
             Optional<User> existingUserOpt = userService.getUserByUsername(username);
             if (existingUserOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -140,44 +140,27 @@ public class AdminController {
             
             User existingUser = existingUserOpt.get();
             
-            // Create user object with updated fields, keeping existing values if new ones aren't provided
-            User updatedUserData = new User();
-            updatedUserData.setFname(fname != null ? fname : existingUser.getFname());
-            updatedUserData.setLname(lname != null ? lname : existingUser.getLname());
-            updatedUserData.setUsername(username); // Keep the same username
-            updatedUserData.setPassword(password); // If null, handled in service
-            updatedUserData.setEmail(existingUser.getEmail()); // Email cannot be changed with this endpoint
-            updatedUserData.setRole(existingUser.getRole()); // Role cannot be changed with this endpoint
-            updatedUserData.setBio(bio != null ? bio : existingUser.getBio());    // Handle profile image 
-            try {
-                if (profileImage != null && !profileImage.isEmpty()) {
-                    // Upload new image and set the URL
-                    String profileImageUrl = cloudinaryService.uploadFile(profileImage);
-                    updatedUserData.setProfileImageUrl(profileImageUrl);
-                } else {
-                    // Explicitly keep the existing profile image URL (not null)
-                    updatedUserData.setProfileImageUrl(existingUser.getProfileImageUrl());
-                }
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Map.of("error", "Failed to process profile image: " + e.getMessage()));
+            // Update fields if provided
+            if (fname != null) existingUser.setFname(fname);
+            if (lname != null) existingUser.setLname(lname);
+            if (bio != null) existingUser.setBio(bio);
+            if (password != null) existingUser.setPassword(password);
+            
+            // Handle profile image upload
+            if (profileImage != null && !profileImage.isEmpty()) {
+                String imageUrl = cloudinaryService.uploadFile(profileImage);
+                existingUser.setProfileImageUrl(imageUrl);
             }
             
-            // Update the user
-            Optional<User> updatedUser = userService.updateUserByUsername(username, updatedUserData);
-            
-            if (updatedUser.isPresent()) {
-                return ResponseEntity.ok(updatedUser.get());
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Map.of("error", "Failed to update user"));
-            }
+            // Save updated user
+            User updatedUser = userService.saveUser(existingUser);
+            return ResponseEntity.ok(updatedUser);
             
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to update user: " + e.getMessage()));
         }
-    }   
+    }
     
     // REGISTER NEW STUDENT USER WITH ENROLLED SUBJECTS
     @PostMapping("/user/addStudent")
@@ -189,7 +172,6 @@ public class AdminController {
             @RequestParam("email") String email,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
             @RequestParam(value = "enrolledSubjects", required = false) String enrolledSubjectsStr) {
-        
         try {
             // Create user with Student role
             User newUser = adminService.addUser(fname, lname, username, password, email, "Student", profileImage);
@@ -219,6 +201,7 @@ public class AdminController {
             response.put("student", newStudent);
             
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
@@ -237,7 +220,6 @@ public class AdminController {
             @RequestParam("email") String email,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
             @RequestParam(value = "subjectTaught", required = false) String subjectTaughtStr) {
-        
         try {
             // Create user with Teacher role
             User newUser = adminService.addUser(fname, lname, username, password, email, "Teacher", profileImage);
@@ -267,130 +249,59 @@ public class AdminController {
             response.put("teacher", newTeacher);
             
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to add teacher user: " + e.getMessage()));
         }
-    }    
-    
-    // DELETE USER WITH CASCADE - Works for both Teacher and Student
-    @DeleteMapping("/deleteUser/{userId}")
-    public ResponseEntity<?> deleteUserWithCascade(@PathVariable Long userId) {
-        try {
-            // Check if the user exists
-            Optional<User> userOpt = userService.getUserById(userId);
-            if (userOpt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "User not found with id: " + userId));
-            }
-            
-            User user = userOpt.get();
-            
-            // Create response with details
-            Map<String, Object> response = new HashMap<>();
-            response.put("userId", userId);
-            response.put("username", user.getUsername());
-            response.put("role", user.getRole());
-            
-            // Execute cascade delete
-            boolean deleted = userService.deleteUserWithCascade(userId);
-            
-            if (deleted) {
-                response.put("success", true);
-                response.put("message", "User and all associated records deleted successfully");
-            } else {
-                response.put("success", false);
-                response.put("message", "Failed to delete user");
-            }
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to delete user: " + e.getMessage()));
-        }
     }
+    
     
     // UPDATE USER PROFILE BASED ON USER ID - Update only fname, lname, profile, bio, password
     @PutMapping("/user/{userId}")
     public ResponseEntity<?> updateUserProfile(
-            @PathVariable Long userId,
+            @PathVariable Integer userId,
             @RequestParam(value = "fname", required = false) String fname,
             @RequestParam(value = "lname", required = false) String lname,
             @RequestParam(value = "bio", required = false) String bio,
             @RequestParam(value = "password", required = false) String password,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
-        
         try {
-            // First check if the user exists
-            Optional<User> existingUserOpt = userService.getUserById(userId);
-            if (existingUserOpt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "User not found with id: " + userId));
-            }
-            
-            User existingUser = existingUserOpt.get();
-            
-            // Update only allowed fields, keeping existing values if new ones aren't provided
-            if (fname != null) {
-                existingUser.setFname(fname);
-            }
-            
-            if (lname != null) {
-                existingUser.setLname(lname);
-            }
-            
-            if (bio != null) {
-                existingUser.setBio(bio);
-            }
-            
-            if (password != null && !password.isEmpty()) {
-                existingUser.setPassword(password);
-            }
-              // Upload and update profile image if provided and not empty
-            if (profileImage != null && !profileImage.isEmpty()) {
-                try {
-                    String profileImageUrl = cloudinaryService.uploadFile(profileImage);
-                    existingUser.setProfileImageUrl(profileImageUrl);
-                } catch (Exception e) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(Map.of("error", "Failed to upload profile image: " + e.getMessage()));
-                }
-            }
-            // If profileImage is null or empty, I keep the existing image URL (no change)
-            
-            // Save the updated user
-            User updatedUser = userService.saveUser(existingUser);
-            
-            return ResponseEntity.ok(updatedUser);
+            User updatedUser = adminService.editUser(userId, fname, lname, null, password, null, null, profileImage);
+            if (bio != null) updatedUser.setBio(bio);
+            return ResponseEntity.ok(userService.saveUser(updatedUser));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to update user: " + e.getMessage()));
+                    .body(Map.of("error", "Failed to update user profile: " + e.getMessage()));
         }
     }
-
+    
     // GET ALL SUBJECTS
     @GetMapping("/subjects")
     public ResponseEntity<List<Subject>> getAllSubjects() {
-        List<Subject> subjects = subjectService.getAllSubjects();
-        return ResponseEntity.ok(subjects);
+        return ResponseEntity.ok(subjectService.getAllSubjects());
     }
-    
-    // GET SUBJECT BY ID
+      // GET SUBJECT BY ID
     @GetMapping("/subject/{subjectId}")
     public ResponseEntity<?> getSubjectById(@PathVariable Integer subjectId) {
-        return subjectService.getSubjectById(subjectId)
-                .map(subject -> ResponseEntity.ok(subject))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+        if (subject.isPresent()) {
+            return ResponseEntity.ok(subject.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Subject not found with id: " + subjectId));
+        }
     }
     
     // ADD ENROLLED SUBJECTS TO STUDENT
     @PostMapping("/student/{studentId}/addSubjects")
     public ResponseEntity<?> addEnrolledSubjectsToStudent(
-            @PathVariable Long studentId,
+            @PathVariable Integer studentId,
             @RequestParam("subjectsToAdd") String subjectsToAddStr) {
         try {
             // Get the student by ID
@@ -443,6 +354,7 @@ public class AdminController {
                 "message", "Enrolled subjects updated successfully",
                 "student", updatedStudent
             ));
+            
         } catch (NumberFormatException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "Invalid subject ID format. Please provide comma-separated integers."));
@@ -454,8 +366,8 @@ public class AdminController {
     
     // ADD SUBJECTS TAUGHT TO TEACHER
     @PostMapping("/teacher/{teacherId}/addSubjects")
-    public ResponseEntity<?> addSubjectsTaughtToTeacher(
-            @PathVariable Long teacherId,
+    public ResponseEntity<?> addTeacherWithSubjects(
+            @PathVariable Integer teacherId,
             @RequestParam("subjectsToAdd") String subjectsToAddStr) {
         try {
             // Get the teacher by ID
@@ -508,6 +420,7 @@ public class AdminController {
                 "message", "Subjects taught updated successfully",
                 "teacher", updatedTeacher
             ));
+            
         } catch (NumberFormatException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "Invalid subject ID format. Please provide comma-separated integers."));
@@ -520,7 +433,7 @@ public class AdminController {
     // REMOVE ENROLLED SUBJECTS FROM STUDENT
     @PostMapping("/student/{studentId}/removeSubjects")
     public ResponseEntity<?> removeEnrolledSubjectsFromStudent(
-            @PathVariable Long studentId,
+            @PathVariable Integer studentId,
             @RequestParam("subjectsToRemove") String subjectsToRemoveStr) {
         try {
             // Get the student by ID
@@ -577,6 +490,7 @@ public class AdminController {
                 "message", "Enrolled subjects updated successfully",
                 "student", updatedStudent
             ));
+            
         } catch (NumberFormatException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "Invalid subject ID format. Please provide comma-separated integers."));
@@ -589,7 +503,7 @@ public class AdminController {
     // REMOVE SUBJECTS TAUGHT BY TEACHER
     @PostMapping("/teacher/{teacherId}/removeSubjects")
     public ResponseEntity<?> removeSubjectsTaughtByTeacher(
-            @PathVariable Long teacherId,
+            @PathVariable Integer teacherId,
             @RequestParam("subjectsToRemove") String subjectsToRemoveStr) {
         try {
             // Get the teacher by ID
@@ -646,12 +560,37 @@ public class AdminController {
                 "message", "Subjects taught updated successfully",
                 "teacher", updatedTeacher
             ));
+            
         } catch (NumberFormatException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "Invalid subject ID format. Please provide comma-separated integers."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to remove subjects taught: " + e.getMessage()));
+        }
+    }
+    
+    // DELETE USER AND ALL ASSOCIATED RECORDS
+    @DeleteMapping("/user/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable Integer userId) {
+        try {
+            // Get user first to check role
+            Optional<User> userOpt = userService.getUserById(userId);
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "User not found with id: " + userId));
+            }            // Delete reports associated with the user
+            List<Report> userReports = reportRepository.findByUserId(userId);
+            reportRepository.deleteAll(userReports);
+
+            // Delete user and associated records based on role
+            adminService.removeUser(userId);
+
+            return ResponseEntity.ok(Map.of("message", "User and associated records deleted successfully"));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to delete user: " + e.getMessage()));
         }
     }
 }

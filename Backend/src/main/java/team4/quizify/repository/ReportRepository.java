@@ -10,14 +10,14 @@ import java.util.List;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Integer> {
-    
     // Find reports by quiz ID
     List<Report> findByQuizId(Integer quizId);
-      // Find reports by user ID
-    List<Report> findByUserId(Long userId);
+    
+    // Find reports by user ID
+    List<Report> findByUserId(Integer userId);
     
     // Find reports by both quiz ID and user ID
-    List<Report> findByQuizIdAndUserId(Integer quizId, Long userId);
+    List<Report> findByQuizIdAndUserId(Integer quizId, Integer userId);
     
     // Custom query to get average marks for a quiz
     @Query("SELECT AVG(r.obtainMarks) FROM Report r WHERE r.quizId = :quizId")

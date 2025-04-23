@@ -16,7 +16,8 @@ public class StudentReportService implements team4.quizify.service.Report {
     
     @Autowired
     private ReportRepository reportRepository;
-      @Autowired
+    
+    @Autowired
     private UserRepository userRepository;
     
     @Autowired
@@ -27,11 +28,9 @@ public class StudentReportService implements team4.quizify.service.Report {
         return new ArrayList<>();
     }
     
-   // Method to generate a report for a specific quiz taken by a student
-    public Map<String, Object> generateStudentQuizReport(Integer quizId, Long userId) {
+    public Map<String, Object> generateStudentQuizReport(Integer quizId, Integer userId) {
         Map<String, Object> reportData = new HashMap<>();
         
-        // Get the report for this quiz and user
         List<Report> reports = reportRepository.findByQuizIdAndUserId(quizId, userId);
         
         if (reports.isEmpty()) {
@@ -41,11 +40,9 @@ public class StudentReportService implements team4.quizify.service.Report {
         
         Report report = reports.get(0);
         
-        // Get quiz details for total marks
         Optional<Quiz> quizData = quizDataRepository.findById(quizId);
         Integer totalMarks = quizData.isPresent() ? quizData.get().getMarks() : null;
         
-        // Get user details
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -57,7 +54,6 @@ public class StudentReportService implements team4.quizify.service.Report {
         reportData.put("obtainedMarks", report.getObtainMarks());
         reportData.put("totalMarks", totalMarks);
         
-        // Get quiz statistics
         Double avgMarks = reportRepository.getAverageMarksByQuizId(quizId);
         Integer maxMarks = reportRepository.getMaxMarksByQuizId(quizId);
         Integer minMarks = reportRepository.getMinMarksByQuizId(quizId);
@@ -69,11 +65,9 @@ public class StudentReportService implements team4.quizify.service.Report {
         return reportData;
     }
     
-   // Method to generate a report for all quizzes taken by a student
-    public List<Map<String, Object>> generateStudentAllQuizzesReport(Long userId) {
+    public List<Map<String, Object>> generateStudentAllQuizzesReport(Integer userId) {
         List<Map<String, Object>> reportData = new ArrayList<>();
         
-        // Get all reports for this user
         List<Report> reports = reportRepository.findByUserId(userId);
         
         if (reports.isEmpty()) {
@@ -83,7 +77,6 @@ public class StudentReportService implements team4.quizify.service.Report {
             return reportData;
         }
         
-        // Group reports by quiz ID
         Map<Integer, List<Report>> reportsByQuizId = new HashMap<>();
         for (Report report : reports) {
             Integer quizId = report.getQuizId();
@@ -93,7 +86,6 @@ public class StudentReportService implements team4.quizify.service.Report {
             reportsByQuizId.get(quizId).add(report);
         }
         
-        // Get user details
         Optional<User> userOptional = userRepository.findById(userId);
         String studentName = "";
         if (userOptional.isPresent()) {
@@ -101,12 +93,10 @@ public class StudentReportService implements team4.quizify.service.Report {
             studentName = user.getFname() + " " + user.getLname();
         }
         
-        // Generate report for each quiz
         for (Map.Entry<Integer, List<Report>> entry : reportsByQuizId.entrySet()) {
             Integer quizId = entry.getKey();
-            Report report = entry.getValue().get(0); // Take the first report for this quiz
+            Report report = entry.getValue().get(0);
             
-            // Get quiz details for total marks
             Optional<Quiz> quizData = quizDataRepository.findById(quizId);
             Integer totalMarks = quizData.isPresent() ? quizData.get().getMarks() : null;
             
@@ -117,7 +107,6 @@ public class StudentReportService implements team4.quizify.service.Report {
             quizReport.put("obtainedMarks", report.getObtainMarks());
             quizReport.put("totalMarks", totalMarks);
             
-            // Get quiz statistics
             Double avgMarks = reportRepository.getAverageMarksByQuizId(quizId);
             Integer maxMarks = reportRepository.getMaxMarksByQuizId(quizId);
             Integer minMarks = reportRepository.getMinMarksByQuizId(quizId);
@@ -132,11 +121,9 @@ public class StudentReportService implements team4.quizify.service.Report {
         return reportData;
     }
     
-    // Method to generate a report for all students who took a specific quiz
     public Map<String, Object> generateQuizReport(Integer quizId) {
         Map<String, Object> reportData = new HashMap<>();
         
-        // Get all reports for this quiz
         List<Report> reports = reportRepository.findByQuizId(quizId);
         
         if (reports.isEmpty()) {
@@ -144,11 +131,9 @@ public class StudentReportService implements team4.quizify.service.Report {
             return reportData;
         }
         
-        // Get quiz details for total marks
         Optional<Quiz> quizData = quizDataRepository.findById(quizId);
         Integer totalMarks = quizData.isPresent() ? quizData.get().getMarks() : null;
         
-        // Get quiz statistics
         Double avgMarks = reportRepository.getAverageMarksByQuizId(quizId);
         Integer maxMarks = reportRepository.getMaxMarksByQuizId(quizId);
         Integer minMarks = reportRepository.getMinMarksByQuizId(quizId);
@@ -160,12 +145,10 @@ public class StudentReportService implements team4.quizify.service.Report {
         reportData.put("maxMarks", maxMarks != null ? maxMarks : 0);
         reportData.put("minMarks", minMarks != null ? minMarks : 0);
         
-        // List of student performances
         List<Map<String, Object>> studentPerformances = new ArrayList<>();
         for (Report report : reports) {
             Map<String, Object> performance = new HashMap<>();
             
-            // Get user details
             Optional<User> userOptional = userRepository.findById(report.getUserId());
             if (userOptional.isPresent()) {
                 User user = userOptional.get();

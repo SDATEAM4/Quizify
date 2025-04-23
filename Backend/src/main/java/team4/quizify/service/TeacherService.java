@@ -23,10 +23,8 @@ public class TeacherService {
     @Autowired
     private CloudinaryService cloudinaryService;
     
-
     public Teacher addTeacher(String fname, String lname, String username, String password, 
                         String email, Integer[] subjectTaught, MultipartFile profileImage) {
-        
         // First create the user with role "teacher"
         if (userService.isUsernameExists(username)) {
             throw new IllegalArgumentException("Username already exists");
@@ -55,28 +53,26 @@ public class TeacherService {
         return teacherRepository.save(teacher);
     }
     
-    public Teacher getTeacherByTeacherId(Long teacherId) {
+    public Teacher getTeacherByTeacherId(Integer teacherId) {
         return teacherRepository.findById(teacherId).orElse(null);
     }
     
-    public Teacher getTeacherByUserId(Long userId) {
-        return teacherRepository.findByUserId(userId);
+    public Teacher getTeacherByUserId(Integer userId) {
+        return teacherRepository.findByUser_UserId(userId);
     }
     
     public Teacher updateTeacher(Teacher teacher) {
         return teacherRepository.save(teacher);
     }
     
- 
-    public void deleteByUserId(Long userId) {
-        Teacher teacher = teacherRepository.findByUserId(userId);
+    public void deleteByUserId(Integer userId) {
+        Teacher teacher = teacherRepository.findByUser_UserId(userId);
         if (teacher != null) {
             teacherRepository.delete(teacher);
         }
     }
     
-
-    public Teacher removeSubjectTaught(Long teacherId, Integer subjectId) {
+    public Teacher removeSubjectTaught(Integer teacherId, Integer subjectId) {
         Teacher teacher = getTeacherByTeacherId(teacherId);
         if (teacher == null) {
             return null;

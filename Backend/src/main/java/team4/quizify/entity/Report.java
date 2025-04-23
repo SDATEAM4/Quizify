@@ -14,12 +14,13 @@ import jakarta.persistence.Column;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Report {
-    
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "report_id")
     private Integer reportId;
-      @Column(name = "user_id")
-    private Long userId;
+
+    @Column(name = "user_id")
+    private Integer userId;
     
     @Column(name = "obtain_marks")
     private Integer obtainMarks;
