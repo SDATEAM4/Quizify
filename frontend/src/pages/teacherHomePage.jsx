@@ -1,7 +1,7 @@
-import { NavBar } from '../components/navbar.jsx';
+import { TeacherNavbar } from '../components/teacherNavbar.jsx';
 import { CourseCard } from '../components/courseCard.jsx';
 import { Footer } from '../components/footer.jsx';
-export const StudentHomePage = () => {
+export const TeacherHomePage = () => {
   // Dummy course data
   const courses = [
     {
@@ -36,7 +36,7 @@ export const StudentHomePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <NavBar />
+      <TeacherNavbar />
       
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6 flex-1">
