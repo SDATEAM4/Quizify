@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 export const QuizCard = ({ data, subject }) => {
   const navigate = useNavigate(); // Move useNavigate to the top level of the component
-
   const filteredQuizzes = data.filter((quiz) => quiz.subject === subject);
 
   const getDifficultyColor = (level) => {
@@ -80,7 +79,7 @@ export const QuizCard = ({ data, subject }) => {
 
   const handleclick = () => {
     // Navigate to the quiz page with the quiz data
-    navigate("/quizGenerator", { state: quizState }); // Pass quizState as state
+    navigate("/quizGenerator", { state:{ quizState,quizType:"NormalQuiz"} }); // Pass quizState as state
   };
 
   return (

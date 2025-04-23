@@ -3,7 +3,7 @@ import { Calculator, Settings, FlaskRound as Flask, Dna, ArrowLeft } from 'lucid
 import { useNavigate } from 'react-router-dom';
 
 
-export const QuizDialog = ({ quizData,setPage }) => {
+export const QuizDialog = ({ quizData, setPage }) => {
     const [selectedSubject, setSelectedSubject] = useState('');
     const [selectedTopic, setSelectedTopic] = useState('');
     const [questionCount, setQuestionCount] = useState(5);
@@ -48,64 +48,125 @@ export const QuizDialog = ({ quizData,setPage }) => {
         quizTopic: "Classical Mechanics & Electromagnetism",
         timeDuration: 10,
         dataset: [
-          {
-            question: "What is Newton's first law of motion also known as?",
-            options: {
-              a: "The Law of Acceleration",
-              b: "The Law of Inertia",
-              c: "The Law of Friction",
-              d: "The Law of Momentum",
+            {
+              question: "What is the unit of force in the International System of Units (SI)?",
+              options: {
+                a: "Newton (N)",
+                b: "Kilogram (kg)",
+                c: "Meter (m)",
+                d: "Second (s)"
+              },
+              answer: "a",
+              explanation: "The Newton (N) is the SI unit of force."
             },
-            answer: "b",
-          },
-          {
-            question: "Which phenomenon is described by the equation P = F/A?",
-            options: {
-              a: "work",
-              b: "energy",
-              c: "pressure",
-              d: "power",
+            {
+              question: "Which of the following is a vector quantity in physics?",
+              options: {
+                a: "Mass",
+                b: "Speed",
+                c: "Velocity",
+                d: "Temperature"
+              },
+              answer: "c",
+              explanation: "Velocity is a vector quantity as it has both magnitude and direction."
             },
-            answer: "c",
-          },
-          {
-            question: "The unit of electrical resistance is the ohm. Which of the following is a way to measure resistance?",
-            options: {
-              a: "voltmeter",
-              b: "ammeter",
-              c: "ohmmeter",
-              d: "capacitance meter",
+            {
+              question: "What is the formula for calculating the work done by a force?",
+              options: {
+                a: "W = F * d",
+                b: "W = F / d",
+                c: "W = F + d",
+                d: "W = F - d"
+              },
+              answer: "a",
+              explanation: "Work (W) is calculated as the product of force (F) and displacement (d)."
             },
-            answer: "c",
-          },
-          {
-            question: "What does the speed of light in a vacuum have an approximate value of?",
-            options: {
-              a: "300,000 km/s",
-              b: "3,000 km/s",
-              c: "300 km/s",
-              d: "30 km/s",
+            {
+              question: "Which of the following is a correct statement about friction?",
+              options: {
+                a: "Friction always opposes motion.",
+                b: "Friction is always beneficial.",
+                c: "Friction is always harmful.",
+                d: "Friction is always constant."
+              },
+              answer: "a",
+              explanation: "Friction always opposes motion."
             },
-            answer: "a",
-          },
-          {
-            question: "Which principle explains why a neutron star can have such a strong gravitational pull?",
-            options: {
-              a: "Newton's third law of motion",
-              b: "Einstein's theory of relativity",
-              c: "Gravitation from mass",
-              d: "The Pauli exclusion principle",
+            {
+              question: "What is the relationship between force and acceleration?",
+              options: {
+                a: "Force is directly proportional to acceleration.",
+                b: "Force is inversely proportional to acceleration.",
+                c: "Force is independent of acceleration.",
+                d: "Force is directly proportional to the square of acceleration."
+              },
+              answer: "a",
+              explanation: "Force is directly proportional to acceleration."
             },
-            answer: "c",
-          },
-        ],
-      };
-      const navigate=useNavigate();
-      const handleclick = () => {
+            {
+              question: "Which of the following is a correct statement about Newton's Third Law?",
+              options: {
+                a: "For every action, there is an equal and opposite reaction.",
+                b: "For every action, there is an equal and opposite force.",
+                c: "For every action, there is an equal and opposite reaction force.",
+                d: "For every action, there is an equal and opposite force."
+              },
+              answer: "a",
+              explanation: "For every action, there is an equal and opposite reaction."
+            },
+            {
+              question: "What is the formula for calculating the kinetic energy of an object?",
+              options: {
+                a: "KE = 1/2 * m * v^2",
+                b: "KE = m * v^2",
+                c: "KE = m * v",
+                d: "KE = 1/2 * m * v"
+              },
+              answer: "a",
+              explanation: "Kinetic energy (KE) is calculated as 1/2 * mass (m) * velocity (v)^2."
+            },
+            {
+              question: "Which of the following is a correct statement about the center of mass?",
+              options: {
+                a: "The center of mass is always at the center of the object.",
+                b: "The center of mass is always at the center of the object's base.",
+                c: "The center of mass is the point where the object's weight is evenly distributed.",
+                d: "The center of mass is the point where the object's mass is evenly distributed."
+              },
+              answer: "d",
+              explanation: "The center of mass is the point where the object's mass is evenly distributed."
+            },
+            {
+              question: "What is the formula for calculating the work done by a force in a circular motion?",
+              options: {
+                a: "W = F * d",
+                b: "W = F * θ",
+                c: "W = F * r",
+                d: "W = F * θ * r"
+              },
+              answer: "b",
+              explanation: "Work (W) is calculated as force (F) times the angle (θ) in radians."
+            },
+            {
+              question: "Which of the following is a correct statement about the relationship between force and motion?",
+              options: {
+                a: "Force is always required to change the motion of an object.",
+                b: "Force is always required to maintain the motion of an object.",
+                c: "Force is always required to change the direction of an object.",
+                d: "Force is always required to maintain the direction of an object."
+              },
+              answer: "a",
+              explanation: "Force is always required to change the motion of an object."
+            }
+          ]
+          ,
+    };
+    const navigate = useNavigate();
+    const handleclick = () => {
         // Navigate to the quiz page with the quiz data
-        navigate("/quizGenerator", { state: quizState }); // Pass quizState as state
-      };
-      
+        navigate("/quizGenerator", { state: { quizState, quizType: "PracticeQuiz" } }); // Pass quizState as state
+    };
+
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 backdrop-blur-sm">
             <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
