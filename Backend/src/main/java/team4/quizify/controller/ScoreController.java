@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team4.quizify.entity.Report;
 import team4.quizify.service.ReportService;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/Quizify/scores")
@@ -13,18 +14,18 @@ import team4.quizify.service.ReportService;
 public class ScoreController {
 
     @Autowired
-    private ReportService reportService;
-
-  
-    @PostMapping
-    public ResponseEntity<Report> submitQuizScore(@RequestBody Report report) {
+    private ReportService reportService;    @PostMapping
+    public ResponseEntity<?> submitQuizScore(@RequestBody Report report) {
         try {
             Report savedReport = reportService.saveQuizScore(report);
-            return new ResponseEntity<>(savedReport, HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("message", "Score saved successfully"));
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", "Can't save your score"));
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Internal error while saving score"));
         }
     }
     

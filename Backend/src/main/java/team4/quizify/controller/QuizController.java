@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import team4.quizify.entity.Quiz;
 import team4.quizify.service.QuizManagementService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/Quizify/quizzes")
@@ -18,35 +20,50 @@ public class QuizController {
     private QuizManagementService quizManagementService;
 
     @GetMapping
-    public ResponseEntity<List<Quiz>> getAllQuizzes() {
+    public ResponseEntity<?> getAllQuizzes() {
         try {
             List<Quiz> quizzes = quizManagementService.getAllQuizzes();
             return new ResponseEntity<>(quizzes, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Internal error while fetching data");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
   
     @GetMapping("/{quizId}")
-    public ResponseEntity<Quiz> getQuizById(@PathVariable Integer quizId) {
+    public ResponseEntity<?> getQuizById(@PathVariable Integer quizId) {
         try {
             return quizManagementService.getQuizById(quizId)
-                    .map(quiz -> new ResponseEntity<>(quiz, HttpStatus.OK))
-                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                    .map(quiz -> new ResponseEntity<Object>(quiz, HttpStatus.OK))
+                    .orElseGet(() -> {
+                        Map<String, String> errorResponse = new HashMap<>();
+                        errorResponse.put("message", "Quiz not found");
+                        return new ResponseEntity<Object>(errorResponse, HttpStatus.BAD_REQUEST);
+                    });
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Internal error while fetching data");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
     @GetMapping("/subject/{subjectId}")
-    public ResponseEntity<List<Quiz>> getQuizzesBySubject(@PathVariable Integer subjectId) {
+    public ResponseEntity<?> getQuizzesBySubject(@PathVariable Integer subjectId) {
         try {
             List<Quiz> quizzes = quizManagementService.getQuizzesBySubject(subjectId);
+            if (quizzes.isEmpty()) {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Quiz not found");
+                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<>(quizzes, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Internal error while fetching data");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
