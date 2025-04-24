@@ -27,4 +27,7 @@ public class Report {
     
     @Column(name = "quiz_id")
     private Integer quizId;
+    
+    @Column(name = "points")
+    private Integer points;
 }
