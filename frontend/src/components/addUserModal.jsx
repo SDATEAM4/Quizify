@@ -1,17 +1,24 @@
-import { useState } from "react";
-import { FaUserPlus, FaBookOpen, FaCheck } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaUserPlus, FaCheck } from "react-icons/fa";
 import { SelectCourses } from "./selectCourses";
 import { AddUserForm } from "./addUserForms";
+import toast from "react-hot-toast";
+import axios from 'axios';
+
 export default function AddUserComponent() {
   const [username, setUsername] = useState("");
-  const [firstname, setfirstname] = useState("");
-  const [lastname, setlastname] = useState("");
-  const [email, setemail] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordStrength, setPasswordStrength] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [subjects, setSubjects] = useState([]);
-
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [availableSubjects, setAvailableSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [userType, setUserType] = useState("teacher");
+  
   const checkPasswordStrength = (password) => {
     if (password.length === 0) return "";
     if (password.length < 6) return "weak";
@@ -19,13 +26,39 @@ export default function AddUserComponent() {
     if (password.length >= 10) return "strong";
   };
 
+  // Fetch subjects on component mount
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/Quizify/admin/subjects");
+        
+        // Transform the API response to match our component's expected format
+        const formattedSubjects = response.data.map(subject => ({
+          id: subject.subject_id,
+          name: subject.name
+        }));
+        
+        console.log(formattedSubjects)
+        toast.success("Courses fetched successfully")
+        setAvailableSubjects(formattedSubjects);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching subjects:", err);
+        setError("Failed to load subjects. Please try again later.");
+        setLoading(false);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
+
   const handleClear = () => {
     setUsername("");
-    setfirstname("");
-    setlastname("");
-    setemail("");
+    setFirstname("");
+    setLastname("");
+    setEmail("");
     setPassword("");
-    setSubjects([]);
+    setSelectedSubjects([]);
     setPasswordStrength("");
   };
 
@@ -35,90 +68,164 @@ export default function AddUserComponent() {
     setPasswordStrength(checkPasswordStrength(newPassword));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validation
-    if (!username || !password) {
-      alert("Username and password are required");
+    if (!username || !password || !firstname || !lastname || !email) {
+      alert("All fields are required");
+      return;
+    }
+    
+    if (selectedSubjects.length === 0) {
+      alert("Please select at least one subject");
       return;
     }
 
-    // Show success message
-    setShowSuccessMessage(true);
-
-    // Reset form after submission
-    setTimeout(() => {
-      setUsername("");
-      setPassword("");
-      setPasswordStrength("");
-      setSubjects([]);
-      setShowSuccessMessage(false);
-    }, 3000);
+    setLoading(true);
+    
+    try {
+      // Create FormData for the API request
+      const formData = new FormData();
+      
+      // Add basic user information
+      formData.append("fname", firstname);
+      formData.append("lname", lastname);
+      formData.append("username", username);
+      formData.append("password", password);
+      formData.append("email", email);
+      
+      // Add subject IDs as a comma-separated string
+      const subjectIds = selectedSubjects.map(subject => subject.id).join(",");
+      
+      if (userType === "teacher") {
+        formData.append("subjectTaught", subjectIds);
+        await axios.post("http://localhost:8080/Quizify/admin/user/addTeacher", formData);
+      } else {
+        formData.append("enrolledSubjects", subjectIds);
+        await axios.post("http://localhost:8080/Quizify/admin/user/addStudent", formData);
+      }
+      
+      // Show success message
+      setShowSuccessMessage(true);
+      
+      // Reset form after successful submission
+      handleClear();
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 3000);
+    } catch (err) {
+      console.error("Error adding user:", err);
+      toast.error(err.message)
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto ">
+    <div className="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-800 mb-2">Add New User</h1>
       <p className="text-gray-600 mb-6">
         Create a new user account with specific role and permissions
       </p>
+
+      {/* User Type Selection */}
+      <div className="mb-6">
+        <div className="flex space-x-4">
+          <button
+            type="button"
+            className={`px-4 py-2 rounded-md ${
+              userType === "teacher"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setUserType("teacher")}
+          >
+            Teacher
+          </button>
+          <button
+            type="button"
+            className={`px-4 py-2 rounded-md ${
+              userType === "student"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setUserType("student")}
+          >
+            Student
+          </button>
+        </div>
+      </div>
 
       {/* Success Message */}
       {showSuccessMessage && (
         <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded">
           <div className="flex items-center">
             <FaCheck className="mr-2" />
-            <span>User added successfully!</span>
+            <span>{userType === "teacher" ? "Teacher" : "Student"} added successfully!</span>
           </div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <AddUserForm
-          username={username}
-          setUsername={setUsername}
-          firstname={firstname}
-          setfirstname={setfirstname}
-          lastname={lastname}
-          setlastname={setlastname}
-          email={email}
-          setemail={setemail}
-          password={password}
-          setPassword={setPassword}
-          passwordStrength={passwordStrength}
-          handlePasswordChange={handlePasswordChange}
-        />
-
-        <SelectCourses
-          selectedCourses={subjects}
-          setSelectedCourses={setSubjects}
-          label="Select Subjects"
-        />
-
-        {/* Submit Button */}
-        <div className="flex justify-between">
-          
-          <button
-            className={`cursor-pointer p-2 rounded-t-2xl flex items-center relative group shadow-sm  `}
-            onClick={handleClear}
-            type="reset"
-          >
-            <FaUserPlus className="mr-2" /> Clear Details            
-              <span className="bg-blue-500 hover-underline-animation"></span>
-
-          </button>
-          <button
-          type="submit"
-            className={`cursor-pointer p-2 flex items-center relative group shadow-sm rounded-t-2xl `}
-            onClick={handleSubmit}
-          >
-            <FaUserPlus className="mr-2" /> Add User            
-              <span className="bg-blue-500 hover-underline-animation"></span>
-
-          </button>
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+          {error}
         </div>
-      </form>
+      )}
+
+      {loading && availableSubjects.length === 0 ? (
+        <div className="text-center p-6">Loading subjects...</div>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          <AddUserForm
+            username={username}
+            setUsername={setUsername}
+            firstname={firstname}
+            setfirstname={setFirstname}
+            lastname={lastname}
+            setlastname={setLastname}
+            email={email}
+            setemail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            passwordStrength={passwordStrength}
+            handlePasswordChange={handlePasswordChange}
+          />
+
+          <SelectCourses
+            selectedCourses={selectedSubjects}
+            setSelectedCourses={setSelectedSubjects}
+            availableCourses={availableSubjects}
+            label={userType === "teacher" ? "Select Subjects to Teach" : "Select Subjects for Enrollment"}
+          />
+
+          {/* Submit and Clear Buttons */}
+          <div className="flex justify-between">
+            <button
+              className="cursor-pointer p-2 rounded-t-2xl flex items-center relative group shadow-sm"
+              onClick={handleClear}
+              type="reset"
+              disabled={loading}
+            >
+              <FaUserPlus className="mr-2" /> Clear Details
+              <span className="bg-blue-500 hover-underline-animation"></span>
+            </button>
+            
+            <button
+              type="submit"
+              className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-t-2xl"
+              disabled={loading}
+            >
+              <FaUserPlus className="mr-2" /> 
+              {loading ? "Processing..." : `Add ${userType === "teacher" ? "Teacher" : "Student"}`}
+              <span className="bg-blue-500 hover-underline-animation"></span>
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }
