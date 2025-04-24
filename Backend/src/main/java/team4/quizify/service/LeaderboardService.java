@@ -19,7 +19,6 @@ public class LeaderboardService {
     @Autowired
     private StudentRepository studentRepository;
     
-  
     public List<Map<String, Object>> getLeaderboard() {
         // Get all reports and students
         List<Report> allReports = reportRepository.findAll();
