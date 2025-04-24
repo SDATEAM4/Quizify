@@ -13,7 +13,7 @@ public class QueryService {
 
     private final QueryRepository queryRepository;
 
-    public List<Query> getUnresolvedQueriesForTeacher(Long teacherId) {
+    public List<Query> getUnresolvedQueriesForTeacher(int teacherId) {
         return queryRepository.findByReceiverIdAndResolveStatusFalse(teacherId);
     }
 }

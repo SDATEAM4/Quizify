@@ -24,7 +24,6 @@ public class AdminService {
     public User addUser(String fname, String lname, String username, String password, 
                         String email, String role, MultipartFile profileImage) {
         
-        // Check if username or email already exists
         if (userService.isUsernameExists(username)) {
             throw new IllegalArgumentException("Username already exists");
         }
@@ -33,17 +32,16 @@ public class AdminService {
             throw new IllegalArgumentException("Email already exists");
         }
         
-        // Upload profile image to Cloudinary if provided
         String profileImageUrl = null;
         if (profileImage != null && !profileImage.isEmpty()) {
             profileImageUrl = cloudinaryService.uploadFile(profileImage);
         }
         
-        // Create and save the new user
-        User newUser = new User(fname, lname, username, password, email, role, profileImageUrl);
-        return userService.saveUser(newUser);
+        User user = new User(fname, lname, username, password, email, role, profileImageUrl);
+        return userService.saveUser(user);
     }
-      public void removeUser(Long userId) {
+    
+    public void removeUser(Integer userId) {
         // First check if the user exists
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
@@ -62,41 +60,32 @@ public class AdminService {
         userService.deleteUser(userId);
     }
     
-    public User editUser(Long userId, String fname, String lname, String username, 
+    public User editUser(Integer userId, String fname, String lname, String username, 
                          String password, String email, String role, MultipartFile profileImage) {
         
-        User existingUser = userService.getUserById(userId)
+        User user = userService.getUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
         
-        // Check if username is being changed and is already taken by another user
-        if (!existingUser.getUsername().equals(username) && userService.isUsernameExists(username)) {
+        if (username != null && !username.equals(user.getUsername()) && userService.isUsernameExists(username)) {
             throw new IllegalArgumentException("Username already exists");
         }
         
-        // Check if email is being changed and is already taken by another user
-        if (!existingUser.getEmail().equals(email) && userService.isEmailExists(email)) {
+        if (email != null && !email.equals(user.getEmail()) && userService.isEmailExists(email)) {
             throw new IllegalArgumentException("Email already exists");
         }
         
-        // Update user details
-        existingUser.setFname(fname);
-        existingUser.setLname(lname);
-        existingUser.setUsername(username);
+        if (fname != null) user.setFname(fname);
+        if (lname != null) user.setLname(lname);
+        if (username != null) user.setUsername(username);
+        if (password != null) user.setPassword(password);
+        if (email != null) user.setEmail(email);
+        if (role != null) user.setRole(role);
         
-        // Only update password if a new one is provided
-        if (password != null && !password.isEmpty()) {
-            existingUser.setPassword(password);
-        }
-        
-        existingUser.setEmail(email);
-        existingUser.setRole(role);
-        
-        // Upload and update profile image if provided
         if (profileImage != null && !profileImage.isEmpty()) {
             String profileImageUrl = cloudinaryService.uploadFile(profileImage);
-            existingUser.setProfileImageUrl(profileImageUrl);
+            user.setProfileImageUrl(profileImageUrl);
         }
         
-        return userService.saveUser(existingUser);
+        return userService.saveUser(user);
     }
 }

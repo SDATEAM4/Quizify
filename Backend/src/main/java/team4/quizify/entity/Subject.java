@@ -12,10 +12,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Subject {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer subject_id;
+    // @Id
+    // @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // private Integer subject_id;
     
+      @Id
+          @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "subject_id")
+    private Integer subject_id;
+
+
     @Column(nullable = false)
     private String name;
     
@@ -25,6 +31,6 @@ public class Subject {
     @Column
     private String imageUrl;
     
-    @Column
-    private String description;
+    // @Column
+    // private String description;
 }

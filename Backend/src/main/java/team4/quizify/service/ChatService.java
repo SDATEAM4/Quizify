@@ -19,7 +19,7 @@ public class ChatService {
     private final QueryRepository queryRepository;
     private final UserRepository userRepository;
 
-    public List<Chat> getChatsForUser(Long userId) {
+    public List<Chat> getChatsForUser(int  userId) {
         return chatRepository.findBySenderIdOrReceiverId(userId, userId);
     }
 
@@ -28,7 +28,7 @@ public class ChatService {
         return chatRepository.save(chat);
     }
 
-    public List<Chat> getMessagesInChat(Long senderId, Long receiverId) {
+    public List<Chat> getMessagesInChat(int senderId, int receiverId) {
         return chatRepository.findByTeacherAndStudent(receiverId, senderId);
     }
 
@@ -36,7 +36,7 @@ public class ChatService {
         chatRepository.deleteById(chatId);
     }
 
-    public List<String> getStudentsWhoSentQueriesToTeacher(Long teacherId) {
+    public List<String> getStudentsWhoSentQueriesToTeacher(int teacherId) {
         List<Chat> chats = chatRepository.findByReceiverId(teacherId);
         return chats.stream()
                 .map(chat -> userRepository.findById(chat.getSenderId())
@@ -47,18 +47,18 @@ public class ChatService {
     }
 
     // ✅ For: GET /chats/{teacherId}/{studentId}
-    public List<Chat> getMessagesBetweenTeacherAndStudent(Long teacherId, Long studentId) {
+    public List<Chat> getMessagesBetweenTeacherAndStudent(int teacherId, int studentId) {
         return chatRepository.findByTeacherAndStudent(teacherId, studentId);
     }
 
     // ✅ For: DELETE /chats/{teacherId}/{studentId}
-    public void deleteMessagesBetweenTeacherAndStudent(Long teacherId, Long studentId) {
+    public void deleteMessagesBetweenTeacherAndStudent(int teacherId, int studentId) {
         List<Chat> messages = chatRepository.findByTeacherAndStudent(teacherId, studentId);
         chatRepository.deleteAll(messages);
     }
 
     // ✅ For: GET /chats/{teacherId}/{studentId}/unresolved
-    public boolean isQueryUnresolved(Long teacherId, Long studentId) {
+    public boolean isQueryUnresolved(int  teacherId, int  studentId) {
         List<Query> queries = queryRepository.findByReceiverIdAndResolveStatusFalse(teacherId);
         return queries.stream().anyMatch(query -> query.getSenderId().equals(studentId));
     }
@@ -75,7 +75,7 @@ public class ChatService {
     }
 
     // ✅ For: PATCH /chats/{teacherId}/{studentId}/unreadbyTeacher
-    public void markUnreadByTeacher(Long teacherId, Long studentId) {
+    public void markUnreadByTeacher(int teacherId, int studentId) {
         List<Chat> chats = chatRepository.findByTeacherAndStudent(teacherId, studentId);
         for (Chat chat : chats) {
             // Let's pretend we added an unreadByTeacher flag — simulate here
@@ -85,7 +85,7 @@ public class ChatService {
     }
 
     // ✅ For: PATCH /chats/{teacherId}/{studentId}/unreadbyStudent
-    public void markUnreadByStudent(Long teacherId, Long studentId) {
+    public void markUnreadByStudent(int teacherId, int studentId) {
         List<Chat> chats = chatRepository.findByTeacherAndStudent(teacherId, studentId);
         for (Chat chat : chats) {
             // Similarly simulate an unreadByStudent field

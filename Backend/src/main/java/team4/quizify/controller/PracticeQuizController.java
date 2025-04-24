@@ -20,6 +20,8 @@ public class PracticeQuizController {
     @GetMapping("/practiceQuiz")
     public List<PracticeQuiz> getPracticeQuiz(
             @RequestParam String subject,
+            @RequestParam String topic,
+            @RequestParam String description,
             @RequestParam(required = false, defaultValue = "mix") String level,
             @RequestParam(required = false, defaultValue = "5") int numQuestions) {
         
@@ -30,6 +32,6 @@ public class PracticeQuizController {
             numQuestions = 5;
         }
         
-        return quizService.generateQuiz(subject, level, numQuestions);
+        return quizService.generateQuiz(subject,topic,description, level, numQuestions);
     }
 }

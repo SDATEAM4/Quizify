@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
@@ -16,6 +18,7 @@ import jakarta.persistence.Table;
 public class Quiz {
     
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "quiz_id")
     private Integer quizId;
     
@@ -36,4 +39,12 @@ public class Quiz {
     
     @Column(name = "question_ids")
     private String questionIds;
+
+    //added
+    @Column(name = "title")
+    private String title;
+
+    //added
+    @Column(name = "description")
+    private String description;
 }

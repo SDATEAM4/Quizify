@@ -19,10 +19,10 @@ public class Chat {
     private Long chatId;
 
     @Column(nullable = false)
-    private Long senderId;
+    private int senderId;
 
     @Column(nullable = false)
-    private Long receiverId;
+    private int  receiverId;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String message;

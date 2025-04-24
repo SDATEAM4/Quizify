@@ -15,7 +15,7 @@ public class QueryController {
     private final QueryService queryService;
 
     @GetMapping("/unresolved")
-    public List<Query> getUnresolvedQueries(@RequestParam Long teacherId) {
+    public List<Query> getUnresolvedQueries(@RequestParam int teacherId) {
         return queryService.getUnresolvedQueriesForTeacher(teacherId);
     }
 }

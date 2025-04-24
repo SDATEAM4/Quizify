@@ -5,5 +5,5 @@ import team4.quizify.entity.Query;
 import java.util.List;
 
 public interface QueryRepository extends JpaRepository<Query, Long> {
-    List<Query> findByReceiverIdAndResolveStatusFalse(Long receiverId);
+    List<Query> findByReceiverIdAndResolveStatusFalse(int receiverId);
 }

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import team4.quizify.entity.Student;
 
 @Repository
-public interface StudentRepository extends JpaRepository<Student, Long> {
-    // Find student by user ID
-    Student findByUserId(Long userId);
+public interface StudentRepository extends JpaRepository<Student, Integer> {    // Find student by user ID
+    Student findByUser_UserId(Integer userId);
 }

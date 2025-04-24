@@ -17,7 +17,7 @@ public class ChatController {
 
     // 1. Get all students who sent a query to a teacher
     @GetMapping("/{teacherId}")
-    public ResponseEntity<List<String>> getStudentsWhoSentQueries(@PathVariable Long teacherId) {
+    public ResponseEntity<List<String>> getStudentsWhoSentQueries(@PathVariable int  teacherId) {
         List<String> studentNames = chatService.getStudentsWhoSentQueriesToTeacher(teacherId);
         return ResponseEntity.ok(studentNames);
     }
@@ -25,8 +25,8 @@ public class ChatController {
     // 2. Get all messages between teacher and student
     @GetMapping("/{teacherId}/{studentId}")
     public ResponseEntity<List<Chat>> getAllMessagesBetweenTeacherAndStudent(
-            @PathVariable Long teacherId,
-            @PathVariable Long studentId
+            @PathVariable int teacherId,
+            @PathVariable int studentId
     ) {
         return ResponseEntity.ok(chatService.getMessagesBetweenTeacherAndStudent(teacherId, studentId));
     }
@@ -34,8 +34,8 @@ public class ChatController {
     // 3. Post a message (send message)
     @PostMapping("/{teacherId}/{studentId}/message")
     public ResponseEntity<Chat> sendMessage(
-            @PathVariable Long teacherId,
-            @PathVariable Long studentId,
+            @PathVariable int  teacherId,
+            @PathVariable int  studentId,
             @RequestBody Chat chat
     ) {
         chat.setSenderId(studentId);   // assuming student is sending
@@ -46,8 +46,8 @@ public class ChatController {
     // 4. Delete all messages between teacher and student
     @DeleteMapping("/{teacherId}/{studentId}")
     public ResponseEntity<Void> deleteMessagesBetweenTeacherAndStudent(
-            @PathVariable Long teacherId,
-            @PathVariable Long studentId
+            @PathVariable int  teacherId,
+            @PathVariable int  studentId
     ) {
         chatService.deleteMessagesBetweenTeacherAndStudent(teacherId, studentId);
         return ResponseEntity.ok().build();
@@ -56,8 +56,8 @@ public class ChatController {
     // 5. Get unresolved query status
     @GetMapping("/{teacherId}/{studentId}/unresolved")
     public ResponseEntity<Boolean> isQueryUnresolved(
-            @PathVariable Long teacherId,
-            @PathVariable Long studentId
+            @PathVariable int  teacherId,
+            @PathVariable int  studentId
     ) {
         return ResponseEntity.ok(chatService.isQueryUnresolved(teacherId, studentId));
     }
@@ -71,8 +71,8 @@ public class ChatController {
     // 7. Add unread status by teacher
     @PatchMapping("/{teacherId}/{studentId}/unreadbyTeacher")
     public ResponseEntity<Void> markUnreadByTeacher(
-            @PathVariable Long teacherId,
-            @PathVariable Long studentId
+            @PathVariable int  teacherId,
+            @PathVariable int  studentId
     ) {
         chatService.markUnreadByTeacher(teacherId, studentId);
         return ResponseEntity.ok().build();
@@ -81,8 +81,8 @@ public class ChatController {
     // 8. Add unread status by student
     @PatchMapping("/{teacherId}/{studentId}/unreadbyStudent")
     public ResponseEntity<Void> markUnreadByStudent(
-            @PathVariable Long teacherId,
-            @PathVariable Long studentId
+            @PathVariable int  teacherId,
+            @PathVariable int  studentId
     ) {
         chatService.markUnreadByStudent(teacherId, studentId);
         return ResponseEntity.ok().build();
