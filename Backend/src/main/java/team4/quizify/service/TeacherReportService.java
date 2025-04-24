@@ -28,7 +28,7 @@ public class TeacherReportService {
         // Check if the quiz exists
         Optional<Quiz> quizDataOptional = quizDataRepository.findById(quizId);
         if (quizDataOptional.isEmpty()) {
-            statistics.put("error", "Quiz not found with ID: " + quizId);
+            statistics.put("error", "Quiz not found");
             return statistics;
         }
         

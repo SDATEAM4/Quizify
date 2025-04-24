@@ -32,7 +32,7 @@ public class UserController {
             return ResponseEntity.ok(user.get());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "User not found with id: " + userId));
+                    .body(Map.of("error", "User not found"));
         }
     }
     
@@ -44,7 +44,7 @@ public class UserController {
             return ResponseEntity.ok(user.get());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "User not found with username: " + username));
+                    .body(Map.of("error", "User not found"));
         }
     }
     
@@ -72,7 +72,7 @@ public class UserController {
             Optional<User> existingUser = userService.getUserById(userId);
             if (existingUser.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "User not found with id: " + userId));
+                        .body(Map.of("error", "User not found"));
             }
             
             User user = existingUser.get();
