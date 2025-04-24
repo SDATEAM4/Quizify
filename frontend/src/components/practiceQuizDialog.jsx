@@ -20,8 +20,7 @@ export const QuizDialog = ({ quizData, setPage }) => {
         Beginner: 'bg-green-500 text-white',
         Intermediate: 'bg-yellow-500 text-white',
         Advanced: 'bg-orange-500 text-white',
-        Aura: 'bg-red-500 text-white',
-        Impossible: 'bg-purple-500 text-white'
+        Impossible: 'bg-red-500 text-white'
     };
 
     const uniqueSubjects = useMemo(() => {

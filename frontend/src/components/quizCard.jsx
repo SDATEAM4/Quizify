@@ -1,10 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
 export const QuizCard = ({ data, subject }) => {
-  const navigate = useNavigate(); // Move useNavigate to the top level of the component
-  const filteredQuizzes = data.filter((quiz) => quiz.subject === subject);
-
+  const navigate = useNavigate(); 
+  const filteredQuizzes = data.filter((quiz) => quiz.subject === subject); // it filters the quizzes based on the subject passed as a prop
+  
   const getDifficultyColor = (level) => {
     switch (level) {
       case "Beginner":
@@ -77,7 +76,10 @@ export const QuizCard = ({ data, subject }) => {
     ],
   };
 
-  const handleclick = () => {
+  const handleclick = (id) => {
+    //setting api call here
+    console.log(`Quiz ID: ${id}`); // Log the quiz ID for debugging
+    
     // Navigate to the quiz page with the quiz data
     navigate("/quizGenerator", { state:{ quizState,quizType:"NormalQuiz"} }); // Pass quizState as state
   };
@@ -111,7 +113,7 @@ export const QuizCard = ({ data, subject }) => {
               </span>
               <button
                 className="bg-primary border-2 text-black px-6 py-2 rounded-button hover:bg-black hover:text-white hover:cursor-pointer transition-colors whitespace-nowrap"
-                onClick={handleclick}
+                onClick={() =>  handleclick(quiz.id)} // Pass the quiz ID to the handleclick function
               >
                 Start Quiz
               </button>
