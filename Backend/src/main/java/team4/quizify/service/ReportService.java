@@ -19,6 +19,33 @@ public class ReportService {
     @Autowired
     private QuizRepository quizDataRepository;
     
+   
+    public Report saveQuizScore(Report report) {
+        // Check if the quiz exists
+        Optional<Quiz> quizData = quizDataRepository.findById(report.getQuizId());
+        if (quizData.isEmpty()) {
+            throw new IllegalArgumentException("Quiz with ID " + report.getQuizId() + " not found");
+        }
+        
+        // Save the report
+        return reportRepository.save(report);
+    }
+    
+   
+    public List<Report> getAllReports() {
+        return reportRepository.findAll();
+    }
+    
+   
+    public List<Report> getReportsByUserId(Integer userId) {
+        return reportRepository.findByUserId(userId);
+    }
+    
+   
+    public List<Report> getReportsByQuizId(Integer quizId) {
+        return reportRepository.findByQuizId(quizId);
+    }
+    
     // Method to generate a report for a specific quiz
     public TeacherReport generateTeacherReport(Integer quizId) {
         // Check if the quiz exists
