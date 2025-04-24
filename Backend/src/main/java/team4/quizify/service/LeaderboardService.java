@@ -19,10 +19,6 @@ public class LeaderboardService {
     @Autowired
     private StudentRepository studentRepository;
     
-    /**
-     * Get the leaderboard with user rankings based on total points accumulated
-     * @return List of leaderboard entries containing position, username, userId, and points
-     */
     public List<Map<String, Object>> getLeaderboard() {
         // Get all reports and students
         List<Report> allReports = reportRepository.findAll();
