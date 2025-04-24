@@ -1,62 +1,83 @@
-import React from 'react';
+import { useState } from "react";
+import { FaTimes } from "react-icons/fa";
 
-export const SelectCourses = ({
-  selectedCourses,
-  setSelectedCourses,
-  label = "Select Courses",
-  availableCourses = [
-    'Mathematics', 'Physics', 'Chemistry', 'Biology',
-    'History', 'Geography', 'Literature', 'Computer Science',
-    'Art', 'Music', 'Physical Education', 'Economics'
-  ]
-}) => {
-  const toggleCourse = (course) => {
-    if (selectedCourses.includes(course)) {
-      setSelectedCourses(selectedCourses.filter(item => item !== course));
-    } else {
+export const SelectCourses = ({ selectedCourses, setSelectedCourses, label, availableCourses}) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  // Add a course to selected courses
+  const addCourse = (course) => {
+    // Check if course is already selected
+    if (!selectedCourses.find(c => c.id === course.id)) {
       setSelectedCourses([...selectedCourses, course]);
     }
+    setSearchTerm("");
   };
+
+  // Remove a course from selected courses
+  const removeCourse = (courseId) => {
+    setSelectedCourses(selectedCourses.filter(course => course.id !== courseId));
+  };
+
+  // Filter courses based on search term
+  const filteredCourses = availableCourses.filter(course => 
+    course.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    !selectedCourses.find(c => c.id === course.id)
+  );
 
   return (
     <div className="mb-6">
-      <label className="block text-gray-700 mb-2">{label}</label>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
-        {availableCourses.map((course) => (
-          <div key={course} className="flex items-center">
-            <input
-              type="checkbox"
-              id={`course-${course}`}
-              checked={selectedCourses.includes(course)}
-              onChange={() => toggleCourse(course)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
-            />
-            <label htmlFor={`course-${course}`} className="text-gray-700">
-              {course}
-            </label>
+      <label className="block text-gray-700 text-sm font-bold mb-2">
+        {label || "Select Courses"}
+      </label>
+      
+      {/* Search Input */}
+      <div className="relative mb-3">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search courses..."
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        />
+        
+        {/* Dropdown results */}
+        {searchTerm && (
+          <div className="absolute z-10 w-full mt-1 bg-white border rounded shadow-lg max-h-60 overflow-auto">
+            {filteredCourses.length > 0 ? (
+              filteredCourses.map(course => (
+                <div
+                  key={`course-${course.id}`}
+                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => addCourse(course)}
+                >
+                  {course.name}
+                </div>
+              ))
+            ) : (
+              <div className="p-2 text-gray-500">No courses found</div>
+            )}
+          </div>
+        )}
+      </div>
+      
+      {/* Selected courses */}
+      <div className="flex flex-wrap gap-2">
+        {selectedCourses.map(course => (
+          <div 
+            key={`selected-${course.id}`}
+            className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center"
+          >
+            <span>{course.name}</span>
+            <button 
+              type="button"
+              onClick={() => removeCourse(course.id)}
+              className="ml-2 text-blue-600 hover:text-blue-800"
+            >
+              <FaTimes size={12} />
+            </button>
           </div>
         ))}
       </div>
-      {/* Selected Courses Tags */}
-      {selectedCourses.length > 0 && (
-        <div className="mt-4">
-          <p className="text-sm text-gray-600 mb-2">Selected courses:</p>
-          <div className="flex flex-wrap gap-2">
-            {selectedCourses.map((course) => (
-              <span key={`tag-${course}`} className="bg-blue-100 text-blue-800 text-sm py-1 px-3 rounded-full flex items-center">
-                {course}
-                <button
-                  type="button"
-                  onClick={() => toggleCourse(course)}
-                  className="ml-2 text-blue-800 hover:text-blue-900 focus:outline-none"
-                >
-                  &times;
-                </button>
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
