@@ -127,7 +127,7 @@ export const QuizGenerator = () => {
         <QuizResults
           quizName={quizName}
           stats={calculateScore()}
-          dataSet={dataset}
+          dataSet={quizState}
           quizType={quizType}
           isCorrect={isCorrect}
         />
