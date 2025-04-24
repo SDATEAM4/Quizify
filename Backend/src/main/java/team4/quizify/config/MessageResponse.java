@@ -1,4 +1,4 @@
-package team4.quizify.payload;
+package team4.quizify.config;
 
 public class MessageResponse {
     private String message;
