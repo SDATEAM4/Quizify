@@ -19,10 +19,6 @@ public class LeaderboardController {
     @Autowired
     private LeaderboardService leaderboardService;
     
-    /**
-     * Get global leaderboard rankings
-     * @return List of leaderboard entries with position, userId, username, name, points
-     */
     @GetMapping("/leaderboard")
     public ResponseEntity<List<Map<String, Object>>> getLeaderboard() {
         return ResponseEntity.ok(leaderboardService.getLeaderboard());
