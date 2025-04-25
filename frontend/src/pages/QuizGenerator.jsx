@@ -8,20 +8,20 @@ import { useLocation } from 'react-router-dom';
 
 export const QuizGenerator = () => {
     const location = useLocation();
-    const {quizState,quizType} = location.state;
-  const { quizName, quizTopic, timeDuration, dataset } = quizState;
-
+    //const {quizState,quizType} = location.state;
+  const { quizName, quizTopic, timeDuration, dataset,quizType } = location.state;
+  
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState(Array(dataset.length).fill(''));
+  const [selectedcorrect_answers, setSelectedcorrect_answers] = useState(Array(dataset.length).fill(''));
   const [isCorrect, setIsCorrect] = useState(Array(dataset.length).fill(false));
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(timeDuration * 60); // Convert minutes to seconds
+  const [timeRemaining, setTimeRemaining] = useState(timeDuration); // Convert minutes to seconds
   const [timeTaken, setTimeTaken] = useState(0);
   
   // Timer effect
   useEffect(() => {
-    if (isQuizCompleted) return;
-    
+    if (isQuizCompleted || quizType === "PracticeQuiz") return;
+  
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 0) {
@@ -31,22 +31,23 @@ export const QuizGenerator = () => {
         }
         return prev - 1;
       });
-      
+  
       setTimeTaken((prev) => prev + 1);
     }, 1000);
-    
-    return () => clearInterval(timer);
-  }, [isQuizCompleted]);
   
-  // Handle answer selection
-  const handleSelectAnswer = (option) => {
-    const newSelectedAnswers = [...selectedAnswers];
-    newSelectedAnswers[currentQuestionIndex] = option;
-    setSelectedAnswers(newSelectedAnswers);
+    return () => clearInterval(timer);
+  }, [isQuizCompleted, quizType]);
+  
+  
+  // Handle correct_answer selection
+  const handleSelectcorrect_answer = (option) => {
+    const newSelectedcorrect_answers = [...selectedcorrect_answers];
+    newSelectedcorrect_answers[currentQuestionIndex] = option;
+    setSelectedcorrect_answers(newSelectedcorrect_answers);
     
-    // Check if answer is correct
+    // Check if correct_answer is correct
     const newIsCorrect = [...isCorrect];
-    newIsCorrect[currentQuestionIndex] = option === dataset[currentQuestionIndex].answer;
+    newIsCorrect[currentQuestionIndex] = option === dataset[currentQuestionIndex].correct_answer;
     setIsCorrect(newIsCorrect);
   };
   
@@ -87,7 +88,7 @@ export const QuizGenerator = () => {
   };
   
   // Convert remaining time to MM:SS format
-  const formattedTimeRemaining = formatTime(timeRemaining);
+  const formattedTimeRemaining = quizType === "PracticeQuiz" ? '∞' : formatTime(timeRemaining);
   
   // Calculate progress percentage
   const progressPercentage = Math.round(((currentQuestionIndex + 1) / dataset.length) * 100);
@@ -100,13 +101,14 @@ export const QuizGenerator = () => {
             quizName={quizName}
             quizTopic={quizTopic}
             timeRemaining={formattedTimeRemaining}
+            quizType={quizType}
           />
           
           <QuestionCard
             question={dataset[currentQuestionIndex]}
             questionNumber={currentQuestionIndex + 1}
-            selectedAnswer={selectedAnswers[currentQuestionIndex]}
-            onSelectAnswer={handleSelectAnswer}
+            selectedcorrect_answer={selectedcorrect_answers[currentQuestionIndex]}
+            onSelectcorrect_answer={handleSelectcorrect_answer}
           />
           
           <QuizNavigation
@@ -127,7 +129,7 @@ export const QuizGenerator = () => {
         <QuizResults
           quizName={quizName}
           stats={calculateScore()}
-          dataSet={quizState}
+          dataSet={{quizName, quizTopic, timeDuration, dataset}}
           quizType={quizType}
           isCorrect={isCorrect}
         />
