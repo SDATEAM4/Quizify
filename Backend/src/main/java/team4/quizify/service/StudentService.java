@@ -59,9 +59,7 @@ public class StudentService {
     
     public Student updateStudent(Student student) {
         return studentRepository.save(student);
-    }
-    
-    public void deleteByUserId(Integer userId) {
+    }    public void deleteByUserId(Integer userId) {
         Student student = studentRepository.findByUser_UserId(userId);
         if (student != null) {
             studentRepository.delete(student);

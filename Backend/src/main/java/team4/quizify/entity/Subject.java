@@ -27,10 +27,10 @@ public class Subject {
     
     @Column(name = "teachers_id", columnDefinition = "integer[]")
     private Integer[] teachersId;
-    
-    @Column
+
+    @Column(name = "image_url")
     private String imageUrl;
     
-    // @Column
-    // private String description;
+    @Column(name = "description")
+    private String description;
 }

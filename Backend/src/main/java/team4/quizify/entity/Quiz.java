@@ -37,14 +37,12 @@ public class Quiz {
     @Column(name = "type")
     private String type;
     
-    @Column(name = "question_ids")
-    private String questionIds;
+    @Column(name = "question_ids", columnDefinition = "integer[]")
+    private Integer[] questionIds;
 
-    //added
     @Column(name = "title")
     private String title;
 
-    //added
     @Column(name = "description")
     private String description;
 }
