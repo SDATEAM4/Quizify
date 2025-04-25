@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/Quizify/admin")
@@ -75,41 +74,47 @@ public class AdminController {
             if (user.isPresent()) {
                 User userData = user.get();
                 Map<String, Object> response = new HashMap<>();
-                response.put("user", userData);
-                
-                // Check if user is a student and add subject names
+                response.put("user", userData);                // Check if user is a student and add subject names and student ID
                 if ("Student".equals(userData.getRole())) {
-                    Student student = studentService.getStudentByStudentId(userId);
-                    if (student != null && student.getEnrolledSubjects() != null) {
-                        List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
-                        for (Integer subjectId : student.getEnrolledSubjects()) {
-                            Optional<Subject> subject = subjectService.getSubjectById(subjectId);
-                            if (subject.isPresent()) {
-                                Map<String, Object> subjectInfo = new HashMap<>();
-                                subjectInfo.put("id", subjectId);
-                                subjectInfo.put("name", subject.get().getName());
-                                subjectsWithNames.add(subjectInfo);
+                    Student student = studentService.getStudentByUserId(userId);
+                    if (student != null) {
+                        // Add student ID to response
+                        response.put("studentId", student.getStudent_id());
+                        
+                        if (student.getEnrolledSubjects() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : student.getEnrolledSubjects()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
                             }
+                            response.put("enrolledSubjectsWithNames", subjectsWithNames);
                         }
-                        response.put("enrolledSubjectsWithNames", subjectsWithNames);
                     }
-                }
-                
-                // Check if user is a teacher and add subject names
+                }                // Check if user is a teacher and add subject names and teacher ID
                 if ("Teacher".equals(userData.getRole())) {
-                    Teacher teacher = teacherService.getTeacherByTeacherId(userId);
-                    if (teacher != null && teacher.getSubjectTaught() != null) {
-                        List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
-                        for (Integer subjectId : teacher.getSubjectTaught()) {
-                            Optional<Subject> subject = subjectService.getSubjectById(subjectId);
-                            if (subject.isPresent()) {
-                                Map<String, Object> subjectInfo = new HashMap<>();
-                                subjectInfo.put("id", subjectId);
-                                subjectInfo.put("name", subject.get().getName());
-                                subjectsWithNames.add(subjectInfo);
+                    Teacher teacher = teacherService.getTeacherByUserId(userId);
+                    if (teacher != null) {
+                        // Add teacher ID to response
+                        response.put("teacherId", teacher.getTeacher_id());
+                        
+                        if (teacher.getSubjectTaught() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : teacher.getSubjectTaught()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
                             }
+                            response.put("subjectsTaughtWithNames", subjectsWithNames);
                         }
-                        response.put("subjectsTaughtWithNames", subjectsWithNames);
                     }
                 }
                 
@@ -141,8 +146,7 @@ public class AdminController {
         }
         
         return ResponseEntity.ok(response);
-    }
-      //GET USER BY USERNAME
+    }      //GET USER BY USERNAME
     @GetMapping("/user/username/{username}")
     public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
         try {
@@ -152,39 +156,49 @@ public class AdminController {
                 Map<String, Object> response = new HashMap<>();
                 response.put("user", userData);
                 
-                // Check if user is a student and add subject names
+                // Check if user is a student and add subject names and student ID
                 if ("Student".equals(userData.getRole())) {
                     Student student = studentService.getStudentByUserId(userData.getUserId());
-                    if (student != null && student.getEnrolledSubjects() != null) {
-                        List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
-                        for (Integer subjectId : student.getEnrolledSubjects()) {
-                            Optional<Subject> subject = subjectService.getSubjectById(subjectId);
-                            if (subject.isPresent()) {
-                                Map<String, Object> subjectInfo = new HashMap<>();
-                                subjectInfo.put("id", subjectId);
-                                subjectInfo.put("name", subject.get().getName());
-                                subjectsWithNames.add(subjectInfo);
+                    if (student != null) {
+                        // Add student ID to response
+                        response.put("studentId", student.getStudent_id());
+                        
+                        if (student.getEnrolledSubjects() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : student.getEnrolledSubjects()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
                             }
+                            response.put("enrolledSubjectsWithNames", subjectsWithNames);
                         }
-                        response.put("enrolledSubjectsWithNames", subjectsWithNames);
                     }
                 }
                 
-                // Check if user is a teacher and add subject names
+                // Check if user is a teacher and add subject names and teacher ID
                 if ("Teacher".equals(userData.getRole())) {
                     Teacher teacher = teacherService.getTeacherByUserId(userData.getUserId());
-                    if (teacher != null && teacher.getSubjectTaught() != null) {
-                        List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
-                        for (Integer subjectId : teacher.getSubjectTaught()) {
-                            Optional<Subject> subject = subjectService.getSubjectById(subjectId);
-                            if (subject.isPresent()) {
-                                Map<String, Object> subjectInfo = new HashMap<>();
-                                subjectInfo.put("id", subjectId);
-                                subjectInfo.put("name", subject.get().getName());
-                                subjectsWithNames.add(subjectInfo);
+                    if (teacher != null) {
+                        // Add teacher ID to response
+                        response.put("teacherId", teacher.getTeacher_id());
+                        
+                        if (teacher.getSubjectTaught() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : teacher.getSubjectTaught()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
                             }
+                            response.put("subjectsTaughtWithNames", subjectsWithNames);
                         }
-                        response.put("subjectsTaughtWithNames", subjectsWithNames);
                     }
                 }
                 
@@ -209,40 +223,48 @@ public class AdminController {
                 User userData = user.get();
                 Map<String, Object> response = new HashMap<>();
                 response.put("user", userData);
-                
-                // Check if user is a student and add subject names
+                  // Check if user is a student and add subject names and student ID
                 if ("Student".equals(userData.getRole())) {
                     Student student = studentService.getStudentByUserId(userData.getUserId());
-                    if (student != null && student.getEnrolledSubjects() != null) {
-                        List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
-                        for (Integer subjectId : student.getEnrolledSubjects()) {
-                            Optional<Subject> subject = subjectService.getSubjectById(subjectId);
-                            if (subject.isPresent()) {
-                                Map<String, Object> subjectInfo = new HashMap<>();
-                                subjectInfo.put("id", subjectId);
-                                subjectInfo.put("name", subject.get().getName());
-                                subjectsWithNames.add(subjectInfo);
+                    if (student != null) {
+                        // Add student ID to response
+                        response.put("studentId", student.getStudent_id());
+                        
+                        if (student.getEnrolledSubjects() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : student.getEnrolledSubjects()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
                             }
+                            response.put("enrolledSubjectsWithNames", subjectsWithNames);
                         }
-                        response.put("enrolledSubjectsWithNames", subjectsWithNames);
                     }
                 }
-                
-                // Check if user is a teacher and add subject names
+                  // Check if user is a teacher and add subject names and teacher ID
                 if ("Teacher".equals(userData.getRole())) {
                     Teacher teacher = teacherService.getTeacherByUserId(userData.getUserId());
-                    if (teacher != null && teacher.getSubjectTaught() != null) {
-                        List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
-                        for (Integer subjectId : teacher.getSubjectTaught()) {
-                            Optional<Subject> subject = subjectService.getSubjectById(subjectId);
-                            if (subject.isPresent()) {
-                                Map<String, Object> subjectInfo = new HashMap<>();
-                                subjectInfo.put("id", subjectId);
-                                subjectInfo.put("name", subject.get().getName());
-                                subjectsWithNames.add(subjectInfo);
+                    if (teacher != null) {
+                        // Add teacher ID to response
+                        response.put("teacherId", teacher.getTeacher_id());
+                        
+                        if (teacher.getSubjectTaught() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : teacher.getSubjectTaught()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
                             }
+                            response.put("subjectsTaughtWithNames", subjectsWithNames);
                         }
-                        response.put("subjectsTaughtWithNames", subjectsWithNames);
                     }
                 }
                 
@@ -404,13 +426,12 @@ public class AdminController {
             student.setUser(newUser);
             student.setEnrolledSubjects(enrolledSubjects);
             student.setAttemptedQuiz(new Integer[0]);
+              student = studentService.updateStudent(student);
             
-            studentService.updateStudent(student);
-            
-            Map<String, Object> response = new HashMap<>();
-    
-            
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "User added successfully"));
+            // Return response with student ID
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "message", "User added successfully"
+            ));
             
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
@@ -451,13 +472,12 @@ public class AdminController {
             teacher.setUser(newUser);
             teacher.setSubjectTaught(subjectTaught);
             teacher.setCreatedQuiz(new Integer[0]);
+              teacher = teacherService.updateTeacher(teacher);
             
-            teacherService.updateTeacher(teacher);
-            
-            Map<String, Object> response = new HashMap<>();
-           
-            
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "User added successfully"));
+            // Return response with teacher ID
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "message", "User added successfully"
+            ));
             
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
@@ -488,23 +508,6 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to update user profile: " + e.getMessage()));
-        }
-    }
-    
-    // GET ALL SUBJECTS
-    @GetMapping("/subjects")
-    public ResponseEntity<List<Subject>> getAllSubjects() {
-        return ResponseEntity.ok(subjectService.getAllSubjects());
-    }
-      // GET SUBJECT BY ID
-    @GetMapping("/subject/{subjectId}")
-    public ResponseEntity<?> getSubjectById(@PathVariable Integer subjectId) {
-        Optional<Subject> subject = subjectService.getSubjectById(subjectId);
-        if (subject.isPresent()) {
-            return ResponseEntity.ok(subject.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "Subject not found"));
         }
     }
     
