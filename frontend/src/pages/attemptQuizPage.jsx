@@ -8,113 +8,166 @@ import {QuizDialog} from "../components/practiceQuizDialog";
 export const AttemptQuizPage = () => {
   const quizData = [
     {
-      id: 1,
-      subject: "Mathematics",
+      quiz_id: 1,
+      subject_id: 1,
+      subject_name: "Mathematics",
       title: "Advanced Calculus",
       description: "Test your knowledge of derivatives, integrals, and limits",
-      duration: 30, // minutes
-      questionCount: 10,
-      difficulty: "Advanced",
-      image: "/images/math-calculus-background.jpg",
-      icon: "calculator", // For the subject icon
+      timelimit: 30, // minutes
+      questions: 10,
+      level: 1,
+      user_id: 9,
+      attemptedQuiz: false,
+      username: "meowwww",
+      marks: 40,
+      type: "Automatic",
+      student_id: 2
+
     },
     {
-      id: 2,
-      subject: "Mathematics",
+      quiz_id: 2,
+      subject_id: 1,
+      subject_name: "Mathematics",
       title: "Linear Algebra Fundamentals",
       description: "Master matrices, vectors, and linear transformations",
-      duration: 25, // minutes
-      questionCount: 8,
-      difficulty: "Intermediate",
-      image: "/images/linear-algebra-background.jpg",
-      icon: "calculator",
+      timelimit: 25, // minutes
+      questions: 8,
+      level: 2,
+      user_id: 9,
+      attemptedQuiz: false,
+      username: "meowwww",
+      marks: 40,
+      type: "Automatic",
+      student_id: 2
+   
     },
     {
-      id: 3,
-      subject: "Mathematics",
+      quiz_id: 3,
+      subject_id: 1,
+      subject_name: "Mathematics",
       title: "Probability & Statistics",
       description: "Explore statistical concepts and probability theory",
-      duration: 35, // minutes
-      questionCount: 12,
-      difficulty: "Advanced",
-      image: "/images/probability-stats-background.jpg",
-      icon: "calculator",
+      timelimit: 35, // minutes
+      questions: 12,
+      level: 3,
+      user_id: 9,
+      attemptedQuiz: false,
+      username: "meowwww",
+      marks: 40,
+      type: "Automatic",
+      student_id: 2
     },
     {
-      id: 4,
-      subject: "Physics",
+      quiz_id: 4,
+      subject_id: 1,
+      subject_name: "Physics",
       title: "Classical Mechanics",
       description: "Understand Newton's laws and mechanical systems",
-      duration: 40, // minutes
-      questionCount: 15,
-      difficulty: "Intermediate",
-      image: "/images/physics-mechanics-background.jpg",
-      icon: "settings",
+      timelimit: 40, // minutes
+      questions: 15,
+      level: "Intermediate",
+      user_id: 9,
+      attemptedQuiz: false,
+      username: "meowwww",
+      marks: 40,
+      type: "Automatic",
+      student_id: 2
+     
     },
     {
-      id: 5,
-      subject: "Physics",
+      quiz_id: 5,
+      subject_id: 1,
+      subject_name: "Physics",
       title: "Electromagnetism",
       description: "Study electric and magnetic fields and their interactions",
-      duration: 45, // minutes
-      questionCount: 18,
-      difficulty: "Advanced",
-      image: "/images/physics-em-background.jpg",
-      icon: "settings",
+      timelimit: 45, // minutes
+      questions: 18,
+      level: "Advanced",
+      user_id: 9,
+      attemptedQuiz: false,
+      username: "meowwww",
+      marks: 40,
+      type: "Automatic",
+      student_id: 2
+     
     },
     {
-      id: 6,
-      subject: "Chemistry",
+      quiz_id: 6,
+      subject_id: 1,
+      subject_name: "Chemistry",
       title: "Organic Chemistry",
       description: "Learn about carbon compounds and their reactions",
-      duration: 35, // minutes
-      questionCount: 14,
-      difficulty: "Advanced",
-      image: "/images/organic-chemistry-background.jpg",
-      icon: "flask",
+      timelimit: 35, // minutes
+      questions: 14,
+      level: "Advanced",
+      user_id: 9,
+      attemptedQuiz: false,
+      username: "meowwww",
+      marks: 40,
+      type: "Automatic",
+      student_id: 2
+      
     },
     {
-      id: 7,
-      subject: "Chemistry",
+      quiz_id: 7,
+      subject_id: 1,
+      subject_name: "Chemistry",
       title: "Periodic Table Elements",
       description: "Explore properties and patterns of chemical elements",
-      duration: 20, // minutes
-      questionCount: 10,
-      difficulty: "Beginner",
-      image: "/images/periodic-table-background.jpg",
-      icon: "flask",
+      timelimit: 20, // minutes
+      questions: 10,
+      level: "Beginner",
+      user_id: 9,
+      attemptedQuiz: false,
+      username: "meowwww",
+      marks: 40,
+      type: "Automatic",
+      student_id: 2
+     
     },
     {
-      id: 8,
-      subject: "Biology",
+      quiz_id: 8,
+      subject_id: 1,
+      subject_name: "Biology",
       title: "Cell Biology",
       description: "Discover the fundamental unit of all living organisms",
-      duration: 30, // minutes
-      questionCount: 12,
-      difficulty: "Intermediate",
-      image: "/images/cell-biology-background.jpg",
-      icon: "dna",
+      timelimit: 30, // minutes
+      questions: 12,
+      level: "Intermediate",
+      user_id: 9,
+      attemptedQuiz: false,
+      username: "meowwww",
+      marks: 40,
+      type: "Automatic",
+      student_id: 2
+   
     },
     {
-      id: 9,
-      subject: "Biology",
+      quiz_id: 9,
+      subject_id: 1,
+      subject_name: "Biology",
       title: "Human Anatomy",
       description: "Study the structure and systems of the human body",
-      duration: 50, // minutes
-      questionCount: 20,
-      difficulty: "Advanced",
-      image: "/images/human-anatomy-background.jpg",
-      icon: "dna",
+      timelimit: 50, // minutes
+      questions: 20,
+      level: "Advanced",
+      user_id: 9,
+      attemptedQuiz: false,
+      username: "meowwww",
+      marks: 40,
+      type: "Automatic",
+      student_id: 2
+  
     },
   ];
 
   const [activePage, setActivePage] = useState("attemptQuiz");
-  const [activeSubject, setActiveSubject] = useState("");
+  const [activesubject_name, setActivesubject_name] = useState("");
 
   useEffect(() => {
-    const uniqueSubjects = [...new Set(quizData.map((q) => q.subject))];
-    if (uniqueSubjects.length) {
-      setActiveSubject(uniqueSubjects[0]);
+    const uniquesubject_names = [...new Set(quizData.map((q) => q.subject_name))];
+    if (uniquesubject_names.length) {
+      setActivesubject_name(uniquesubject_names[0]);
     }
   }, []);
 
@@ -125,12 +178,12 @@ export const AttemptQuizPage = () => {
         <div className="container mx-auto px-4 py-8">
           <SubjectTabs
             data={quizData}
-            activeSubject={activeSubject}
-            onSubjectChange={setActiveSubject}
+            activesubject_name={activesubject_name}
+            onsubject_nameChange={setActivesubject_name}
             onPracticeMode={() => setActivePage("practiceMode")}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <QuizCard data={quizData} subject={activeSubject} />
+            <QuizCard data={quizData} subject_name={activesubject_name} />
           </div>
         </div>
       ) : (

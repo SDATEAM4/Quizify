@@ -21,7 +21,7 @@ export const QuestionCard2 = ({ questionNumber, question, isCorrect }) => {
       </div>
       
       <div className="text-lg font-medium text-gray-800 mb-6 leading-relaxed">
-        {question.question}
+        {question.statement}
       </div>
       
       <div className="space-y-3 mb-6">
@@ -29,20 +29,20 @@ export const QuestionCard2 = ({ questionNumber, question, isCorrect }) => {
           <div 
             key={key} 
             className={`flex items-center p-4 rounded-lg border ${
-              key === question.answer 
+              key === question.correct_answer 
                 ? 'bg-green-50 border-green-200' 
                 : 'bg-gray-50 border-gray-200'
             }`}
           >
             <span className={`flex items-center justify-center w-7 h-7 rounded-full text-sm font-semibold mr-3 ${
-              key === question.answer 
+              key === question.correct_answer 
                 ? 'bg-green-600 text-white' 
                 : 'bg-gray-200 text-gray-700'
             }`}>
               {key.toUpperCase()}
             </span>
             <span className="flex-1">{value}</span>
-            {key === question.answer && (
+            {key === question.correct_answer && (
               <CheckCircle size={16} className="text-green-600 ml-2" />
             )}
           </div>
