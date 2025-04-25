@@ -52,16 +52,83 @@ public class AdminController {
 
     //GET ALL USERS
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
-    
-    //GET USER BY ID
+    public ResponseEntity<?> getAllUsers() {
+        try {
+            List<User> users = userService.getAllUsers();
+            if (users.isEmpty()) {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "User not found");
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            }
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Internal error while fetching data");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }    //GET USER BY ID
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable Integer userId) {
-        return userService.getUserById(userId)
-                .map(user -> ResponseEntity.ok(user))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        try {
+            Optional<User> user = userService.getUserById(userId);
+            if (user.isPresent()) {
+                User userData = user.get();
+                Map<String, Object> response = new HashMap<>();
+                response.put("user", userData);                // Check if user is a student and add subject names and student ID
+                if ("Student".equals(userData.getRole())) {
+                    Student student = studentService.getStudentByUserId(userId);
+                    if (student != null) {
+                        // Add student ID to response
+                        response.put("studentId", student.getStudent_id());
+                        
+                        if (student.getEnrolledSubjects() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : student.getEnrolledSubjects()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
+                            }
+                            response.put("enrolledSubjectsWithNames", subjectsWithNames);
+                        }
+                    }
+                }                // Check if user is a teacher and add subject names and teacher ID
+                if ("Teacher".equals(userData.getRole())) {
+                    Teacher teacher = teacherService.getTeacherByUserId(userId);
+                    if (teacher != null) {
+                        // Add teacher ID to response
+                        response.put("teacherId", teacher.getTeacher_id());
+                        
+                        if (teacher.getSubjectTaught() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : teacher.getSubjectTaught()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
+                            }
+                            response.put("subjectsTaughtWithNames", subjectsWithNames);
+                        }
+                    }
+                }
+                
+                return ResponseEntity.ok().body(response);
+            } else {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "User not found");
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Internal error while fetching data");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     
     //CHECK DUPLICATE USERNAME OR EMAIL
@@ -79,45 +146,212 @@ public class AdminController {
         }
         
         return ResponseEntity.ok(response);
-    }
-    
-    //GET USER BY USERNAME
+    }      //GET USER BY USERNAME
     @GetMapping("/user/username/{username}")
     public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
-        return userService.getUserByUsername(username)
-                .map(user -> ResponseEntity.ok(user))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        try {
+            Optional<User> user = userService.getUserByUsername(username);
+            if (user.isPresent()) {
+                User userData = user.get();
+                Map<String, Object> response = new HashMap<>();
+                response.put("user", userData);
+                
+                // Check if user is a student and add subject names and student ID
+                if ("Student".equals(userData.getRole())) {
+                    Student student = studentService.getStudentByUserId(userData.getUserId());
+                    if (student != null) {
+                        // Add student ID to response
+                        response.put("studentId", student.getStudent_id());
+                        
+                        if (student.getEnrolledSubjects() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : student.getEnrolledSubjects()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
+                            }
+                            response.put("enrolledSubjectsWithNames", subjectsWithNames);
+                        }
+                    }
+                }
+                
+                // Check if user is a teacher and add subject names and teacher ID
+                if ("Teacher".equals(userData.getRole())) {
+                    Teacher teacher = teacherService.getTeacherByUserId(userData.getUserId());
+                    if (teacher != null) {
+                        // Add teacher ID to response
+                        response.put("teacherId", teacher.getTeacher_id());
+                        
+                        if (teacher.getSubjectTaught() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : teacher.getSubjectTaught()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
+                            }
+                            response.put("subjectsTaughtWithNames", subjectsWithNames);
+                        }
+                    }
+                }
+                
+                return ResponseEntity.ok().body(response);
+            } else {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "User not found");
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Internal error while fetching data");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-    
-    //GET USER BY EMAIL
+      //GET USER BY EMAIL
     @GetMapping("/user/email/{email}")
     public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
-        return userService.getUserByEmail(email)
-                .map(user -> ResponseEntity.ok(user))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        try {
+            Optional<User> user = userService.getUserByEmail(email);
+            if (user.isPresent()) {
+                User userData = user.get();
+                Map<String, Object> response = new HashMap<>();
+                response.put("user", userData);
+                  // Check if user is a student and add subject names and student ID
+                if ("Student".equals(userData.getRole())) {
+                    Student student = studentService.getStudentByUserId(userData.getUserId());
+                    if (student != null) {
+                        // Add student ID to response
+                        response.put("studentId", student.getStudent_id());
+                        
+                        if (student.getEnrolledSubjects() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : student.getEnrolledSubjects()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
+                            }
+                            response.put("enrolledSubjectsWithNames", subjectsWithNames);
+                        }
+                    }
+                }
+                  // Check if user is a teacher and add subject names and teacher ID
+                if ("Teacher".equals(userData.getRole())) {
+                    Teacher teacher = teacherService.getTeacherByUserId(userData.getUserId());
+                    if (teacher != null) {
+                        // Add teacher ID to response
+                        response.put("teacherId", teacher.getTeacher_id());
+                        
+                        if (teacher.getSubjectTaught() != null) {
+                            List<Map<String, Object>> subjectsWithNames = new ArrayList<>();
+                            for (Integer subjectId : teacher.getSubjectTaught()) {
+                                Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                                if (subject.isPresent()) {
+                                    Map<String, Object> subjectInfo = new HashMap<>();
+                                    subjectInfo.put("id", subjectId);
+                                    subjectInfo.put("name", subject.get().getName());
+                                    subjectsWithNames.add(subjectInfo);
+                                }
+                            }
+                            response.put("subjectsTaughtWithNames", subjectsWithNames);
+                        }
+                    }
+                }
+                
+                return ResponseEntity.ok().body(response);
+            } else {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "User not found");
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Internal error while fetching data");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     
     //GET STUDENT BY ID
     @GetMapping("/student/{studentId}")
     public ResponseEntity<?> getStudentById(@PathVariable Integer studentId) {
-        Student student = studentService.getStudentByStudentId(studentId);
-        if (student != null) {
-            return ResponseEntity.ok(student);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "Student not found with id: " + studentId));
+        try {
+            Student student = studentService.getStudentByStudentId(studentId);
+            if (student != null) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("student", student);
+                
+                // Add subject names for enrolled subjects
+                List<Map<String, Object>> enrolledSubjectsWithNames = new ArrayList<>();
+                if (student.getEnrolledSubjects() != null) {
+                    for (Integer subjectId : student.getEnrolledSubjects()) {
+                        Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                        if (subject.isPresent()) {
+                            Map<String, Object> subjectInfo = new HashMap<>();
+                            subjectInfo.put("id", subjectId);
+                            subjectInfo.put("name", subject.get().getName());
+                            enrolledSubjectsWithNames.add(subjectInfo);
+                        }
+                    }
+                }
+                response.put("enrolledSubjectsWithNames", enrolledSubjectsWithNames);
+                
+                return ResponseEntity.ok(response);
+            } else {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "User not found");
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Internal error while fetching data");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
     //GET TEACHER BY ID
     @GetMapping("/teacher/{teacherId}")
     public ResponseEntity<?> getTeacherById(@PathVariable Integer teacherId) {
-        Teacher teacher = teacherService.getTeacherByTeacherId(teacherId);
-        if (teacher != null) {
-            return ResponseEntity.ok(teacher);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "Teacher not found with id: " + teacherId));
+        try {
+            Teacher teacher = teacherService.getTeacherByTeacherId(teacherId);
+            if (teacher != null) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("teacher", teacher);
+                
+                // Add subject names for subjects taught
+                List<Map<String, Object>> taughtSubjectsWithNames = new ArrayList<>();
+                if (teacher.getSubjectTaught() != null) {
+                    for (Integer subjectId : teacher.getSubjectTaught()) {
+                        Optional<Subject> subject = subjectService.getSubjectById(subjectId);
+                        if (subject.isPresent()) {
+                            Map<String, Object> subjectInfo = new HashMap<>();
+                            subjectInfo.put("id", subjectId);
+                            subjectInfo.put("name", subject.get().getName());
+                            taughtSubjectsWithNames.add(subjectInfo);
+                        }
+                    }
+                }
+                response.put("subjectsTaughtWithNames", taughtSubjectsWithNames);
+                
+                return ResponseEntity.ok(response);
+            } else {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "User not found");
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Internal error while fetching data");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -135,7 +369,7 @@ public class AdminController {
             Optional<User> existingUserOpt = userService.getUserByUsername(username);
             if (existingUserOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "User not found with username: " + username));
+                        .body(Map.of("error", "User not found"));
             }
             
             User existingUser = existingUserOpt.get();
@@ -151,10 +385,9 @@ public class AdminController {
                 String imageUrl = cloudinaryService.uploadFile(profileImage);
                 existingUser.setProfileImageUrl(imageUrl);
             }
-            
-            // Save updated user
-            User updatedUser = userService.saveUser(existingUser);
-            return ResponseEntity.ok(updatedUser);
+              // Save updated user
+            userService.saveUser(existingUser);
+            return ResponseEntity.ok(Map.of("message", "User updated successfully"));
             
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -193,14 +426,12 @@ public class AdminController {
             student.setUser(newUser);
             student.setEnrolledSubjects(enrolledSubjects);
             student.setAttemptedQuiz(new Integer[0]);
+              student = studentService.updateStudent(student);
             
-            Student newStudent = studentService.updateStudent(student);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("user", newUser);
-            response.put("student", newStudent);
-            
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            // Return response with student ID
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "message", "User added successfully"
+            ));
             
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
@@ -241,14 +472,12 @@ public class AdminController {
             teacher.setUser(newUser);
             teacher.setSubjectTaught(subjectTaught);
             teacher.setCreatedQuiz(new Integer[0]);
+              teacher = teacherService.updateTeacher(teacher);
             
-            Teacher newTeacher = teacherService.updateTeacher(teacher);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("user", newUser);
-            response.put("teacher", newTeacher);
-            
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            // Return response with teacher ID
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "message", "User added successfully"
+            ));
             
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
@@ -271,30 +500,14 @@ public class AdminController {
         try {
             User updatedUser = adminService.editUser(userId, fname, lname, null, password, null, null, profileImage);
             if (bio != null) updatedUser.setBio(bio);
-            return ResponseEntity.ok(userService.saveUser(updatedUser));
+            userService.saveUser(updatedUser);
+            return ResponseEntity.ok(Map.of("message", "User updated successfully"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to update user profile: " + e.getMessage()));
-        }
-    }
-    
-    // GET ALL SUBJECTS
-    @GetMapping("/subjects")
-    public ResponseEntity<List<Subject>> getAllSubjects() {
-        return ResponseEntity.ok(subjectService.getAllSubjects());
-    }
-      // GET SUBJECT BY ID
-    @GetMapping("/subject/{subjectId}")
-    public ResponseEntity<?> getSubjectById(@PathVariable Integer subjectId) {
-        Optional<Subject> subject = subjectService.getSubjectById(subjectId);
-        if (subject.isPresent()) {
-            return ResponseEntity.ok(subject.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "Subject not found with id: " + subjectId));
         }
     }
     
@@ -308,7 +521,7 @@ public class AdminController {
             Student student = studentService.getStudentByStudentId(studentId);
             if (student == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Student not found with id: " + studentId));
+                        .body(Map.of("error", "Student not found"));
             }
             
             // Parse the new subjects to add
@@ -348,11 +561,10 @@ public class AdminController {
             student.setEnrolledSubjects(updatedSubjects.toArray(new Integer[0]));
             
             // Save the updated student record
-            Student updatedStudent = studentService.updateStudent(student);
+           studentService.updateStudent(student);
             
             return ResponseEntity.ok(Map.of(
-                "message", "Enrolled subjects updated successfully",
-                "student", updatedStudent
+                "message", "Enrolled subjects updated successfully"
             ));
             
         } catch (NumberFormatException e) {
@@ -374,7 +586,7 @@ public class AdminController {
             Teacher teacher = teacherService.getTeacherByTeacherId(teacherId);
             if (teacher == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Teacher not found with id: " + teacherId));
+                        .body(Map.of("error", "Teacher not found"));
             }
             
             // Parse the new subjects to add
@@ -414,11 +626,10 @@ public class AdminController {
             teacher.setSubjectTaught(updatedSubjects.toArray(new Integer[0]));
             
             // Save the updated teacher record
-            Teacher updatedTeacher = teacherService.updateTeacher(teacher);
+            teacherService.updateTeacher(teacher);
             
             return ResponseEntity.ok(Map.of(
-                "message", "Subjects taught updated successfully",
-                "teacher", updatedTeacher
+                "message", "Subjects taught updated successfully"
             ));
             
         } catch (NumberFormatException e) {
@@ -440,7 +651,7 @@ public class AdminController {
             Student student = studentService.getStudentByStudentId(studentId);
             if (student == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Student not found with id: " + studentId));
+                        .body(Map.of("error", "Student not found"));
             }
             
             // Parse the subjects to remove
@@ -484,11 +695,10 @@ public class AdminController {
             student.setEnrolledSubjects(updatedSubjects.toArray(new Integer[0]));
             
             // Save the updated student record
-            Student updatedStudent = studentService.updateStudent(student);
+             studentService.updateStudent(student);
             
             return ResponseEntity.ok(Map.of(
-                "message", "Enrolled subjects updated successfully",
-                "student", updatedStudent
+                "message", "Enrolled subjects updated successfully"
             ));
             
         } catch (NumberFormatException e) {
@@ -510,7 +720,7 @@ public class AdminController {
             Teacher teacher = teacherService.getTeacherByTeacherId(teacherId);
             if (teacher == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Teacher not found with id: " + teacherId));
+                        .body(Map.of("error", "Teacher not found"));
             }
             
             // Parse the subjects to remove
@@ -554,11 +764,10 @@ public class AdminController {
             teacher.setSubjectTaught(updatedSubjects.toArray(new Integer[0]));
             
             // Save the updated teacher record
-            Teacher updatedTeacher = teacherService.updateTeacher(teacher);
+            teacherService.updateTeacher(teacher);
             
             return ResponseEntity.ok(Map.of(
-                "message", "Subjects taught updated successfully",
-                "teacher", updatedTeacher
+                "message", "Subjects taught updated successfully"
             ));
             
         } catch (NumberFormatException e) {
@@ -578,7 +787,7 @@ public class AdminController {
             Optional<User> userOpt = userService.getUserById(userId);
             if (userOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "User not found with id: " + userId));
+                        .body(Map.of("error", "User not found"));
             }            // Delete reports associated with the user
             List<Report> userReports = reportRepository.findByUserId(userId);
             reportRepository.deleteAll(userReports);

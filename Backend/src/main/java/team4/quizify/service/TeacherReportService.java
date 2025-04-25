@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team4.quizify.entity.Quiz;
 import team4.quizify.entity.Report;
+import team4.quizify.entity.Subject;
 import team4.quizify.repository.QuizRepository;
 import team4.quizify.repository.ReportRepository;
+import team4.quizify.repository.SubjectRepository;
 
 import java.util.*;
 
@@ -13,9 +15,11 @@ import java.util.*;
 public class TeacherReportService {
     @Autowired
     private ReportRepository reportRepository;
+      @Autowired
+    private QuizRepository quizDataRepository;
     
     @Autowired
-    private QuizRepository quizDataRepository;
+    private SubjectRepository subjectRepository;
     
     public List<Map<String, Object>> generateSubjectTeacherStudentReport() {
         return new ArrayList<>();
@@ -28,7 +32,7 @@ public class TeacherReportService {
         // Check if the quiz exists
         Optional<Quiz> quizDataOptional = quizDataRepository.findById(quizId);
         if (quizDataOptional.isEmpty()) {
-            statistics.put("error", "Quiz not found with ID: " + quizId);
+            statistics.put("error", "Quiz not found");
             return statistics;
         }
         
@@ -36,20 +40,31 @@ public class TeacherReportService {
         
         // Get all reports for the quiz
         List<Report> reports = reportRepository.findByQuizId(quizId);
-        
-        if (reports.isEmpty()) {
+          if (reports.isEmpty()) {
+            // Get subject name
+            Integer subjectId = quizData.getSubjectId();
+            String subjectName = "Unknown Subject";
+            Optional<Subject> subjectOptional = subjectRepository.findById(subjectId);
+            if (subjectOptional.isPresent()) {
+                subjectName = subjectOptional.get().getName();
+            }
+            
             statistics.put("quizId", quizId);
-            statistics.put("quizName", quizData.getType()); 
+            statistics.put("type", quizData.getType());
+            statistics.put("quizName", quizData.getTitle()); 
             statistics.put("totalMarks", quizData.getMarks());
             statistics.put("message", "No students have attempted this quiz yet.");
             statistics.put("totalAttempts", 0);
             statistics.put("averageMarks", 0);
             statistics.put("maximumMarks", 0);
             statistics.put("minimumMarks", 0);
+            statistics.put("subjectId", subjectId);
+            statistics.put("subjectName", subjectName);
+            statistics.put("title", quizData.getTitle());
+            statistics.put("description", quizData.getDescription());
             return statistics;
         }
-        
-        // Get total number of students who attempted
+          // Get total number of students who attempted
         int totalAttempts = reports.size();
         
         // Calculate statistics
@@ -57,9 +72,16 @@ public class TeacherReportService {
         Integer maxMarks = reportRepository.getMaxMarksByQuizId(quizId);
         Integer minMarks = reportRepository.getMinMarksByQuizId(quizId);
         
-        // Build response
-        statistics.put("quizId", quizId);
-        statistics.put("quizName", quizData.getType()); 
+        // Get subject name
+        Integer subjectId = quizData.getSubjectId();
+        String subjectName = "Unknown Subject";
+        Optional<Subject> subjectOptional = subjectRepository.findById(subjectId);
+        if (subjectOptional.isPresent()) {
+            subjectName = subjectOptional.get().getName();
+        }
+          // Build response        statistics.put("quizId", quizId);
+        statistics.put("type", quizData.getType()); 
+        statistics.put("quizName", quizData.getTitle());
         statistics.put("totalMarks", quizData.getMarks());
         statistics.put("totalAttempts", totalAttempts);
         statistics.put("averageMarks", averageMarks != null ? averageMarks : 0);
@@ -67,7 +89,9 @@ public class TeacherReportService {
         statistics.put("minimumMarks", minMarks != null ? minMarks : 0);
         statistics.put("level", quizData.getLevel());
         statistics.put("timeLimit", quizData.getTimelimit());
-        statistics.put("subjectId", quizData.getSubjectId());
+        statistics.put("subjectId", subjectId);
+        statistics.put("subjectName", subjectName);
+        statistics.put("description", quizData.getDescription());
         
         return statistics;
     }
