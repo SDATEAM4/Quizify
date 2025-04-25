@@ -41,121 +41,10 @@ export const QuizDialog = ({ quizData, setPage }) => {
   const handleBack = () => {
     setPage();
   };
-  //dummy data-set
 
 
-  const response = [
-    {
-      question: "What is the unit of force in the International System of Units (SI)?",
-      options: {
-        a: "Newton (N)",
-        b: "Kilogram (kg)",
-        c: "Meter (m)",
-        d: "Second (s)"
-      },
-      answer: "a",
-      explanation: "The Newton (N) is the SI unit of force."
-    },
-    {
-      question: "Which of the following is a vector quantity in physics?",
-      options: {
-        a: "Mass",
-        b: "Speed",
-        c: "Velocity",
-        d: "Temperature"
-      },
-      answer: "c",
-      explanation: "Velocity is a vector quantity as it has both magnitude and direction."
-    },
-    {
-      question: "What is the formula for calculating the work done by a force?",
-      options: {
-        a: "W = F * d",
-        b: "W = F / d",
-        c: "W = F + d",
-        d: "W = F - d"
-      },
-      answer: "a",
-      explanation: "Work (W) is calculated as the product of force (F) and displacement (d)."
-    },
-    {
-      question: "Which of the following is a correct statement about friction?",
-      options: {
-        a: "Friction always opposes motion.",
-        b: "Friction is always beneficial.",
-        c: "Friction is always harmful.",
-        d: "Friction is always constant."
-      },
-      answer: "a",
-      explanation: "Friction always opposes motion."
-    },
-    {
-      question: "What is the relationship between force and acceleration?",
-      options: {
-        a: "Force is directly proportional to acceleration.",
-        b: "Force is inversely proportional to acceleration.",
-        c: "Force is independent of acceleration.",
-        d: "Force is directly proportional to the square of acceleration."
-      },
-      answer: "a",
-      explanation: "Force is directly proportional to acceleration."
-    },
-    {
-      question: "Which of the following is a correct statement about Newton's Third Law?",
-      options: {
-        a: "For every action, there is an equal and opposite reaction.",
-        b: "For every action, there is an equal and opposite force.",
-        c: "For every action, there is an equal and opposite reaction force.",
-        d: "For every action, there is an equal and opposite force."
-      },
-      answer: "a",
-      explanation: "For every action, there is an equal and opposite reaction."
-    },
-    {
-      question: "What is the formula for calculating the kinetic energy of an object?",
-      options: {
-        a: "KE = 1/2 * m * v^2",
-        b: "KE = m * v^2",
-        c: "KE = m * v",
-        d: "KE = 1/2 * m * v"
-      },
-      answer: "a",
-      explanation: "Kinetic energy (KE) is calculated as 1/2 * mass (m) * velocity (v)^2."
-    },
-    {
-      question: "Which of the following is a correct statement about the center of mass?",
-      options: {
-        a: "The center of mass is always at the center of the object.",
-        b: "The center of mass is always at the center of the object's base.",
-        c: "The center of mass is the point where the object's weight is evenly distributed.",
-        d: "The center of mass is the point where the object's mass is evenly distributed."
-      },
-      answer: "d",
-      explanation: "The center of mass is the point where the object's mass is evenly distributed."
-    },
-    {
-      question: "What is the formula for calculating the work done by a force in a circular motion?",
-      options: {
-        a: "W = F * d",
-        b: "W = F * θ",
-        c: "W = F * r",
-        d: "W = F * θ * r"
-      },
-      answer: "b",
-      explanation: "Work (W) is calculated as force (F) times the angle (θ) in radians."
-    },
-    {
-      question: "Which of the following is a correct statement about the relationship between force and motion?",
-      options: {
-        a: "Force is always required to change the motion of an object.",
-        b: "Force is always required to maintain the motion of an object.",
-        c: "Force is always required to change the direction of an object.",
-        d: "Force is always required to maintain the direction of an object."
-      },
-      answer: "a",
-      explanation: "Force is always required to change the motion of an object."
-    }
-  ]
+
+ 
   const transformDataset = (data) => {
     return data.map(({ question, answer, ...rest }) => ({
       ...rest,
@@ -169,13 +58,129 @@ export const QuizDialog = ({ quizData, setPage }) => {
   
   const navigate = useNavigate();
   const handleclick = () => {
-    
-    const quizName = selectedsubject_name
-    const quizTopic = selectedTopic
-    const timeDuration = 10;// its a dummy data
+    //this body data will be passed to the api to get response
+    const quizName = selectedsubject_name;
+    const quizTopic = selectedTopic;
+    const description='';
+    const difficultyLevel = difficulty;
+    const noOfquestion=questionCount;
+      //dummy data-set
+    const response = [
+      {
+        question: "What is the unit of force in the International System of Units (SI)?",
+        options: {
+          a: "Newton (N)",
+          b: "Kilogram (kg)",
+          c: "Meter (m)",
+          d: "Second (s)"
+        },
+        answer: "a",
+        explanation: "The Newton (N) is the SI unit of force."
+      },
+      {
+        question: "Which of the following is a vector quantity in physics?",
+        options: {
+          a: "Mass",
+          b: "Speed",
+          c: "Velocity",
+          d: "Temperature"
+        },
+        answer: "c",
+        explanation: "Velocity is a vector quantity as it has both magnitude and direction."
+      },
+      {
+        question: "What is the formula for calculating the work done by a force?",
+        options: {
+          a: "W = F * d",
+          b: "W = F / d",
+          c: "W = F + d",
+          d: "W = F - d"
+        },
+        answer: "a",
+        explanation: "Work (W) is calculated as the product of force (F) and displacement (d)."
+      },
+      {
+        question: "Which of the following is a correct statement about friction?",
+        options: {
+          a: "Friction always opposes motion.",
+          b: "Friction is always beneficial.",
+          c: "Friction is always harmful.",
+          d: "Friction is always constant."
+        },
+        answer: "a",
+        explanation: "Friction always opposes motion."
+      },
+      {
+        question: "What is the relationship between force and acceleration?",
+        options: {
+          a: "Force is directly proportional to acceleration.",
+          b: "Force is inversely proportional to acceleration.",
+          c: "Force is independent of acceleration.",
+          d: "Force is directly proportional to the square of acceleration."
+        },
+        answer: "a",
+        explanation: "Force is directly proportional to acceleration."
+      },
+      {
+        question: "Which of the following is a correct statement about Newton's Third Law?",
+        options: {
+          a: "For every action, there is an equal and opposite reaction.",
+          b: "For every action, there is an equal and opposite force.",
+          c: "For every action, there is an equal and opposite reaction force.",
+          d: "For every action, there is an equal and opposite force."
+        },
+        answer: "a",
+        explanation: "For every action, there is an equal and opposite reaction."
+      },
+      {
+        question: "What is the formula for calculating the kinetic energy of an object?",
+        options: {
+          a: "KE = 1/2 * m * v^2",
+          b: "KE = m * v^2",
+          c: "KE = m * v",
+          d: "KE = 1/2 * m * v"
+        },
+        answer: "a",
+        explanation: "Kinetic energy (KE) is calculated as 1/2 * mass (m) * velocity (v)^2."
+      },
+      {
+        question: "Which of the following is a correct statement about the center of mass?",
+        options: {
+          a: "The center of mass is always at the center of the object.",
+          b: "The center of mass is always at the center of the object's base.",
+          c: "The center of mass is the point where the object's weight is evenly distributed.",
+          d: "The center of mass is the point where the object's mass is evenly distributed."
+        },
+        answer: "d",
+        explanation: "The center of mass is the point where the object's mass is evenly distributed."
+      },
+      {
+        question: "What is the formula for calculating the work done by a force in a circular motion?",
+        options: {
+          a: "W = F * d",
+          b: "W = F * θ",
+          c: "W = F * r",
+          d: "W = F * θ * r"
+        },
+        answer: "b",
+        explanation: "Work (W) is calculated as force (F) times the angle (θ) in radians."
+      },
+      {
+        question: "Which of the following is a correct statement about the relationship between force and motion?",
+        options: {
+          a: "Force is always required to change the motion of an object.",
+          b: "Force is always required to maintain the motion of an object.",
+          c: "Force is always required to change the direction of an object.",
+          d: "Force is always required to maintain the direction of an object."
+        },
+        answer: "a",
+        explanation: "Force is always required to change the motion of an object."
+      }
+    ]
+
     const dataset = transformDataset(response);
     // Navigate to the quiz page with the quiz data
-    navigate("/quizGenerator", { state: { quizName, quizTopic, timeDuration,dataset, quizType: "PracticeQuiz" } }); // Pass quizState as state
+    navigate("/quizGenerator", { state: { quizName, quizTopic, timeDuration:0,dataset,totalMarks:0, quizType: "PracticeQuiz" } }); // Pass quizState as state
   };
 
   return (

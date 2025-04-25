@@ -4,9 +4,11 @@ import { QuizCard } from "../components/quizCard";
 import { Footer } from "../components/footer";
 import { NavBar } from "../components/navbar";
 import {QuizDialog} from "../components/practiceQuizDialog"; 
+//import{authContext} from "../context/authContext";
 
 export const AttemptQuizPage = () => {
-  const quizData = [
+  //const {uId} = authContext();// get uid then get reponse as response from DB
+  const response = [
     {
       quiz_id: 1,
       subject_id: 1,
@@ -165,7 +167,7 @@ export const AttemptQuizPage = () => {
   const [activesubject_name, setActivesubject_name] = useState("");
 
   useEffect(() => {
-    const uniquesubject_names = [...new Set(quizData.map((q) => q.subject_name))];
+    const uniquesubject_names = [...new Set(response.map((q) => q.subject_name))];
     if (uniquesubject_names.length) {
       setActivesubject_name(uniquesubject_names[0]);
     }
@@ -177,18 +179,18 @@ export const AttemptQuizPage = () => {
       {activePage === "attemptQuiz" ? (
         <div className="container mx-auto px-4 py-8">
           <SubjectTabs
-            data={quizData}
+            data={response}
             activesubject_name={activesubject_name}
             onsubject_nameChange={setActivesubject_name}
             onPracticeMode={() => setActivePage("practiceMode")}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <QuizCard data={quizData} subject_name={activesubject_name} />
+            <QuizCard data={response} subject_name={activesubject_name} />
           </div>
         </div>
       ) : (
         <div className="container mx-auto px-4 py-8">
-          <QuizDialog quizData={quizData} setPage={() => setActivePage("attemptQuiz")} />
+          <QuizDialog quizData={response} setPage={() => setActivePage("attemptQuiz")} />
         </div>
       )}
       <Footer />
