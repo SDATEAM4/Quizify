@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface OtpRepository extends JpaRepository<Otp, Long> {
-    Optional<Otp> findByUserIdAndOtpCode(Long userId, String otpCode);
+    Optional<Otp> findByUserIdAndOtpCode(int userId, String otpCode);
     void deleteByCreatedAtBefore(LocalDateTime time);
 
 }

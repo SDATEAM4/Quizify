@@ -14,7 +14,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")  // Automatically picks from application.properties
+    @Value("${spring.mail.username}")
     private String senderEmail;
 
     public void sendOtp(String toEmail, String otp) throws MessagingException {

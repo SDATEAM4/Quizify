@@ -47,7 +47,7 @@ public class AuthService {
 
             // Step 3: Create an OTP entity and map it to the userId
             Otp otpEntity = new Otp();
-            otpEntity.setUserId(user.getUserId().longValue()); // Convert Integer to Long
+            otpEntity.setUserId(user.getUserId());
             otpEntity.setOtpCode(otp); // Set the generated OTP code
 
             // Step 4: Save the OTP entity to the database
@@ -66,7 +66,7 @@ public class AuthService {
         return false;  // User not found
     }
 
-    public boolean verifyOtp(Long userId, String otpCode) {
+    public boolean verifyOtp(int userId, String otpCode) {
         otpRepository.deleteByCreatedAtBefore(LocalDateTime.now().minusMinutes(5));
         Optional<Otp> otpOptional = otpRepository.findByUserIdAndOtpCode(userId, otpCode);
         if (otpOptional.isPresent()) {

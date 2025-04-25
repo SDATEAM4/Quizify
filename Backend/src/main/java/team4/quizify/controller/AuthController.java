@@ -9,7 +9,7 @@ import team4.quizify.service.AuthService;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/Quizify")
 public class AuthController {
 
     @Autowired
@@ -36,7 +36,7 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password/verify-otp")
-    public ResponseEntity<?> verifyOtp(@RequestParam Long userId, @RequestParam String otp) {
+    public ResponseEntity<?> verifyOtp(@RequestParam int userId, @RequestParam String otp) {
         boolean valid = authService.verifyOtp(userId, otp);
         return valid ? ResponseEntity.ok("OTP verified") :
                 ResponseEntity.status(400).body("Invalid OTP");

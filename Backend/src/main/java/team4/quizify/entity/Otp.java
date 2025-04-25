@@ -7,14 +7,16 @@ import java.time.LocalDateTime;
 public class Otp {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // or GenerationType.AUTO
+    @Column(name = "otp_id")
+    private Integer otpId;
+    @Column(name = "user_id")
+    private int userId;
 
-    private Long userId;
-
+    @Column(name = "otp_code")
     private String otpCode;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
@@ -23,19 +25,19 @@ public class Otp {
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
+    public Integer getOtpId() {
+        return otpId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setOtpId(Integer otpId) {
+        this.otpId = otpId;
     }
 
-    public Long getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
