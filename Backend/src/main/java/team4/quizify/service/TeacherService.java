@@ -63,9 +63,7 @@ public class TeacherService {
     
     public Teacher updateTeacher(Teacher teacher) {
         return teacherRepository.save(teacher);
-    }
-    
-    public void deleteByUserId(Integer userId) {
+    }    public void deleteByUserId(Integer userId) {
         Teacher teacher = teacherRepository.findByUser_UserId(userId);
         if (teacher != null) {
             teacherRepository.delete(teacher);

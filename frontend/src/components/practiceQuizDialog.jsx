@@ -20,8 +20,7 @@ export const QuizDialog = ({ quizData, setPage }) => {
         Beginner: 'bg-green-500 text-white',
         Intermediate: 'bg-yellow-500 text-white',
         Advanced: 'bg-orange-500 text-white',
-        Aura: 'bg-red-500 text-white',
-        Impossible: 'bg-purple-500 text-white'
+        Impossible: 'bg-red-500 text-white'
     };
 
     const uniqueSubjects = useMemo(() => {
@@ -35,7 +34,7 @@ export const QuizDialog = ({ quizData, setPage }) => {
     }, [quizData, selectedSubject]);
 
     const handleQuestionCountChange = (e) => {
-        const value = Math.min(Math.max(parseInt(e.target.value) || 5, 5), 15);
+        const value = Math.min(Math.max(parseInt(e.target.value) || 5, 5), 20);
         setQuestionCount(value);
     };
 
@@ -223,12 +222,12 @@ export const QuizDialog = ({ quizData, setPage }) => {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Number of Questions (5-15)
+                            Number of Questions (5-20)
                         </label>
                         <input
                             type="number"
                             min="5"
-                            max="15"
+                            max="20"
                             value={questionCount}
                             onChange={handleQuestionCountChange}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black"
@@ -240,7 +239,7 @@ export const QuizDialog = ({ quizData, setPage }) => {
                             Difficulty Level
                         </label>
                         <div className="grid grid-cols-2 gap-3">
-                            {['Beginner', 'Intermediate', 'Advanced', 'Aura', 'Impossible'].map((level) => (
+                            {['Beginner', 'Intermediate', 'Advanced', 'Impossible'].map((level) => (
                                 <label
                                     key={level}
                                     className={`

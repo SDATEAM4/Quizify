@@ -9,7 +9,8 @@ import team4.quizify.service.ChatService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/chats")
+
+@RequestMapping("/Quizify/chats")
 @RequiredArgsConstructor
 public class ChatController {
 
@@ -42,16 +43,22 @@ public class ChatController {
         chat.setReceiverId(teacherId); // assuming teacher is receiving
         return ResponseEntity.ok(chatService.sendMessage(chat));
     }
-
-    // 4. Delete all messages between teacher and student
+//4.Delete all messages between teacher and student
     @DeleteMapping("/{teacherId}/{studentId}")
-    public ResponseEntity<Void> deleteMessagesBetweenTeacherAndStudent(
-            @PathVariable int  teacherId,
-            @PathVariable int  studentId
+    public ResponseEntity<String> deleteMessagesBetweenTeacherAndStudent(
+            @PathVariable int teacherId,
+            @PathVariable int studentId
     ) {
+        List<Chat> messages = chatService.getMessagesBetweenTeacherAndStudent(teacherId, studentId);
+
+        if (messages.isEmpty()) {
+            return ResponseEntity.status(404).body("No messages found between the given teacher and student.");
+        }
+
         chatService.deleteMessagesBetweenTeacherAndStudent(teacherId, studentId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("All messages deleted successfully.");
     }
+
 
     // 5. Get unresolved query status
     @GetMapping("/{teacherId}/{studentId}/unresolved")

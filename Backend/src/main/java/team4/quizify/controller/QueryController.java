@@ -8,7 +8,7 @@ import team4.quizify.service.QueryService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/chats")
+@RequestMapping("/Quizify/chats")
 @RequiredArgsConstructor
 public class QueryController {
 

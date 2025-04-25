@@ -3,9 +3,11 @@ package team4.quizify.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team4.quizify.entity.Report;
+import team4.quizify.entity.Subject;
 import team4.quizify.entity.User;
 import team4.quizify.entity.Quiz;
 import team4.quizify.repository.ReportRepository;
+import team4.quizify.repository.SubjectRepository;
 import team4.quizify.repository.UserRepository;
 import team4.quizify.repository.QuizRepository;
 
@@ -19,9 +21,11 @@ public class StudentReportService implements team4.quizify.service.Report {
     
     @Autowired
     private UserRepository userRepository;
+      @Autowired
+    private QuizRepository quizDataRepository;
     
     @Autowired
-    private QuizRepository quizDataRepository;
+    private SubjectRepository subjectRepository;
     
     @Override
     public List<Map<String, Object>> generateSubjectTeacherStudentReport() {
@@ -39,9 +43,22 @@ public class StudentReportService implements team4.quizify.service.Report {
         }
         
         Report report = reports.get(0);
+          Optional<Quiz> quizOptional = quizDataRepository.findById(quizId);
+        if (!quizOptional.isPresent()) {
+            reportData.put("message", "Quiz not found");
+            return reportData;
+        }
         
-        Optional<Quiz> quizData = quizDataRepository.findById(quizId);
-        Integer totalMarks = quizData.isPresent() ? quizData.get().getMarks() : null;
+        Quiz quiz = quizOptional.get();
+        Integer totalMarks = quiz.getMarks();
+        Integer subjectId = quiz.getSubjectId();
+        
+        // Get subject name
+        String subjectName = "Unknown Subject";
+        Optional<Subject> subjectOptional = subjectRepository.findById(subjectId);
+        if (subjectOptional.isPresent()) {
+            subjectName = subjectOptional.get().getName();
+        }
         
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
@@ -53,6 +70,10 @@ public class StudentReportService implements team4.quizify.service.Report {
         reportData.put("userId", userId);
         reportData.put("obtainedMarks", report.getObtainMarks());
         reportData.put("totalMarks", totalMarks);
+        reportData.put("title", quiz.getTitle());
+        reportData.put("description", quiz.getDescription());
+        reportData.put("subjectName", subjectName);
+        reportData.put("subjectId", subjectId);
         
         Double avgMarks = reportRepository.getAverageMarksByQuizId(quizId);
         Integer maxMarks = reportRepository.getMaxMarksByQuizId(quizId);
@@ -96,9 +117,21 @@ public class StudentReportService implements team4.quizify.service.Report {
         for (Map.Entry<Integer, List<Report>> entry : reportsByQuizId.entrySet()) {
             Integer quizId = entry.getKey();
             Report report = entry.getValue().get(0);
+              Optional<Quiz> quizOptional = quizDataRepository.findById(quizId);
+            if (!quizOptional.isPresent()) {
+                continue;
+            }
             
-            Optional<Quiz> quizData = quizDataRepository.findById(quizId);
-            Integer totalMarks = quizData.isPresent() ? quizData.get().getMarks() : null;
+            Quiz quiz = quizOptional.get();
+            Integer totalMarks = quiz.getMarks();
+            Integer subjectId = quiz.getSubjectId();
+            
+            // Get subject name
+            String subjectName = "Unknown Subject";
+            Optional<Subject> subjectOptional = subjectRepository.findById(subjectId);
+            if (subjectOptional.isPresent()) {
+                subjectName = subjectOptional.get().getName();
+            }
             
             Map<String, Object> quizReport = new HashMap<>();
             quizReport.put("quizId", quizId);
@@ -106,6 +139,10 @@ public class StudentReportService implements team4.quizify.service.Report {
             quizReport.put("userId", userId);
             quizReport.put("obtainedMarks", report.getObtainMarks());
             quizReport.put("totalMarks", totalMarks);
+            quizReport.put("title", quiz.getTitle());
+            quizReport.put("description", quiz.getDescription());
+            quizReport.put("subjectName", subjectName);
+            quizReport.put("subjectId", subjectId);
             
             Double avgMarks = reportRepository.getAverageMarksByQuizId(quizId);
             Integer maxMarks = reportRepository.getMaxMarksByQuizId(quizId);
@@ -130,9 +167,22 @@ public class StudentReportService implements team4.quizify.service.Report {
             reportData.put("message", "No reports found for this quiz");
             return reportData;
         }
+          Optional<Quiz> quizOptional = quizDataRepository.findById(quizId);
+        if (!quizOptional.isPresent()) {
+            reportData.put("message", "Quiz not found");
+            return reportData;
+        }
         
-        Optional<Quiz> quizData = quizDataRepository.findById(quizId);
-        Integer totalMarks = quizData.isPresent() ? quizData.get().getMarks() : null;
+        Quiz quiz = quizOptional.get();
+        Integer totalMarks = quiz.getMarks();
+        Integer subjectId = quiz.getSubjectId();
+        
+        // Get subject name
+        String subjectName = "Unknown Subject";
+        Optional<Subject> subjectOptional = subjectRepository.findById(subjectId);
+        if (subjectOptional.isPresent()) {
+            subjectName = subjectOptional.get().getName();
+        }
         
         Double avgMarks = reportRepository.getAverageMarksByQuizId(quizId);
         Integer maxMarks = reportRepository.getMaxMarksByQuizId(quizId);
@@ -144,6 +194,10 @@ public class StudentReportService implements team4.quizify.service.Report {
         reportData.put("averageMarks", avgMarks != null ? avgMarks : 0);
         reportData.put("maxMarks", maxMarks != null ? maxMarks : 0);
         reportData.put("minMarks", minMarks != null ? minMarks : 0);
+        reportData.put("title", quiz.getTitle());
+        reportData.put("description", quiz.getDescription());
+        reportData.put("subjectName", subjectName);
+        reportData.put("subjectId", subjectId);
         
         List<Map<String, Object>> studentPerformances = new ArrayList<>();
         for (Report report : reports) {

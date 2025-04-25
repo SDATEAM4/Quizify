@@ -1,6 +1,7 @@
 package team4.quizify.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import team4.quizify.entity.User;
@@ -40,24 +41,33 @@ public class AdminService {
         User user = new User(fname, lname, username, password, email, role, profileImageUrl);
         return userService.saveUser(user);
     }
+      @Autowired
+    private JdbcTemplate jdbcTemplate;
     
     public void removeUser(Integer userId) {
         // First check if the user exists
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
         
-        // Delete associated student record if user is a student
-        if ("Student".equals(user.getRole())) {
-            studentService.deleteByUserId(userId);
+        try {
+            // Delete any chat records associated with the user first
+            jdbcTemplate.update("DELETE FROM chat WHERE sender_id = ? OR receiver_id = ?", userId, userId);
+            
+            // Delete associated student record if user is a student
+            if ("Student".equals(user.getRole())) {
+                studentService.deleteByUserId(userId);
+            }
+            
+            // Delete associated teacher record if user is a teacher
+            if ("Teacher".equals(user.getRole())) {
+                teacherService.deleteByUserId(userId);
+            }
+            
+            // Delete the user
+            userService.deleteUser(userId);
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting user: " + e.getMessage(), e);
         }
-        
-        // Delete associated teacher record if user is a teacher
-        if ("Teacher".equals(user.getRole())) {
-            teacherService.deleteByUserId(userId);
-        }
-        
-        // Delete the user
-        userService.deleteUser(userId);
     }
     
     public User editUser(Integer userId, String fname, String lname, String username, 

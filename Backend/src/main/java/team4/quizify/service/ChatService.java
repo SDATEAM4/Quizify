@@ -57,10 +57,11 @@ public class ChatService {
         chatRepository.deleteAll(messages);
     }
 
+
     // ✅ For: GET /chats/{teacherId}/{studentId}/unresolved
     public boolean isQueryUnresolved(int  teacherId, int  studentId) {
         List<Query> queries = queryRepository.findByReceiverIdAndResolveStatusFalse(teacherId);
-        return queries.stream().anyMatch(query -> query.getSenderId().equals(studentId));
+        return queries.stream().anyMatch(query -> query.getSenderId() == studentId);
     }
 
     // ✅ For: GET /chats/subjects?subjectId=2

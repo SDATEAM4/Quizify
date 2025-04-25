@@ -1,19 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Save, Home } from 'lucide-react';
-
+import AnswerKey from './AnswerKey';
+import { useNavigate } from 'react-router-dom';
 const QuizResults = ({ quizName, stats, dataSet, quizType,isCorrect }) => {
   const { percentage, correctCount, incorrectCount, totalQuestions, formattedTime } = stats;
-  
+  const [viewAnswerKey, setViewAnswerKey] = useState(false); 
   const handleSaveResults = () => {
     alert("Result saved!");
   };
-  const displayAnswerKey = () => {
+  const navigate = useNavigate();
 
 
-    // Implement logic to display the answer key
-    alert("Answer key displayed!");
-  };
-  return (
+  return viewAnswerKey === false ? (
+   
     <div className="bg-white rounded-xl p-10 shadow-lg text-center">
       <h1 className="text-3xl font-bold text-slate-800 mb-2">Quiz Completed!</h1>
       <p className="text-base text-slate-500 mb-10">Here's how you performed on {quizName}</p>
@@ -55,19 +54,23 @@ const QuizResults = ({ quizName, stats, dataSet, quizType,isCorrect }) => {
             </button>
           ) : (
             <button className="flex items-center justify-center px-6 py-3 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
-              onClick={displayAnswerKey}>
+              onClick={() =>{ setViewAnswerKey(true);}}>
               <Save size={18} className="mr-2" />
               <span>View Answer Key</span>
             </button>
           )
         }
 
-        <button className="flex items-center justify-center px-6 py-3 bg-slate-800 text-white rounded-lg text-sm font-semibold hover:bg-slate-900 transition-colors duration-200">
+        <button className="flex items-center justify-center px-6 py-3 bg-slate-800 text-white rounded-lg text-sm font-semibold hover:bg-slate-900 transition-colors duration-200" onClick={() => navigate('/student/home')}>
           <Home size={18} className="mr-2" />
-          <span>Return to Dashboard</span>
+          <span>Return to Home</span>
         </button>
       </div>
     </div>
+) : (
+    
+    //<div>hello bhai</div>
+    <AnswerKey dataSet={dataSet} isCorrect={isCorrect} myfunction={setViewAnswerKey} />
   );
 };
 
