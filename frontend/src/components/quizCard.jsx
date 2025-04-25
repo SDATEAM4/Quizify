@@ -1,9 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 export const QuizCard = ({ data, subject_name }) => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const filteredQuizzes = data.filter((quiz) => quiz.subject_name === subject_name); // it filters the quizzes based on the subject_name passed as a prop
-  
+
   const getlevelColor = (level) => {
     switch (level) {
       case "Beginner":
@@ -18,18 +18,19 @@ export const QuizCard = ({ data, subject_name }) => {
   };
 
   // Dummy quiz data
-  
+
 
   const handleclick = (quiz_id) => {
 
     //setting api call here
     console.log(`Quiz quiz_id: ${quiz_id}`); // Log the quiz quiz_id for debugging
-    
+
     //=========================================================================
     const response = {
+      subject_id: 1,
+      quiz_id: 5,
+      level: 3,
       subject_name: "Physics Fundamentals",
-      title: "Classical Mechanics & Electromagnetism",
-      timelimit: 2714,// in seconds
       questions: [
         {
           level: 2,
@@ -46,7 +47,7 @@ export const QuizCard = ({ data, subject_name }) => {
 
         },
         {
-          
+
           level: 2,
           statement: "Which phenomenon is described by the equation P = F/A?",
           options: {
@@ -60,7 +61,7 @@ export const QuizCard = ({ data, subject_name }) => {
           question_id: 3
         },
         {
-          
+
           level: 2,
           statement: "The unit of electrical resistance is the ohm. Which of the following is a way to measure resistance?",
           options: {
@@ -74,7 +75,7 @@ export const QuizCard = ({ data, subject_name }) => {
           question_id: 3
         },
         {
-          
+
           level: 2,
           statement: "What does the speed of light in a vacuum have an approximate value of?",
           options: {
@@ -88,7 +89,7 @@ export const QuizCard = ({ data, subject_name }) => {
           question_id: 3
         },
         {
-          
+
           level: 2,
           statement: "Which principle explains why a neutron star can have such a strong gravitational pull?",
           options: {
@@ -98,15 +99,25 @@ export const QuizCard = ({ data, subject_name }) => {
             d: "The Pauli exclusion principle",
           },
           correct_answer: "c",
-        },
+          marks: 7,
+          question_id: 3
+        }
+
       ],
+      description: null,
+      marks: 35,
+      title: "Classical Mechanics & Electromagnetism",
+      type: "Manual",
+      timelimit: 2701
+
     };
     const quizName = response.subject_name; // Extract the quiz name from the response
     const quizTopic = response.title; // Extract the quiz topic from the response
     const timeDuration = response.timelimit; // Extract the time duration from the response
     const dataset = response.questions; // Extract the dataset from the response
+    const totalMarks = response.marks; // Extract the marks from the response
     // Navigate to the quiz page with the quiz data
-    navigate("/quizGenerator", { state:{ quizName, quizTopic, timeDuration, dataset, quizType:"NormalQuiz"} }); // Pass response as state
+    navigate("/quizGenerator", { state: { quizName, quizTopic, timeDuration, dataset, totalMarks,quizType: "NormalQuiz" } }); // Pass response as state
     //==========================================================================
   };
 
@@ -134,12 +145,12 @@ export const QuizCard = ({ data, subject_name }) => {
             </div>
 
             <div className="flex items-center justify-between">
-              <span className={`px-3 py-1 rounded-full text-sm ${getlevelColor(quiz.level==1?"Beginner":quiz.level==2?"Intermediate":"Advanced")}`}>
-                {quiz.level==1?"Beginner":quiz.level==2?"Intermediate":"Advanced"}
+              <span className={`px-3 py-1 rounded-full text-sm ${getlevelColor(quiz.level == 1 ? "Beginner" : quiz.level == 2 ? "Intermediate" : "Advanced")}`}>
+                {quiz.level == 1 ? "Beginner" : quiz.level == 2 ? "Intermediate" : "Advanced"}
               </span>
               <button
                 className="bg-primary border-2 text-black px-6 py-2 rounded-button hover:bg-black hover:text-white hover:cursor-pointer transition-colors whitespace-nowrap"
-                onClick={() =>  handleclick(quiz.quiz_id)} // Pass the quiz quiz_id to the handleclick function
+                onClick={() => handleclick(quiz.quiz_id)} // Pass the quiz quiz_id to the handleclick function
               >
                 Start Quiz
               </button>
