@@ -182,7 +182,6 @@ public class QuizController {
             }
         User user = student.getUser();
         
-        // Get created quiz IDs from teacher
         Integer[] attemptedQuiz = student.getAttemptedQuiz();
         if (attemptedQuiz == null || attemptedQuiz.length == 0) {
             return ResponseEntity.ok(new ArrayList<>());
