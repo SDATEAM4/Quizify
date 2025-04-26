@@ -72,7 +72,7 @@ Quizify is a web-based application designed to make quizzes easy and engaging fo
    ```bash
    ./mvnw spring-boot:run
    ```
-4. Start the frontend using Vaadin:  
+4. Start the frontend using React + Vite:  
    ```bash
    npm run dev
    ```

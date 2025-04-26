@@ -170,11 +170,11 @@ public class QuizController {
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-         @GetMapping("/student/{studentId}")
+        @GetMapping("/student/{studentId}")
     public ResponseEntity<?> getQuizzesWithQuestionsByStudent(@PathVariable Integer studentId) {
-         try {
+        try {
+            // Check if student exists
             Student student = studentService.getStudentByStudentId(studentId);
-            
             if (student == null) {
                 Map<String, String> errorResponse = new HashMap<>();
                 errorResponse.put("message", "Student not found");
@@ -182,26 +182,33 @@ public class QuizController {
             }
         User user = student.getUser();
         
-        Integer[] attemptedQuiz = student.getAttemptedQuiz();
-        if (attemptedQuiz == null || attemptedQuiz.length == 0) {
+        // Get enrolled subject IDs
+        Integer[] enrolledSubjectIds = student.getEnrolledSubjects();
+        if (enrolledSubjectIds == null || enrolledSubjectIds.length == 0) {
             return ResponseEntity.ok(new ArrayList<>());
         }
+        
+        // Get attempted quiz IDs
+        List<Integer> attemptedQuizIds = Arrays.asList(student.getAttemptedQuiz() != null ? 
+                student.getAttemptedQuiz() : new Integer[0]);
         
         // Prepare response
         List<Map<String, Object>> quizzesList = new ArrayList<>();
         
-        // Get quiz details for each quiz ID
-        for (Integer quizId : attemptedQuiz) {
-            Optional<Quiz> quizOptional = quizManagementService.getQuizById(quizId);
+        // Get quizzes for each enrolled subject
+        for (Integer subjectId : enrolledSubjectIds) {
+            List<Quiz> subjectQuizzes = quizManagementService.getQuizzesBySubject(subjectId);
             
-            if (quizOptional.isPresent()) {
-                Quiz quiz = quizOptional.get();
-                
-                // Get subject name
-                Optional<Subject> subjectOptional = subjectService.getSubjectById(quiz.getSubjectId());
-                String subjectName = subjectOptional.isPresent() ? subjectOptional.get().getName() : "Unknown Subject";
-                
-                // Create response object
+            if (subjectQuizzes.isEmpty()) {
+                continue;
+            }
+            
+            // Get subject name
+            Optional<Subject> subjectOptional = subjectService.getSubjectById(subjectId);
+            String subjectName = subjectOptional.isPresent() ? subjectOptional.get().getName() : "Unknown Subject";
+            
+            // Process each quiz for this subject
+            for (Quiz quiz : subjectQuizzes) {
                 Map<String, Object> quizData = new HashMap<>();
                 quizData.put("quiz_id", quiz.getQuizId());
                 quizData.put("title", quiz.getTitle());
@@ -211,10 +218,14 @@ public class QuizController {
                 quizData.put("level", quiz.getLevel());
                 quizData.put("marks", quiz.getMarks());
                 quizData.put("timelimit", quiz.getTimelimit());
-                quizData.put("type", quiz.getType());               
+                quizData.put("type", quiz.getType());
                 quizData.put("user_id", user.getUserId());
                 quizData.put("username", user.getUsername());
-                quizData.put("teacher_id", studentId);
+                quizData.put("student_id", studentId);
+                
+                // Check if quiz has been attempted
+                boolean attempted = attemptedQuizIds.contains(quiz.getQuizId());
+                quizData.put("attemptedQuiz", attempted);
                 
                 // Get questions for this quiz
                 List<Map<String, Object>> questionsList = new ArrayList<>();

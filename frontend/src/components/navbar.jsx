@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { FaHome, FaPencilAlt, FaQuestionCircle, FaTrophy, FaChartBar } from 'react-icons/fa';
-
+import { useNavigate } from "react-router-dom";
 export const NavBar = () => {
   const [activeTab, setActiveTab] = useState("home");
-  
+  const navigate = useNavigate(); // Uncomment this when using react-router
   // This would be your navigation handler with useNavigate
   const handleNavigation = (route) => {
     setActiveTab(route);
-    // navigate(`/${route}`); // You would uncomment this when using react-router
+    navigate(`/${route}`); // You would uncomment this when using react-router
   };
 
   return (
@@ -16,56 +16,51 @@ export const NavBar = () => {
         <div className="text-2xl font-bold">Quizify</div>
         <nav className="hidden md:flex items-center space-x-8">
           <button
-            className={`cursor-pointer py-2 flex items-center relative group ${
-              activeTab === "home" ? "border-b-2 border-white" : ""
-            }`}
-            onClick={() => handleNavigation("home")}
+            className={`cursor-pointer py-2 flex items-center relative group ${activeTab === "home" ? "border-b-2 border-white" : ""
+              }`}
+            onClick={() => handleNavigation("student/home")}
           >
             <FaHome className="mr-2" /> Home
             {activeTab !== "home" && <span className="hover-underline-animation"></span>}
           </button>
-          
+
           <button
-            className={`cursor-pointer py-2 flex items-center relative group ${
-              activeTab === "quiz" ? "border-b-2 border-white" : ""
-            }`}
-            onClick={() => handleNavigation("quiz")}
+            className={`cursor-pointer py-2 flex items-center relative group ${activeTab === "quiz" ? "border-b-2 border-white" : ""
+              }`}
+            onClick={() => handleNavigation("attemptQuiz")}
           >
             <FaPencilAlt className="mr-2" /> Attempt Quiz
             {activeTab !== "quiz" && <span className="hover-underline-animation"></span>}
           </button>
-          
+
           <button
-            className={`cursor-pointer py-2 flex items-center relative group ${
-              activeTab === "queries" ? "border-b-2 border-white" : ""
-            }`}
+            className={`cursor-pointer py-2 flex items-center relative group ${activeTab === "queries" ? "border-b-2 border-white" : ""
+              }`}
             onClick={() => handleNavigation("queries")}
           >
             <FaQuestionCircle className="mr-2" /> Queries
             {activeTab !== "queries" && <span className="hover-underline-animation"></span>}
           </button>
-          
+
           <button
-            className={`cursor-pointer py-2 flex items-center relative group ${
-              activeTab === "leaderboard" ? "border-b-2 border-white" : ""
-            }`}
-            onClick={() => handleNavigation("leaderboard")}
+            className={`cursor-pointer py-2 flex items-center relative group ${activeTab === "leaderboard" ? "border-b-2 border-white" : ""
+              }`}
+            onClick={() => handleNavigation("student/leaderboard")}
           >
             <FaTrophy className="mr-2" /> Leaderboard
             {activeTab !== "leaderboard" && <span className="hover-underline-animation"></span>}
           </button>
-          
+
           <button
-            className={`cursor-pointer py-2 flex items-center relative group ${
-              activeTab === "reports" ? "border-b-2 border-white" : ""
-            }`}
-            onClick={() => handleNavigation("reports")}
+            className={`cursor-pointer py-2 flex items-center relative group ${activeTab === "reports" ? "border-b-2 border-white" : ""
+              }`}
+            onClick={() => handleNavigation("student/viewReports")}
           >
             <FaChartBar className="mr-2" /> View Reports
             {activeTab !== "reports" && <span className="hover-underline-animation"></span>}
           </button>
         </nav>
-        
+
         <div className="flex items-center space-x-3">
           <div className="h-8 w-8 rounded-full bg-gray-300 overflow-hidden">
             <img
@@ -77,7 +72,7 @@ export const NavBar = () => {
           <span className="hidden md:inline">John Doe</span>
           <i className="fas fa-chevron-down text-xs"></i>
         </div>
-        
+
         {/* Mobile menu button */}
         <button className="md:hidden text-white focus:outline-none">
           <i className="fas fa-bars text-xl"></i>

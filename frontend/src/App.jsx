@@ -16,6 +16,8 @@ import { AuthProvider } from "./context/authContext";
 import { Toaster } from "react-hot-toast";
 import CustomizeProfile from "./pages/customizeProfile";
 import AddSubjectPage from "./pages/adminAddSubject";
+import StudentViewReport from "./pages/studentViewReports";
+import Leaderboard from "./pages/LeaderBoard";
 function App() {
   return (
     <AuthProvider>
@@ -37,6 +39,8 @@ function App() {
       <Route path="/teacher/home" element={<TeacherHomePage />} />
       <Route path="/teacher/createQuiz" element={<TeacherAddQuiz />} />
       <Route path="/customizeProfile" element={<CustomizeProfile />} />
+      <Route path="/student/leaderboard" element={<Leaderboard />} />
+      <Route path="/student/viewReports" element={< StudentViewReport/>} />
     </Routes>
     </AuthProvider>
   );
