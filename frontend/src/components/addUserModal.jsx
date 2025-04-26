@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaUserPlus, FaCheck } from "react-icons/fa";
+import { FaUserPlus, FaCheck, FaTrash, FaChalkboardTeacher, FaUserGraduate } from "react-icons/fa";
 import { SelectCourses } from "./selectCourses";
 import { AddUserForm } from "./addUserForms";
 import toast from "react-hot-toast";
@@ -71,6 +71,11 @@ export default function AddUserComponent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if(password.length >12){
+      toast.error("Password must have less than 11 characters")
+      return;
+    }
+
     // Validation
     if (!username || !password || !firstname || !lastname || !email) {
       alert("All fields are required");
@@ -108,7 +113,7 @@ export default function AddUserComponent() {
       
       // Show success message
       setShowSuccessMessage(true);
-      
+      toast.success("User added successfully")
       // Reset form after successful submission
       handleClear();
       
@@ -125,10 +130,10 @@ export default function AddUserComponent() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto">
+    <div className="bg-white mt-2 rounded-lg shadow-md p-6 max-w-8/12 mx-auto">
       <h1 className="text-2xl font-bold text-gray-800 mb-2">Add New User</h1>
       <p className="text-gray-600 mb-6">
-        Create a new user account with specific role and permissions
+        Create a new user account
       </p>
 
       {/* User Type Selection */}
@@ -136,24 +141,25 @@ export default function AddUserComponent() {
         <div className="flex space-x-4">
           <button
             type="button"
-            className={`px-4 py-2 rounded-md ${
+            className={`px-4 py-2 rounded-md flex flex-row items-center ${
               userType === "teacher"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700"
             }`}
             onClick={() => setUserType("teacher")}
           >
-            Teacher
+            <FaChalkboardTeacher className="mr-2"/> Teacher
           </button>
           <button
             type="button"
-            className={`px-4 py-2 rounded-md ${
+            className={`px-4 py-2 rounded-md flex flex-row items-center ${
               userType === "student"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700"
             }`}
             onClick={() => setUserType("student")}
           >
+            <FaUserGraduate className="mr-2"/>
             Student
           </button>
         </div>
@@ -200,8 +206,8 @@ export default function AddUserComponent() {
             setSelectedCourses={setSelectedSubjects}
             availableCourses={availableSubjects}
             label={userType === "teacher" ? "Select Subjects to Teach" : "Select Subjects for Enrollment"}
-          />
-
+            />
+           
           {/* Submit and Clear Buttons */}
           <div className="flex justify-between">
             <button
@@ -210,8 +216,9 @@ export default function AddUserComponent() {
               type="reset"
               disabled={loading}
             >
-              <FaUserPlus className="mr-2" /> Clear Details
-              <span className="bg-blue-500 hover-underline-animation"></span>
+              
+              <	FaTrash className="mr-2 bgbl" /> Clear Details
+              <span className="bg-yellow-300 hover-underline-animation"></span>
             </button>
             
             <button
@@ -221,7 +228,7 @@ export default function AddUserComponent() {
             >
               <FaUserPlus className="mr-2" /> 
               {loading ? "Processing..." : `Add ${userType === "teacher" ? "Teacher" : "Student"}`}
-              <span className="bg-blue-500 hover-underline-animation"></span>
+              <span className="bg-green-500 hover-underline-animation"></span>
             </button>
           </div>
         </form>

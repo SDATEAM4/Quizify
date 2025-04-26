@@ -44,7 +44,7 @@ const addCourse = (course) => {
   
 
   return (
-    <div className="mb-6 bg-gray-50 p-2 max-w-100  rounded-lg shadow-md">
+    <div className="mb-6 bg-gray-50 p-4 min-w-100  rounded-lg shadow-md">
       <p className="text-sm text-gray-500 mb-2">Subjects</p>
       <label className="block text-gray-500 text-sm  mb-2">
         {label || "Select Courses"}
