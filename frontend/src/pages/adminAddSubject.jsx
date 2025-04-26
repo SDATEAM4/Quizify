@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FaSave, FaTimesCircle, FaPlus } from "react-icons/fa";
 import axios from "axios";
 import { AdminNavBar } from "../components/adminNavbar";
-
+import BackgroundTypography from "../components/backgroundTypography";
 const AddSubjectPage = () => {
   const [subjectData, setSubjectData] = useState({
     name: "",
@@ -81,9 +81,9 @@ const AddSubjectPage = () => {
   return (
     <div className="min-w-screen min-h-screen">
       <AdminNavBar/>
-    
-      <div className="flex items-center justify-center min-h-[80vh]">
-        <div className="container mx-auto px-4 py-8 max-w-1/3 shadow-md rounded-md">
+    <BackgroundTypography/>
+      <div className="flex items-center justify-center min-h-[80vh] ">
+        <div className="container mx-auto px-4 py-8 max-w-1/3 shadow-md rounded-lg bg-white z-20">
           {/* Page Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold">Add New Subject</h1>
