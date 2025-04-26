@@ -168,7 +168,7 @@ public class QuizService {
                 level.toLowerCase() + " difficulty level";
                 
         return "I need " + numQuestions + " multiple-choice questions (MCQs) for the subject \"" + subject + 
-               "\" with " + difficultyPrompt + "difficulty level and my topic is " + topic + "and the description of subject is " +description + ". Each question should have 4 options labeled a), b), c), and d). " +
+               "\" with " + difficultyPrompt + "difficulty level. Each question should have 4 options labeled a), b), c), and d). " +
                "I need the output in pure JSON format only (no explanation, no extra text, no markdown). " +
                "Each question object should include a question, options (as an object with keys a, b, c, d), " +
                "and answer (the correct option's key, like \"a\"). and with explaination of why that answer is correct in one line without any extra information."+
