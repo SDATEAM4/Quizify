@@ -170,7 +170,7 @@ public class QuizController {
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-         @GetMapping("/student/{studentId}")
+        @GetMapping("/student/{studentId}")
     public ResponseEntity<?> getQuizzesWithQuestionsByStudent(@PathVariable Integer studentId) {
          try {
             Student student = studentService.getStudentByStudentId(studentId);
