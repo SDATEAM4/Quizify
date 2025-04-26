@@ -6,8 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import team4.quizify.entity.Subject;
+import team4.quizify.entity.Student;
+import team4.quizify.entity.Teacher;
 import team4.quizify.service.SubjectService;
 import team4.quizify.service.CloudinaryService;
+import team4.quizify.service.StudentService;
+import team4.quizify.service.TeacherService;
 
 import java.util.List;
 import java.util.Map;
@@ -17,14 +21,17 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/Quizify/admin/subjects")
 @CrossOrigin(origins = "*")
-public class SubjectAdminController {
-
-    @Autowired
+public class SubjectAdminController {    @Autowired
     private SubjectService subjectService;
     
     @Autowired
     private CloudinaryService cloudinaryService;
     
+    @Autowired
+    private StudentService studentService;
+    
+    @Autowired
+    private TeacherService teacherService;
    
     @GetMapping
     public ResponseEntity<List<Subject>> getAllSubjects() {
@@ -109,9 +116,8 @@ public class SubjectAdminController {
                 String imageUrl = cloudinaryService.uploadFile(subjectImage);
                 existingSubject.setImageUrl(imageUrl);
             }
-            
-            // Save the updated subject
-            Subject updatedSubject = subjectService.saveSubject(existingSubject);
+              // Save the updated subject
+            subjectService.saveSubject(existingSubject);
             
             return ResponseEntity.ok(Map.of(
                 "message", "Subject updated successfully"
@@ -122,6 +128,57 @@ public class SubjectAdminController {
         }
     }
     
+  
+    @PutMapping("/overwrite-user-subjects")
+    public ResponseEntity<?> overwriteUserSubjects(
+            @RequestParam("userId") Integer userId,
+            @RequestParam("subjects") String subjectsStr) {
+        try {
+            // Parse the subjects string into an array of integers
+            Integer[] subjectIds;
+            if (subjectsStr != null && !subjectsStr.isEmpty()) {
+                String[] subjectStrings = subjectsStr.split(",");
+                subjectIds = new Integer[subjectStrings.length];
+                for (int i = 0; i < subjectStrings.length; i++) {
+                    subjectIds[i] = Integer.parseInt(subjectStrings[i].trim());
+                }
+            } else {
+                subjectIds = new Integer[0];
+            }
+            
+            // Check if user is a student or teacher
+            Student student = studentService.getStudentByUserId(userId);
+            if (student != null) {
+                // User is a student, update enrolled subjects
+                student.setEnrolledSubjects(subjectIds);
+                studentService.updateStudent(student);
+                return ResponseEntity.ok(Map.of(
+                    "message", "Student enrolled subjects updated successfully"
+                ));
+            } 
+            
+            Teacher teacher = teacherService.getTeacherByUserId(userId);
+            if (teacher != null) {
+                // User is a teacher, update subjects taught
+                teacher.setSubjectTaught(subjectIds);
+                teacherService.updateTeacher(teacher);
+                return ResponseEntity.ok(Map.of(
+                    "message", "Teacher subjects taught updated successfully"
+                ));
+            }
+            
+            // User not found or not a student/teacher
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User not found or not a student/teacher"));
+                
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Invalid subject ID format"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to update user subjects: " + e.getMessage()));
+        }
+    }
    
     @DeleteMapping("/{subjectId}")
     public ResponseEntity<?> deleteSubject(@PathVariable Integer subjectId) {

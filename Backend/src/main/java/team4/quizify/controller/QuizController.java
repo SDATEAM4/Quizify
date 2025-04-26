@@ -187,10 +187,11 @@ public class QuizController {
         if (enrolledSubjectIds == null || enrolledSubjectIds.length == 0) {
             return ResponseEntity.ok(new ArrayList<>());
         }
-        
-        // Get attempted quiz IDs
-        List<Integer> attemptedQuizIds = Arrays.asList(student.getAttemptedQuiz() != null ? 
-                student.getAttemptedQuiz() : new Integer[0]);
+          // Get attempted quiz IDs
+        List<Integer> attemptedQuizIds = new ArrayList<>();
+        if (student.getAttemptedQuiz() != null) {
+            attemptedQuizIds.addAll(Arrays.asList(student.getAttemptedQuiz()));
+        }
         
         // Prepare response
         List<Map<String, Object>> quizzesList = new ArrayList<>();
@@ -222,10 +223,13 @@ public class QuizController {
                 quizData.put("user_id", user.getUserId());
                 quizData.put("username", user.getUsername());
                 quizData.put("student_id", studentId);
-                
-                // Check if quiz has been attempted
+                  // Check if quiz has been attempted
                 boolean attempted = attemptedQuizIds.contains(quiz.getQuizId());
                 quizData.put("attemptedQuiz", attempted);
+                
+                // Debug information to verify fix
+                System.out.println("Student ID: " + studentId + ", Quiz ID: " + quiz.getQuizId() 
+                    + ", Attempted: " + attempted + ", All attempted: " + attemptedQuizIds);
                 
                 // Get questions for this quiz
                 List<Map<String, Object>> questionsList = new ArrayList<>();
