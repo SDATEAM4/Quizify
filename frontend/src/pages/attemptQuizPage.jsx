@@ -3,180 +3,52 @@ import { SubjectTabs } from "../components/subjectTabs";
 import { QuizCard } from "../components/quizCard";
 import { Footer } from "../components/footer";
 import { NavBar } from "../components/navbar";
-import {QuizDialog} from "../components/practiceQuizDialog"; 
-//import{authContext} from "../context/authContext";
+import { QuizDialog } from "../components/practiceQuizDialog";
+// import { authContext } from "../context/authContext";
 
 export const AttemptQuizPage = () => {
-  //const {uId} = authContext();// get uid then get reponse as response from DB
-  const response = [
-    {
-      quiz_id: 1,
-      subject_id: 1,
-      subject_name: "Mathematics",
-      title: "Advanced Calculus",
-      description: "Test your knowledge of derivatives, integrals, and limits",
-      timelimit: 30, // minutes
-      questions: 10,
-      level: 1,
-      user_id: 9,
-      attemptedQuiz: false,
-      username: "meowwww",
-      marks: 40,
-      type: "Automatic",
-      student_id: 2
+  // const { uId } = authContext(); // get uid then get reponse as response from DB
 
-    },
-    {
-      quiz_id: 2,
-      subject_id: 1,
-      subject_name: "Mathematics",
-      title: "Linear Algebra Fundamentals",
-      description: "Master matrices, vectors, and linear transformations",
-      timelimit: 25, // minutes
-      questions: 8,
-      level: 2,
-      user_id: 9,
-      attemptedQuiz: false,
-      username: "meowwww",
-      marks: 40,
-      type: "Automatic",
-      student_id: 2
-   
-    },
-    {
-      quiz_id: 3,
-      subject_id: 1,
-      subject_name: "Mathematics",
-      title: "Probability & Statistics",
-      description: "Explore statistical concepts and probability theory",
-      timelimit: 35, // minutes
-      questions: 12,
-      level: 3,
-      user_id: 9,
-      attemptedQuiz: false,
-      username: "meowwww",
-      marks: 40,
-      type: "Automatic",
-      student_id: 2
-    },
-    {
-      quiz_id: 4,
-      subject_id: 1,
-      subject_name: "Physics",
-      title: "Classical Mechanics",
-      description: "Understand Newton's laws and mechanical systems",
-      timelimit: 40, // minutes
-      questions: 15,
-      level: "Intermediate",
-      user_id: 9,
-      attemptedQuiz: false,
-      username: "meowwww",
-      marks: 40,
-      type: "Automatic",
-      student_id: 2
-     
-    },
-    {
-      quiz_id: 5,
-      subject_id: 1,
-      subject_name: "Physics",
-      title: "Electromagnetism",
-      description: "Study electric and magnetic fields and their interactions",
-      timelimit: 45, // minutes
-      questions: 18,
-      level: "Advanced",
-      user_id: 9,
-      attemptedQuiz: false,
-      username: "meowwww",
-      marks: 40,
-      type: "Automatic",
-      student_id: 2
-     
-    },
-    {
-      quiz_id: 6,
-      subject_id: 1,
-      subject_name: "Chemistry",
-      title: "Organic Chemistry",
-      description: "Learn about carbon compounds and their reactions",
-      timelimit: 35, // minutes
-      questions: 14,
-      level: "Advanced",
-      user_id: 9,
-      attemptedQuiz: false,
-      username: "meowwww",
-      marks: 40,
-      type: "Automatic",
-      student_id: 2
-      
-    },
-    {
-      quiz_id: 7,
-      subject_id: 1,
-      subject_name: "Chemistry",
-      title: "Periodic Table Elements",
-      description: "Explore properties and patterns of chemical elements",
-      timelimit: 20, // minutes
-      questions: 10,
-      level: "Beginner",
-      user_id: 9,
-      attemptedQuiz: false,
-      username: "meowwww",
-      marks: 40,
-      type: "Automatic",
-      student_id: 2
-     
-    },
-    {
-      quiz_id: 8,
-      subject_id: 1,
-      subject_name: "Biology",
-      title: "Cell Biology",
-      description: "Discover the fundamental unit of all living organisms",
-      timelimit: 30, // minutes
-      questions: 12,
-      level: "Intermediate",
-      user_id: 9,
-      attemptedQuiz: false,
-      username: "meowwww",
-      marks: 40,
-      type: "Automatic",
-      student_id: 2
-   
-    },
-    {
-      quiz_id: 9,
-      subject_id: 1,
-      subject_name: "Biology",
-      title: "Human Anatomy",
-      description: "Study the structure and systems of the human body",
-      timelimit: 50, // minutes
-      questions: 20,
-      level: "Advanced",
-      user_id: 9,
-      attemptedQuiz: false,
-      username: "meowwww",
-      marks: 40,
-      type: "Automatic",
-      student_id: 2
-  
-    },
-  ];
-
+  const [DATA, setDATA] = useState([]);
+  const [response, setResponse] = useState([]);
   const [activePage, setActivePage] = useState("attemptQuiz");
   const [activesubject_name, setActivesubject_name] = useState("");
+  const [loading, setLoading] = useState(false); // added loading state
 
   useEffect(() => {
-    const uniquesubject_names = [...new Set(response.map((q) => q.subject_name))];
-    if (uniquesubject_names.length) {
-      setActivesubject_name(uniquesubject_names[0]);
-    }
+    const fetchData = async () => {
+      try {
+        setLoading(true); // start loading
+        const res = await fetch("http://localhost:8080/Quizify/quizzes/student/1");
+        const json = await res.json();
+        setDATA(json);
+
+        const filtered = json.filter((quiz) => quiz.attemptedQuiz === false);
+        setResponse(filtered);
+
+        const uniquesubject_names = [...new Set(filtered.map((q) => q.subject_name))];
+        if (uniquesubject_names.length) {
+          setActivesubject_name(uniquesubject_names[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching quiz data:", error);
+        alert("Failed to load quizzes. Please try again."); // Optional
+      } finally {
+        setLoading(false); // stop loading
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <NavBar />
-      {activePage === "attemptQuiz" ? (
+      {loading ? (
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-xl font-semibold">Loading...</div>
+        </div>
+      ) : activePage === "attemptQuiz" ? (
         <div className="container mx-auto px-4 py-8">
           <SubjectTabs
             data={response}
@@ -197,4 +69,3 @@ export const AttemptQuizPage = () => {
     </div>
   );
 };
-
