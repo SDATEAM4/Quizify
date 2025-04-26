@@ -15,6 +15,7 @@ import { TeacherEditQuiz } from "./pages/teacherEditQuizPage";
 import { AuthProvider } from "./context/authContext";
 import { Toaster } from "react-hot-toast";
 import CustomizeProfile from "./pages/customizeProfile";
+import AddSubjectPage from "./pages/adminAddSubject";
 function App() {
   return (
     <AuthProvider>
@@ -30,6 +31,7 @@ function App() {
       <Route path="/admin/manageUser" element={<ManageUserComponent />} />
       <Route path="/admin/viewReports" element={<ViewReportsAdmin />} />
       <Route path="/teacher/viewReports" element={<TeacherReports />} />
+      <Route path="/admin/addSubject" element={<AddSubjectPage />} />
       <Route path="/teacher/addQuestion" element={<AddNewQuestion />} />
       <Route path="/teacher/editQuiz" element={<TeacherEditQuiz />} />
       <Route path="/teacher/home" element={<TeacherHomePage />} />

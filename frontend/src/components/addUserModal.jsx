@@ -211,7 +211,7 @@ export default function AddUserComponent() {
           {/* Submit and Clear Buttons */}
           <div className="flex justify-between">
             <button
-              className="cursor-pointer p-2 rounded-t-2xl flex items-center relative group shadow-sm"
+              className="cursor-pointer p-2 rounded-md bg-yellow-50 text-yellow-600 flex items-center relative group shadow-sm"
               onClick={handleClear}
               type="reset"
               disabled={loading}
@@ -223,7 +223,7 @@ export default function AddUserComponent() {
             
             <button
               type="submit"
-              className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-t-2xl"
+              className="cursor-pointer p-2 flex bg-green-100 text-green-800 items-center relative group shadow-sm rounded-md"
               disabled={loading}
             >
               <FaUserPlus className="mr-2" /> 
