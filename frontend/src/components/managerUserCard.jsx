@@ -7,6 +7,7 @@ import {
   FaTimesCircle,
   FaEye,
   FaEyeSlash,
+  FaCross,
 } from "react-icons/fa";
 import { SelectCourses } from "./selectCourses";
 
@@ -112,7 +113,7 @@ const ManageUserCard = ({
                   </button>
                 </div>
               ) : (
-                <div className="relative p-2 rounded flex items-center">
+                <div className="relative rounded flex items-center">
                   <p className="font-medium flex-grow">
                     {showPassword
                       ? userData.password || "No password set"
@@ -190,6 +191,7 @@ const ManageUserCard = ({
               className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100"
             >
               <FaUserEdit className="mr-2" /> Edit User
+              <span className="bg-blue-700 hover-underline-animation"></span>
             </button>
             <button
               className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-red-50 text-red-700 hover:bg-red-100"
@@ -197,6 +199,7 @@ const ManageUserCard = ({
             >
               <FaTrash className="mr-2" />
               Delete User
+              <span className="bg-red-700 hover-underline-animation"></span>
             </button>
           </>
         ) : (
@@ -207,6 +210,7 @@ const ManageUserCard = ({
               className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100"
             >
               <FaTimesCircle className="mr-2" /> Cancel
+          <span className="bg-gray-700 hover-underline-animation"></span>
             </button>
             <button
               type="button"
@@ -214,6 +218,7 @@ const ManageUserCard = ({
               className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-green-50 text-green-700 hover:bg-green-100"
             >
               <FaSave className="mr-2" /> Save Changes
+      <span className="bg-green-700 hover-underline-animation"></span>
             </button>
           </>
         )}
@@ -233,7 +238,7 @@ const ManageUserCard = ({
               className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors"
             >
               Cancel
-            </button>
+             </button>
             <button
               type="button"
               onClick={handleDelete}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import ManageUserCard from '../components/managerUserCard';
 import { FaSearch } from "react-icons/fa";
 import { AdminNavBar } from "../components/adminNavbar";
+import BackgroundTypography from "../components/backgroundTypography";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -161,7 +162,8 @@ export default function ManageUserComponent() {
   return (
     <div className="min-h-screen flex justify-center flex-col">
       <AdminNavBar />
-      <div className="flex justify-center items-center min-h-screen">
+      <BackgroundTypography/>
+      <div className="flex justify-center items-center min-h-screen z-20">
         <div className="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto">
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Manage User</h1>
           <p className="text-gray-600 mb-6">
