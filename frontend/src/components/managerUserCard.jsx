@@ -14,13 +14,18 @@ const ManageUserCard = ({
   userData,
   isEditing,
   handleCancel,
-  handleDelete,
+  handleDelete, 
   handleSave,
   toggleDeleteConfirmation,
   handleEdit,
   confirmDelete,
+  newPassword,
+  setNewPassword,
+  subjects,
+  setSubjects
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState("");
 
   const checkPasswordStrength = (password) => {
     if (password.length === 0) return "";
@@ -29,34 +34,19 @@ const ManageUserCard = ({
     if (password.length >= 10) return "strong";
   };
 
-  // Initialize subjects with userData.subjects when the component mounts or userData changes
-  const [subjects, setSubjects] = useState([]);
-  const [newPassword, setNewPassword] = useState("");
-  const [passwordStrength, setPasswordStrength] = useState("");
-
+  // Keep track of password strength when it changes
   useEffect(() => {
-    if (userData && userData.subjects) {
-      setSubjects(userData.subjects);
-    }
-  }, [userData]);
-
-  const handlePasswordChange = (e) => {
-    const password = e.target.value;
-    setNewPassword(password);
-    setPasswordStrength(checkPasswordStrength(password));
-  };
-
-  // Function to handle saving with the updated values
-  const onSave = () => {
-    handleSave({
-      newPassword,
-      subjects,
-    });
-  };
+    setPasswordStrength(checkPasswordStrength(newPassword));
+  }, [newPassword]);
 
   // Toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  // Handle password change
+  const handlePasswordChange = (e) => {
+    setNewPassword(e.target.value);
   };
 
   return (
@@ -66,7 +56,7 @@ const ManageUserCard = ({
         <div className="flex flex-col items-center">
           <div className="w-32 h-32 overflow-hidden rounded-full shadow-md mb-2">
             <img
-              src={userData.profileImage}
+              src={userData.profileImageUrl || "https://via.placeholder.com/150"}
               alt="User Profile"
               className="w-full h-full object-cover"
             />
@@ -81,15 +71,23 @@ const ManageUserCard = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-gray-50 p-3 rounded">
               <p className="text-sm text-gray-500 mb-1">First Name</p>
-              <p className="font-medium break-words">{userData.firstname}</p>
+              <p className="font-medium break-words">{userData.firstName}</p>
             </div>
             <div className="bg-gray-50 p-3 rounded">
               <p className="text-sm text-gray-500 mb-1">Last Name</p>
-              <p className="font-medium break-words">{userData.lastname}</p>
+              <p className="font-medium break-words">{userData.lastName}</p>
             </div>
             <div className="bg-gray-50 p-3 rounded col-span-1 md:col-span-2">
               <p className="text-sm text-gray-500 mb-1">Email</p>
               <p className="font-medium break-words">{userData.email}</p>
+            </div>
+            <div className="bg-gray-50 p-3 rounded">
+              <p className="text-sm text-gray-500 mb-1">Role</p>
+              <p className="font-medium break-words capitalize">{userData.role}</p>
+            </div>
+            <div className="bg-gray-50 p-3 rounded">
+              <p className="text-sm text-gray-500 mb-1">User ID</p>
+              <p className="font-medium break-words">{userData.id}</p>
             </div>
             <div className="bg-gray-50 p-3 rounded col-span-1 md:col-span-2">
               <p className="text-sm text-gray-500 mb-1">Password</p>
@@ -112,7 +110,7 @@ const ManageUserCard = ({
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
-                                  </div>
+                </div>
               ) : (
                 <div className="relative p-2 rounded flex items-center">
                   <p className="font-medium flex-grow">
@@ -132,29 +130,27 @@ const ManageUserCard = ({
                   </button>
                 </div>
               )}
+              {passwordStrength && (
+                <div className="mt-2 flex items-center">
+                  <span className="text-sm mr-2">Strength:</span>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      passwordStrength === "weak"
+                        ? "bg-red-100 text-red-700"
+                        : passwordStrength === "medium"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-green-100 text-green-700"
+                    }`}
+                  >
+                    {passwordStrength}
+                  </span>
+                </div>
+              )}
             </div>
-            {passwordStrength && (
-                    <div className="mt-2 flex items-center">
-                      <span className="text-sm mr-2">Strength:</span>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          passwordStrength === "weak"
-                            ? "bg-red-100 text-red-700"
-                            : passwordStrength === "medium"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-green-100 text-green-700"
-                        }`}
-                      >
-                        {passwordStrength}
-                      </span>
-                    </div>
-                  )}
-
           </div>
 
           {/* Subjects section */}
           <div className="mt-6">
-            <p className="text-sm text-gray-500 mb-2">Subjects</p>
             {isEditing ? (
               <SelectCourses
                 selectedCourses={subjects}
@@ -163,13 +159,14 @@ const ManageUserCard = ({
               />
             ) : (
               <div className="flex flex-wrap gap-2">
-                {userData.subjects && userData.subjects.length > 0 ? (
-                  userData.subjects.map((subject, index) => (
+                {subjects && subjects.length > 0 ? (
+                  subjects.map((subject, index) => (
                     <span
                       key={index}
                       className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
                     >
-                      {subject}
+                      {/* Check if subject is an object or string */}
+                      {typeof subject === 'object' ? subject.name : subject}
                     </span>
                   ))
                 ) : (
@@ -190,18 +187,16 @@ const ManageUserCard = ({
             <button
               type="button"
               onClick={handleEdit}
-              className={`cursor-pointer p-2 flex items-center relative group shadow-sm rounded-t-2xl `}
+              className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100"
             >
-              <span className="bg-blue-500 hover-underline-animation"></span>
               <FaUserEdit className="mr-2" /> Edit User
             </button>
             <button
-              className={`cursor-pointer p-2 flex items-center relative group shadow-sm rounded-t-2xl `}
+              className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-red-50 text-red-700 hover:bg-red-100"
               onClick={toggleDeleteConfirmation}
             >
               <FaTrash className="mr-2" />
               Delete User
-              <span className="bg-red-600 hover-underline-animation"></span>
             </button>
           </>
         ) : (
@@ -209,17 +204,15 @@ const ManageUserCard = ({
             <button
               type="button"
               onClick={handleCancel}
-              className={`cursor-pointer p-2 flex items-center relative group shadow-sm rounded-t-2xl `}
+              className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100"
             >
               <FaTimesCircle className="mr-2" /> Cancel
-              <span className="bg-blue-500 hover-underline-animation"></span>
             </button>
             <button
               type="button"
-              onClick={onSave}
-              className={`cursor-pointer p-2 flex items-center relative group shadow-sm rounded-t-2xl `}
+              onClick={handleSave}
+              className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-green-50 text-green-700 hover:bg-green-100"
             >
-              <span className="bg-green-600 hover-underline-animation"></span>
               <FaSave className="mr-2" /> Save Changes
             </button>
           </>
