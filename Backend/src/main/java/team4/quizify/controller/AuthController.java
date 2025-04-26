@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import team4.quizify.entity.User;
 import team4.quizify.service.AuthService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -14,68 +16,121 @@ import java.util.Optional;
 public class AuthController {
 
     @Autowired
-    private AuthService authService;
-
-    @PostMapping("/login")
+    private AuthService authService;    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestParam(required = false) String username,
                                    @RequestParam(required = false) String email,
                                    @RequestParam String password) {
         try {
+            // Validate input parameters
+            if (username == null && email == null) {
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "Username or email is required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
             Optional<User> userOptional = username != null ?
                     authService.loginWithUsername(username, password) :
                     authService.loginWithEmail(email, password);
 
             if (userOptional.isPresent()) {
-                return ResponseEntity.ok(userOptional.get());
+                // Return only success message, not user details
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "User logged in");
+                return ResponseEntity.ok(response);
             } else {
-                return ResponseEntity.status(401).body("Invalid credentials");
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "Invalid credentials");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Internal Server Error");
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Internal error while fetching data");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-    }
-
-    @PostMapping("/forgot-password/send-otp")
+    }    @PostMapping("/forgot-password/send-otp")
     public ResponseEntity<?> sendOtp(@RequestParam String email) {
         try {
+            if (email == null || email.trim().isEmpty()) {
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "Email is required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
             boolean sent = authService.sendOtpToEmail(email);
-            return sent ? ResponseEntity.ok("OTP sent to email") :
-                    ResponseEntity.status(404).body("Email not found");
+            
+            Map<String, String> response = new HashMap<>();
+            if (sent) {
+                response.put("message", "OTP sent to email");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("error", "User not found with the provided email");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Internal Server Error");
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Internal error while sending OTP");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-    }
-
-    @PostMapping("/forgot-password/verify-otp")
+    }    @PostMapping("/forgot-password/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestParam int userId, @RequestParam String otp) {
         try {
+            if (otp == null || otp.trim().isEmpty()) {
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "OTP is required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
             boolean valid = authService.verifyOtp(userId, otp);
-            return valid ? ResponseEntity.ok("OTP verified") :
-                    ResponseEntity.status(400).body("Invalid OTP");
+            
+            Map<String, String> response = new HashMap<>();
+            if (valid) {
+                response.put("message", "OTP verified successfully");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("error", "Invalid or expired OTP");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Internal Server Error");
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Internal error while verifying OTP");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-    }
-
-    @PutMapping("/forgot-password/reset")
+    }    @PutMapping("/forgot-password/reset")
     public ResponseEntity<?> resetPassword(@RequestParam String email, @RequestParam String newPassword) {
         try {
+            // Validate input parameters
+            if (email == null || email.trim().isEmpty()) {
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "Email is required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
+            if (newPassword == null || newPassword.trim().isEmpty()) {
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "New password is required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
             boolean reset = authService.resetPassword(email, newPassword);
-            return reset ? ResponseEntity.ok("Password reset successfully") :
-                    ResponseEntity.status(404).body("User not found");
+            
+            Map<String, String> response = new HashMap<>();
+            if (reset) {
+                response.put("message", "Password reset successfully");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("error", "User not found with the provided email");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Internal Server Error");
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Internal error while resetting password");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-    }
-
-    // Catches any wrong URL / wrong HTTP method
+    }    
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<String> handleAnyException(Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Internal Server Error");
+    public ResponseEntity<?> handleAnyException(Exception e) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Internal error while fetching data");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
