@@ -3,11 +3,42 @@ import { Save, Home } from 'lucide-react';
 import AnswerKey from './AnswerKey';
 import { useNavigate } from 'react-router-dom';
 
-const QuizResults = ({ quizName, stats, dataSet, quizType, isCorrect }) => {
+const QuizResults = ({ quizName, stats, dataSet, quizType, isCorrect,quiz_id }) => {
   const { percentage, correctCount, incorrectCount, totalQuestions, formattedTime, obtainedMarks, totalMarks, points } = stats;
   const [viewAnswerKey, setViewAnswerKey] = useState(false);
-  const handleSaveResults = () => {
-    alert("Result saved!");
+  const handleSaveResults = async () => {
+    try {
+      // Assuming you have access to the user's ID (you might need to get this from your auth context)
+      const userId = 1; // Replace this with actual user ID from your auth system
+      
+      const requestBody = {
+        userId: userId,
+        obtainMarks: obtainedMarks,
+        quizId: quiz_id,
+        points: points
+      };
+  
+      const response = await fetch('http://localhost:8080/Quizify/scores', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Include authorization header if needed
+          // 'Authorization': `Bearer ${yourAuthToken}`
+        },
+        body: JSON.stringify(requestBody)
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to save results');
+      }
+  
+      const data = await response.json();
+      alert("Result saved successfully!");
+      
+    } catch (error) {
+      console.error('Error saving results:', error);
+      alert("Failed to save results. Please try again.");
+    }
   };
   const navigate = useNavigate();
 

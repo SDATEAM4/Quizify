@@ -37,8 +37,8 @@ export const QuizCard = ({ data, subject_name }) => {
       const dataset = response.questions;
       const totalMarks = response.marks;
 
-      navigate("/quizGenerator", { 
-        state: { quizName, quizTopic, timeDuration, dataset, totalMarks, quizType: "NormalQuiz" } 
+      navigate("/quizGenerator", {
+        state: {quiz_id, quizName, quizTopic, timeDuration, dataset, totalMarks, quizType: "NormalQuiz" } 
       });
     } catch (error) {
       console.error("Error fetching quiz:", error);

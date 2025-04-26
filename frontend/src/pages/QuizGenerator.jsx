@@ -8,7 +8,7 @@ import { useLocation } from 'react-router-dom';
 
 export const QuizGenerator = () => {
   const location = useLocation();
-  const { quizName, quizTopic, timeDuration, dataset, totalMarks, quizType } = location.state;
+  const { quiz_id,quizName, quizTopic, timeDuration, dataset, totalMarks, quizType } = location.state;
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedcorrect_answers, setSelectedcorrect_answers] = useState(Array(dataset.length).fill(''));
@@ -146,6 +146,7 @@ const calculateScore = () => {
           dataSet={{ quizName, quizTopic, timeDuration, dataset }}
           quizType={quizType}
           isCorrect={isCorrect}
+          quiz_id={quiz_id}
         />
       )}
     </div>
