@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 export const QuizCard = ({ data, subject_name }) => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // added loading state
+
   const filteredQuizzes = data.filter((quiz) => quiz.subject_name === subject_name); // it filters the quizzes based on the subject_name passed as a prop
 
   const getlevelColor = (level) => {
@@ -17,112 +20,41 @@ export const QuizCard = ({ data, subject_name }) => {
     }
   };
 
-  // Dummy quiz data
+  const handleclick = async (quiz_id) => {
+    try {
+      setLoading(true); // start loading
+      console.log(`Quiz quiz_id: ${quiz_id}`);
 
+      const res = await fetch(`http://localhost:8080/Quizify/quizzes/${quiz_id}`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch quiz data");
+      }
+      const response = await res.json();
 
-  const handleclick = (quiz_id) => {
+      const quizName = response.subject_name;
+      const quizTopic = response.title;
+      const timeDuration = response.timelimit;
+      const dataset = response.questions;
+      const totalMarks = response.marks;
 
-    //setting api call here
-    console.log(`Quiz quiz_id: ${quiz_id}`); // Log the quiz quiz_id for debugging
-
-    //=========================================================================
-    const response = {
-      subject_id: 1,
-      quiz_id: 5,
-      level: 3,
-      subject_name: "Physics Fundamentals",
-      questions: [
-        {
-          level: 2,
-          statement: "What is Newton's first law of motion also known as?",
-          options: {
-            a: "The Law of Acceleration",
-            b: "The Law of Inertia",
-            c: "The Law of Friction",
-            d: "The Law of Momentum",
-          },
-          correct_answer: "b",
-          marks: 7,
-          question_id: 3
-
-        },
-        {
-
-          level: 2,
-          statement: "Which phenomenon is described by the equation P = F/A?",
-          options: {
-            a: "work",
-            b: "energy",
-            c: "pressure",
-            d: "power",
-          },
-          correct_answer: "c",
-          marks: 7,
-          question_id: 3
-        },
-        {
-
-          level: 2,
-          statement: "The unit of electrical resistance is the ohm. Which of the following is a way to measure resistance?",
-          options: {
-            a: "voltmeter",
-            b: "ammeter",
-            c: "ohmmeter",
-            d: "capacitance meter",
-          },
-          correct_answer: "c",
-          marks: 7,
-          question_id: 3
-        },
-        {
-
-          level: 2,
-          statement: "What does the speed of light in a vacuum have an approximate value of?",
-          options: {
-            a: "300,000 km/s",
-            b: "3,000 km/s",
-            c: "300 km/s",
-            d: "30 km/s",
-          },
-          correct_answer: "a",
-          marks: 7,
-          question_id: 3
-        },
-        {
-
-          level: 2,
-          statement: "Which principle explains why a neutron star can have such a strong gravitational pull?",
-          options: {
-            a: "Newton's third law of motion",
-            b: "Einstein's theory of relativity",
-            c: "Gravitation from mass",
-            d: "The Pauli exclusion principle",
-          },
-          correct_answer: "c",
-          marks: 7,
-          question_id: 3
-        }
-
-      ],
-      description: null,
-      marks: 35,
-      title: "Classical Mechanics & Electromagnetism",
-      type: "Manual",
-      timelimit: 2701
-
-    };
-    const quizName = response.subject_name; // Extract the quiz name from the response
-    const quizTopic = response.title; // Extract the quiz topic from the response
-    const timeDuration = response.timelimit; // Extract the time duration from the response
-    const dataset = response.questions; // Extract the dataset from the response
-    const totalMarks = response.marks; // Extract the marks from the response
-    // Navigate to the quiz page with the quiz data
-    navigate("/quizGenerator", { state: { quizName, quizTopic, timeDuration, dataset, totalMarks,quizType: "NormalQuiz" } }); // Pass response as state
-    //==========================================================================
+      navigate("/quizGenerator", { 
+        state: { quizName, quizTopic, timeDuration, dataset, totalMarks, quizType: "NormalQuiz" } 
+      });
+    } catch (error) {
+      console.error("Error fetching quiz:", error);
+      alert("Failed to load quiz. Please try again."); // Optional: user-friendly error
+    } finally {
+      setLoading(false); // stop loading
+    }
   };
 
   return (
     <>
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
+          <div className="text-xl font-semibold">Loading...</div>
+        </div>
+      )}
       {filteredQuizzes.map((quiz) => (
         <div key={quiz.quiz_id} className="quiz-card bg-white rounded-xl shadow-md overflow-hidden">
           <div
@@ -150,7 +82,8 @@ export const QuizCard = ({ data, subject_name }) => {
               </span>
               <button
                 className="bg-primary border-2 text-black px-6 py-2 rounded-button hover:bg-black hover:text-white hover:cursor-pointer transition-colors whitespace-nowrap"
-                onClick={() => handleclick(quiz.quiz_id)} // Pass the quiz quiz_id to the handleclick function
+                onClick={() => handleclick(quiz.quiz_id)}
+                disabled={loading} // disable button while loading
               >
                 Start Quiz
               </button>
@@ -161,4 +94,3 @@ export const QuizCard = ({ data, subject_name }) => {
     </>
   );
 };
-
