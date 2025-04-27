@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import team4.quizify.entity.Quiz;
 import team4.quizify.entity.Report;
 import team4.quizify.entity.Subject;
+import team4.quizify.entity.Teacher;
 import team4.quizify.repository.QuizRepository;
 import team4.quizify.repository.ReportRepository;
 import team4.quizify.repository.SubjectRepository;
+import team4.quizify.repository.TeacherRepository;
 
 import java.util.*;
 
@@ -20,6 +22,9 @@ public class TeacherReportService {
     
     @Autowired
     private SubjectRepository subjectRepository;
+    
+    @Autowired
+    private TeacherRepository teacherRepository;
     
     public List<Map<String, Object>> generateSubjectTeacherStudentReport() {
         return new ArrayList<>();
@@ -70,16 +75,16 @@ public class TeacherReportService {
         // Calculate statistics
         Double averageMarks = reportRepository.getAverageMarksByQuizId(quizId);
         Integer maxMarks = reportRepository.getMaxMarksByQuizId(quizId);
-        Integer minMarks = reportRepository.getMinMarksByQuizId(quizId);
-        
-        // Get subject name
+        Integer minMarks = reportRepository.getMinMarksByQuizId(quizId);          // Get subject name
         Integer subjectId = quizData.getSubjectId();
         String subjectName = "Unknown Subject";
         Optional<Subject> subjectOptional = subjectRepository.findById(subjectId);
         if (subjectOptional.isPresent()) {
             subjectName = subjectOptional.get().getName();
         }
-          // Build response        statistics.put("quizId", quizId);
+        
+        // Build response - explicitly add quizId first to ensure it's always included
+        statistics.put("quizId", quizId);
         statistics.put("type", quizData.getType()); 
         statistics.put("quizName", quizData.getTitle());
         statistics.put("totalMarks", quizData.getMarks());
@@ -94,5 +99,38 @@ public class TeacherReportService {
         statistics.put("description", quizData.getDescription());
         
         return statistics;
+    }
+    
+    // Method to generate reports for all quizzes created by a teacher
+    public List<Map<String, Object>> generateTeacherAllQuizzesReport(Integer teacherId) {
+        List<Map<String, Object>> allQuizReports = new ArrayList<>();
+        
+        // Find the teacher by ID
+        Optional<Teacher> teacherOptional = teacherRepository.findById(teacherId);
+        if (teacherOptional.isEmpty()) {
+            Map<String, Object> errorReport = new HashMap<>();
+            errorReport.put("error", "Record not found");
+            allQuizReports.add(errorReport);
+            return allQuizReports;
+        }
+        
+        Teacher teacher = teacherOptional.get();
+        Integer[] createdQuizIds = teacher.getCreatedQuiz();
+        
+        // If teacher hasn't created any quizzes
+        if (createdQuizIds == null || createdQuizIds.length == 0) {
+            Map<String, Object> emptyReport = new HashMap<>();
+            emptyReport.put("message", "No quizzes created by this teacher");
+            allQuizReports.add(emptyReport);
+            return allQuizReports;
+        }
+        
+        // Get reports for each quiz
+        for (Integer quizId : createdQuizIds) {
+            Map<String, Object> quizReport = generateQuizStatistics(quizId);
+            allQuizReports.add(quizReport);
+        }
+        
+        return allQuizReports;
     }
 }
