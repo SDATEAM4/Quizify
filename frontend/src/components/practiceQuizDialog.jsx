@@ -132,7 +132,7 @@ export const QuizDialog = ({ quizData, setPage }) => {
               }}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black"
             >
-              <option value="">Choose a subject_name</option>
+              <option value="">Choose a subject</option>
               {uniquesubject_names.map(subject_name => (
                 <option key={subject_name} value={subject_name}>{subject_name}</option>
               ))}

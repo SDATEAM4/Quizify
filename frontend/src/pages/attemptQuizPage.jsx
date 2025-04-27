@@ -7,9 +7,9 @@ import { QuizDialog } from "../components/practiceQuizDialog";
 import { useAuth } from '../context/authContext';
 
 export const AttemptQuizPage = () => {
-  
+
   const { user, studentId } = useAuth();
-  console.log("Student ID:", studentId); // Check the studentId value
+  console.log("Student ID:", studentId);
   const [DATA, setDATA] = useState([]);
   const [response, setResponse] = useState([]);
   const [activePage, setActivePage] = useState("attemptQuiz");
@@ -40,13 +40,13 @@ export const AttemptQuizPage = () => {
     };
 
     fetchData();
-    document.title = 'Quizify - Attemp Quiz'
+    document.title = 'Quizify - Attempt Quiz';
   }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <NavBar />
-      
+
       <main className="flex-1 relative">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 backdrop-blur-sm z-50">
@@ -59,23 +59,32 @@ export const AttemptQuizPage = () => {
             </div>
           </div>
         )}
-        
-        {activePage === "attemptQuiz" ? (
-          <div className="container mx-auto px-4 py-8">
-            <SubjectTabs
-              data={response}
-              activesubject_name={activesubject_name}
-              onsubject_nameChange={setActivesubject_name}
-              onPracticeMode={() => setActivePage("practiceMode")}
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <QuizCard data={response} subject_name={activesubject_name} />
-            </div>
+
+        {!loading && response.length === 0 ? (
+          <div className="flex flex-col items-center justify-center min-h-[70vh] text-center w-full">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">No Quizzes Available</h2>
+            <p className="text-lg text-gray-600 mb-6">
+              There are currently no quizzes for you to attempt. Please check back later!
+            </p>
           </div>
         ) : (
-          <div className="container mx-auto px-4 py-8">
-            <QuizDialog quizData={response} setPage={() => setActivePage("attemptQuiz")} />
-          </div>
+          activePage === "attemptQuiz" ? (
+            <div className="container mx-auto px-4 py-8">
+              <SubjectTabs
+                data={response}
+                activesubject_name={activesubject_name}
+                onsubject_nameChange={setActivesubject_name}
+                onPracticeMode={() => setActivePage("practiceMode")}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <QuizCard data={response} subject_name={activesubject_name} />
+              </div>
+            </div>
+          ) : (
+            <div className="container mx-auto px-4 py-8">
+              <QuizDialog quizData={response} setPage={() => setActivePage("attemptQuiz")} />
+            </div>
+          )
         )}
       </main>
 

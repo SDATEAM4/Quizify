@@ -48,6 +48,20 @@ const MarksChart = ({ quizDetails }) => {
     return null;
   };
 
+  const CustomLegend = () => (
+    <div className="flex flex-wrap justify-center gap-4 mb-4">
+      {chartData.map((entry) => (
+        <div key={entry.name} className="flex items-center gap-2">
+          <div
+            className="w-4 h-4 rounded-sm"
+            style={{ backgroundColor: entry.fill }}
+          />
+          <span className="text-sm text-gray-700">{entry.name}</span>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="w-full h-[400px] mt-8">
       <ResponsiveContainer width="100%" height="100%">
@@ -75,18 +89,14 @@ const MarksChart = ({ quizDetails }) => {
             label={{ value: 'Marks', angle: -90, position: 'insideLeft', offset: 0 }}
           />
           <Tooltip content={<CustomTooltip />} />
-          <Legend verticalAlign="top" height={36} />
-          {chartData.map((entry) => (
-            <Bar
-              key={entry.name}
-              dataKey="value"
-              name={entry.name}
-              fill={entry.fill}
-              radius={[4, 4, 0, 0]}
-              animationDuration={1500}
-              maxBarSize={60}
-            />
-          ))}
+          <Legend content={<CustomLegend />} />
+          <Bar
+            dataKey="value"
+            fill={({ fill }) => fill}
+            radius={[4, 4, 0, 0]}
+            animationDuration={1500}
+            maxBarSize={95}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
