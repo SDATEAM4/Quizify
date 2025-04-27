@@ -57,7 +57,7 @@ const ManageUserCard = ({
         <div className="flex flex-col items-center">
           <div className="w-32 h-32 overflow-hidden rounded-full shadow-md mb-2">
             <img
-              src={userData.profileImageUrl || "https://via.placeholder.com/150"}
+              src={userData.profileImageUrl || '/images/fallback.png'}
               alt="User Profile"
               className="w-full h-full object-cover"
             />
