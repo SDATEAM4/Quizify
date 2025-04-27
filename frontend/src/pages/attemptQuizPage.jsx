@@ -40,6 +40,7 @@ export const AttemptQuizPage = () => {
     };
 
     fetchData();
+    document.title = 'Quizify - Attemp Quiz'
   }, []);
 
   return (

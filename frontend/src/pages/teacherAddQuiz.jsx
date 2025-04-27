@@ -13,6 +13,10 @@ const TeacherAddQuiz = () => {
     difficulty: "easy", // Only used in automatic mode
   });
 
+  useEffect(()=>{
+    document.title = 'Quizify - Teacher Add Quiz'
+  },[])
+
   // State for questions
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [availableQuestions, setAvailableQuestions] = useState([]);

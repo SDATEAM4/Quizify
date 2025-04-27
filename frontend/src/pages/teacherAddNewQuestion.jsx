@@ -24,9 +24,11 @@ export default function AddNewQuestion() {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
+        document.title = 'Quizify - Teacher Add Question'
         const response = await axios.get('http://localhost:8080/Quizify/admin/subjects');
         setSubjects(response.data);
         toast.success("subjects fetched succesfully")
+
       } catch (err) {
         toast.success("could not fetch subjects")
         console.error('Error fetching subjects:', err);

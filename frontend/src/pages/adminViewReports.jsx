@@ -11,6 +11,7 @@ export default function ViewReports() {
   const [expandedSubject, setExpandedSubject] = useState(null);
 
   useEffect(() => {
+    document.title = 'Quizify - Admin Reports'
     const fetchReports = async () => {
       try {
         setLoading(true);

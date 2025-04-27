@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ManageUserCard from '../components/managerUserCard';
 import { FaSearch } from "react-icons/fa";
 import { AdminNavBar } from "../components/adminNavbar";
@@ -16,6 +16,10 @@ export default function ManageUserComponent() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(()=>{
+    document.title = 'Quizify - Admin Manager User'
+  },[])
 
   const handleSearch = async (e) => {
     e.preventDefault();
