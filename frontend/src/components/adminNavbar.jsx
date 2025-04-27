@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { FaChartBar, FaSignOutAlt, FaUserCog, FaUserPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "../context/authContext";
 export const AdminNavBar = () => {
   const [activeTab, setActiveTab] = useState("addUser");
   const navigate = useNavigate();  
   // This would be your navigation handler with useNavigate
-  
-
+  const {logout} = useAuth();
+  const handleLogout = async() =>{
+    logout()
+    navigate('/')
+  }
   return (
     <header className="bg-black text-white min-h-[50px] shadow-md min-w-screen z-20">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -72,6 +75,7 @@ export const AdminNavBar = () => {
         <div className="flex flexro items-center space-x-3">  
           <button
             className="bg-red-600 p-2 rounded-md hover:bg-white hover:text-red-500 transition-all duration-300 flex flex-row items-center gap-1"
+            onClick={handleLogout}
           >
             <FaSignOutAlt/>Log out
           </button>

@@ -18,14 +18,22 @@ export const LoginForm = ({ onForgotPasswordClick }) => {
     }
     
     try {
-      const status = await login(identifier, password);
-      console.log(status)
-      if (status) {
-
-        navigate('/student/home'); // Or wherever you want to redirect
+      const result = await login(identifier, password);
+      
+      if (result.success) {
+        console.log('Login successful, role:', result.role);
+        
+        // Navigate based on the returned role
+        if (result.role === 'Teacher') {
+          navigate('/teacher/home');
+        } else if (result.role === 'Student') {
+          navigate('/student/home');
+        } else {
+          navigate('/admin/addUser');
+        }
       }
     } catch (error) {
-      error.message
+      console.error(error.message);
     }
   };
   
