@@ -67,6 +67,8 @@ public class TeacherReportService {
             statistics.put("subjectName", subjectName);
             statistics.put("title", quizData.getTitle());
             statistics.put("description", quizData.getDescription());
+            statistics.put("level", quizData.getLevel());
+            statistics.put("timeLimit", quizData.getTimelimit());
             return statistics;
         }
           // Get total number of students who attempted
