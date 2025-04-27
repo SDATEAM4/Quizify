@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { FaHome, FaPencilAlt, FaQuestionCircle, FaTrophy, FaChartBar, FaPlusCircle, FaEdit, FaCommentDots } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/authContext";
 export const TeacherNavbar = () => {
   const [activeTab, setActiveTab] = useState("home");
   const navigate = useNavigate();
-
+  const {user}=useAuth();
   return (
     <header className="bg-black text-white shadow-md">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -92,12 +93,12 @@ export const TeacherNavbar = () => {
         <div className="flex items-center space-x-3">
           <div className="h-8 w-8 rounded-full bg-gray-300 overflow-hidden">
             <img
-              src="https://readdy.ai/api/search-image?query=professional%20headshot%20portrait%20of%20a%20person%20with%20neutral%20expression%2C%20high%20quality%2C%20realistic%2C%20professional%20photography%2C%20soft%20lighting%2C%20clean%20background%2C%20minimalist%20style%2C%20business%20attire&width=100&height=100&seq=1&orientation=squarish"
+              src={user.profileImageUrl || 'img/fallback.png'}
               alt="Profile"
               className="h-full w-full object-cover"
             />
           </div>
-          <span className="hidden md:inline">John Doe</span>
+          <span className="hidden md:inline">{user.username}</span>
           <i className="fas fa-chevron-down text-xs"></i>
         </div>
         
