@@ -108,8 +108,11 @@ export default function ManageUserComponent() {
   const handleSave = async () => {
     
     try{
-      await axios.put(`http://localhost:8080/Quizify/forgot-password/reset?email=${userData.email}&newPassword=${newPassword}`)
-      toast.success("Password changed successfully")
+      if(newPassword!=''){
+
+        await axios.put(`http://localhost:8080/Quizify/forgot-password/reset?email=${userData.email}&newPassword=${newPassword}`)
+        toast.success("Password changed successfully")
+      }
       // setting courses now
       try{
         const idsString = subjects.map(course => course.id).join(',');
