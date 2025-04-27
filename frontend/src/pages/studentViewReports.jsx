@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SelectionControls from '../components/SelectionControls';
-import MarksChart from '../components/MarksChart';
+import MarksChart from '../components/Markschart';
 import PieChart from '../components/PieChart';
 import StatsDisplay from '../components/StatsDisplay';
 import { Footer } from "../components/footer";

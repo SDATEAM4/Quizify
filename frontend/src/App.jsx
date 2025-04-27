@@ -17,7 +17,7 @@ import { Toaster } from "react-hot-toast";
 import CustomizeProfile from "./pages/customizeProfile";
 import AddSubjectPage from "./pages/adminAddSubject";
 import StudentViewReport from "./pages/studentViewReports";
-import Leaderboard from "./pages/LeaderBoard";
+import Leaderboard from "./pages/Leaderboard";
 function App() {
   return (
     <AuthProvider>
