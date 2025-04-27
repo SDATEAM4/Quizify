@@ -24,6 +24,7 @@ const TeacherReports = () => {
 
   // Fetch all quizzes for the logged-in teacher
   useEffect(() => {
+    document.title = 'Quizify - Teacher Reports'
     const fetchTeacherQuizzes = async () => {
       try {
         setLoading(true);

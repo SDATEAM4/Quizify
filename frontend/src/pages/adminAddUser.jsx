@@ -1,9 +1,12 @@
 import { AdminNavBar } from "../components/adminNavbar"
 import AddUserComponent from "../components/addUserModal"
 import BackgroundTypography from '../components/backgroundTypography'
+import { useEffect } from "react"
 export const AdminAddUserPage = () => {
   
-
+  useEffect(()=>{
+    document.title = 'Quizify - Admin Add User'
+  })
   return (
     <div className="min-h-screen w-full bg-white flex flex-col -z-0">
       {/* Navbar section - fixed height */}

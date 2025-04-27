@@ -21,6 +21,7 @@ const AddSubjectPage = () => {
 
   // Fetch all subjects when component mounts
   useEffect(() => {
+    document.title = 'Quizify - Teacher Add Subject'
     fetchSubjects();
   }, []);
 

@@ -1,11 +1,15 @@
 import { TeacherNavbar } from "../components/teacherNavbar.jsx";
 import { CourseCard } from "../components/courseCard.jsx";
 import { Footer } from "../components/footer.jsx";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useAuth } from "../context/authContext.jsx";
 export const TeacherHomePage = () => {
   // State variables
   const {user, taughtSubjects} = useAuth();
+
+  useEffect(()=>{
+    document.title = 'Quizify - Teacher Home'
+  },[])
 
     const courseImages = useMemo(() => [
         'https://readdy.ai/api/search-image?query=abstract%20physics%20concept%20visualization%20with%20particles%2C%20waves%2C%20and%20light%20effects%2C%20elegant%20and%20minimalist%20design%2C%20soft%20warm%20colors%2C%20perfect%20for%20educational%20platform%2C%20clean%20background%2C%20high%20quality%20render&width=600&height=300&seq=2&orientation=landscape',

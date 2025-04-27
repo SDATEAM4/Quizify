@@ -57,6 +57,7 @@ export const TeacherEditQuiz = () => {
         
         setQuizzes(mockQuizzes);
         setFilteredQuizzes(mockQuizzes);
+        document.title = 'Quizify - Teacher Edit Quiz'
         setLoading(false);
       } catch (error) {
         console.error("Error fetching quizzes:", error);
