@@ -4,22 +4,23 @@ import { QuizCard } from "../components/quizCard";
 import { Footer } from "../components/footer";
 import { NavBar } from "../components/navbar";
 import { QuizDialog } from "../components/practiceQuizDialog";
-// import { authContext } from "../context/authContext";
+import { useAuth } from '../context/authContext';
 
 export const AttemptQuizPage = () => {
-  // const { uId } = authContext(); // get uid then get reponse as response from DB
-
+  
+  const { user, studentId } = useAuth();
+  console.log("Student ID:", studentId); // Check the studentId value
   const [DATA, setDATA] = useState([]);
   const [response, setResponse] = useState([]);
   const [activePage, setActivePage] = useState("attemptQuiz");
   const [activesubject_name, setActivesubject_name] = useState("");
-  const [loading, setLoading] = useState(false); // added loading state
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true); // start loading
-        const res = await fetch("http://localhost:8080/Quizify/quizzes/student/1");
+        setLoading(true);
+        const res = await fetch(`http://localhost:8080/Quizify/quizzes/student/${studentId}`);
         const json = await res.json();
         setDATA(json);
 
@@ -32,9 +33,9 @@ export const AttemptQuizPage = () => {
         }
       } catch (error) {
         console.error("Error fetching quiz data:", error);
-        alert("Failed to load quizzes. Please try again."); // Optional
+        alert("Failed to load quizzes. Please try again.");
       } finally {
-        setLoading(false); // stop loading
+        setLoading(false);
       }
     };
 
@@ -44,27 +45,39 @@ export const AttemptQuizPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <NavBar />
-      {loading ? (
-        <div className="flex-grow flex items-center justify-center">
-          <div className="text-xl font-semibold">Loading...</div>
-        </div>
-      ) : activePage === "attemptQuiz" ? (
-        <div className="container mx-auto px-4 py-8">
-          <SubjectTabs
-            data={response}
-            activesubject_name={activesubject_name}
-            onsubject_nameChange={setActivesubject_name}
-            onPracticeMode={() => setActivePage("practiceMode")}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <QuizCard data={response} subject_name={activesubject_name} />
+      
+      <main className="flex-1 relative">
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 backdrop-blur-sm z-50">
+            <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+              <h1 className="text-9xl font-bold text-white">Quizify</h1>
+            </div>
+            <div className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center space-y-6 relative z-10">
+              <div className="w-16 h-16 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div>
+              <h2 className="text-2xl font-bold text-gray-800">Loading Quizzes...</h2>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="container mx-auto px-4 py-8">
-          <QuizDialog quizData={response} setPage={() => setActivePage("attemptQuiz")} />
-        </div>
-      )}
+        )}
+        
+        {activePage === "attemptQuiz" ? (
+          <div className="container mx-auto px-4 py-8">
+            <SubjectTabs
+              data={response}
+              activesubject_name={activesubject_name}
+              onsubject_nameChange={setActivesubject_name}
+              onPracticeMode={() => setActivePage("practiceMode")}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <QuizCard data={response} subject_name={activesubject_name} />
+            </div>
+          </div>
+        ) : (
+          <div className="container mx-auto px-4 py-8">
+            <QuizDialog quizData={response} setPage={() => setActivePage("attemptQuiz")} />
+          </div>
+        )}
+      </main>
+
       <Footer />
     </div>
   );

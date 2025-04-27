@@ -2,13 +2,14 @@ import React, { useState, useMemo } from 'react';
 import { Calculator, Settings, FlaskRound as Flask, Dna, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-
 export const QuizDialog = ({ quizData, setPage }) => {
   const [selectedsubject_name, setSelectedsubject_name] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
   const [questionCount, setQuestionCount] = useState(5);
   const [difficulty, setDifficulty] = useState('Beginner');
   const [response, setResponseData] = useState([]);
+  const [loading, setLoading] = useState(false); // ✅ new loading state
+
   const iconMap = {
     calculator: Calculator,
     settings: Settings,
@@ -42,9 +43,6 @@ export const QuizDialog = ({ quizData, setPage }) => {
     setPage();
   };
 
-
-
- 
   const transformDataset = (data) => {
     return data.map(({ question, answer, ...rest }) => ({
       ...rest,
@@ -52,28 +50,27 @@ export const QuizDialog = ({ quizData, setPage }) => {
       correct_answer: answer,
     }));
   };
-  
-  
- 
-  
+
   const navigate = useNavigate();
+
   const handleclick = async () => {
     const quizName = selectedsubject_name;
     const quizTopic = selectedTopic;
     const difficultyLevel = difficulty;
     const noOfquestion = questionCount;
     const description = selectedsubject_name;
-  
+
     try {
+      setLoading(true); // ✅ start loading
       const res = await fetch(`http://localhost:8080/Quizify/practiceQuiz?subject=${quizName}&topic=${quizTopic}&level=${difficultyLevel}&numQuestions=${noOfquestion}&description=${description}`);
-      
+
       if (!res.ok) {
         throw new Error('Failed to fetch quiz data');
       }
-  
+
       const data = await res.json();
       const dataset = transformDataset(data);
-  
+
       navigate("/quizGenerator", {
         state: {
           quiz_id: 0,
@@ -88,9 +85,23 @@ export const QuizDialog = ({ quizData, setPage }) => {
     } catch (error) {
       console.error("Error fetching quiz data:", error);
       // Optional: show an error message to user
+    } finally {
+      setLoading(false); // ✅ stop loading (even if error)
     }
   };
-  
+
+  if (loading) {
+    // ✅ Show loading screen
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 backdrop-blur-sm z-50">
+        <div className="bg-white p-10 rounded-xl shadow-xl text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-gray-900 mx-auto mb-4"></div>
+          <h2 className="text-2xl font-semibold text-gray-700">Generating Quiz...</h2>
+          <p className="text-gray-500 mt-2">Please wait a moment</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 backdrop-blur-sm">
@@ -105,7 +116,6 @@ export const QuizDialog = ({ quizData, setPage }) => {
         >
           <ArrowLeft size={24} />
         </button>
-
 
         <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Create Quiz</h2>
 
@@ -189,7 +199,8 @@ export const QuizDialog = ({ quizData, setPage }) => {
           </div>
 
           <button
-            className="w-full bg-gray-100 text-black py-3 rounded-lg font-medium hover:bg-black hover:text-white transition-colors duration-200 border border-gray-500 shadow-sm hover:shadow-lg cursor-pointer " onClick={handleclick}
+            className="w-full bg-gray-100 text-black py-3 rounded-lg font-medium hover:bg-black hover:text-white transition-colors duration-200 border border-gray-500 shadow-sm hover:shadow-lg cursor-pointer"
+            onClick={handleclick}
             disabled={!selectedsubject_name || !selectedTopic}
           >
             Generate Quiz
@@ -199,4 +210,3 @@ export const QuizDialog = ({ quizData, setPage }) => {
     </div>
   );
 };
-
