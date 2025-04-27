@@ -89,6 +89,8 @@ public class AdminController {
                                     Map<String, Object> subjectInfo = new HashMap<>();
                                     subjectInfo.put("id", subjectId);
                                     subjectInfo.put("name", subject.get().getName());
+                                    subjectInfo.put("description", subject.get().getDescription());
+                                    subjectInfo.put("imageUrl", subject.get().getImageUrl());
                                     subjectsWithNames.add(subjectInfo);
                                 }
                             }
@@ -110,6 +112,8 @@ public class AdminController {
                                     Map<String, Object> subjectInfo = new HashMap<>();
                                     subjectInfo.put("id", subjectId);
                                     subjectInfo.put("name", subject.get().getName());
+                                    subjectInfo.put("description", subject.get().getDescription());
+                                    subjectInfo.put("imageUrl", subject.get().getImageUrl());
                                     subjectsWithNames.add(subjectInfo);
                                 }
                             }
@@ -171,6 +175,8 @@ public class AdminController {
                                     Map<String, Object> subjectInfo = new HashMap<>();
                                     subjectInfo.put("id", subjectId);
                                     subjectInfo.put("name", subject.get().getName());
+                                    subjectInfo.put("description", subject.get().getDescription());
+                                    subjectInfo.put("imageUrl", subject.get().getImageUrl());
                                     subjectsWithNames.add(subjectInfo);
                                 }
                             }
@@ -194,6 +200,8 @@ public class AdminController {
                                     Map<String, Object> subjectInfo = new HashMap<>();
                                     subjectInfo.put("id", subjectId);
                                     subjectInfo.put("name", subject.get().getName());
+                                    subjectInfo.put("description", subject.get().getDescription());
+                                    subjectInfo.put("imageUrl", subject.get().getImageUrl());
                                     subjectsWithNames.add(subjectInfo);
                                 }
                             }
@@ -238,6 +246,8 @@ public class AdminController {
                                     Map<String, Object> subjectInfo = new HashMap<>();
                                     subjectInfo.put("id", subjectId);
                                     subjectInfo.put("name", subject.get().getName());
+                                    subjectInfo.put("description", subject.get().getDescription());
+                                    subjectInfo.put("imageUrl", subject.get().getImageUrl());
                                     subjectsWithNames.add(subjectInfo);
                                 }
                             }
@@ -260,6 +270,8 @@ public class AdminController {
                                     Map<String, Object> subjectInfo = new HashMap<>();
                                     subjectInfo.put("id", subjectId);
                                     subjectInfo.put("name", subject.get().getName());
+                                    subjectInfo.put("description", subject.get().getDescription());
+                                    subjectInfo.put("imageUrl", subject.get().getImageUrl());
                                     subjectsWithNames.add(subjectInfo);
                                 }
                             }
@@ -299,6 +311,8 @@ public class AdminController {
                             Map<String, Object> subjectInfo = new HashMap<>();
                             subjectInfo.put("id", subjectId);
                             subjectInfo.put("name", subject.get().getName());
+                            subjectInfo.put("description", subject.get().getDescription());
+                            subjectInfo.put("imageUrl", subject.get().getImageUrl());
                             enrolledSubjectsWithNames.add(subjectInfo);
                         }
                     }
@@ -336,6 +350,8 @@ public class AdminController {
                             Map<String, Object> subjectInfo = new HashMap<>();
                             subjectInfo.put("id", subjectId);
                             subjectInfo.put("name", subject.get().getName());
+                            subjectInfo.put("description", subject.get().getDescription());
+                            subjectInfo.put("imageUrl", subject.get().getImageUrl());
                             taughtSubjectsWithNames.add(subjectInfo);
                         }
                     }
