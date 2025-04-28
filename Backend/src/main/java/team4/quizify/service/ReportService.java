@@ -85,4 +85,17 @@ public class ReportService {
         
         return teacherReport;
     }
+    
+    /**
+     * Delete all reports for a specific quiz
+     * 
+     * @param quizId The ID of the quiz to delete reports for
+     * @return The number of reports deleted
+     */
+    public int deleteReportsByQuizId(Integer quizId) {
+        List<Report> reports = reportRepository.findByQuizId(quizId);
+        int count = reports.size();
+        reportRepository.deleteAll(reports);
+        return count;
+    }
 }

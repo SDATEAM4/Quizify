@@ -23,6 +23,7 @@ import team4.quizify.service.SubjectService;
 import team4.quizify.service.StudentService;
 import team4.quizify.service.TeacherService;
 import team4.quizify.service.QuestionBankService;
+import team4.quizify.service.ReportService;
 import team4.quizify.config.MessageResponse;
 
 import java.util.HashMap;
@@ -66,10 +67,11 @@ public class QuizController {
     
     @Autowired
     private AutoQuizGenerationTemplate autoQuizGenerationTemplate;
-    
-    @Autowired
+      @Autowired
     private ApplicationContext applicationContext;
     
+    @Autowired
+    private ReportService reportService;
     @GetMapping("/teacher/{teacherId}")
     public ResponseEntity<?> getQuizzesByTeacher(@PathVariable Integer teacherId) {        
         try {
@@ -613,14 +615,19 @@ public class QuizController {
             if (description != null) quiz.setDescription(description);
             if (timeLimit != null) quiz.setTimelimit(timeLimit);
             if (level != null) quiz.setLevel(level);
-            
-            // Save the updated quiz
+              // Save the updated quiz
             Quiz updatedQuiz = quizManagementService.saveQuiz(quiz);
+            
+            // Remove the quiz from students' attempted quizzes and delete related reports
+            int affectedStudents = studentService.removeQuizFromAllStudentsAttempted(quizId);
+            int deletedReports = reportService.deleteReportsByQuizId(quizId);
             
             // Prepare success response
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("quiz_id", updatedQuiz.getQuizId());
             responseBody.put("message", "Quiz updated successfully");
+            responseBody.put("students_affected", affectedStudents);
+            responseBody.put("reports_deleted", deletedReports);
             
             if (finalQuestionIds.size() < count) {
                 responseBody.put("warning", "Not enough questions available. Updated quiz with " + 
@@ -777,9 +784,12 @@ public class QuizController {
                     "Automatically generated quiz with mixed difficulty levels" : 
                     "Automatically generated quiz with difficulty level " + level);
             }
-            
-            // Save the updated quiz
+              // Save the updated quiz
             Quiz updatedQuiz = quizManagementService.saveQuiz(quiz);
+            
+            // Remove the quiz from students' attempted quizzes and delete related reports
+            int affectedStudents = studentService.removeQuizFromAllStudentsAttempted(quizId);
+            int deletedReports = reportService.deleteReportsByQuizId(quizId);
             
             // Prepare success response
             Map<String, Object> responseBody = new HashMap<>();
@@ -790,6 +800,8 @@ public class QuizController {
             responseBody.put("actually_added", finalQuestionIds.size()); 
             responseBody.put("total_questions", updatedQuiz.getQuestionIds().length);
             responseBody.put("level", level);
+            responseBody.put("students_affected", affectedStudents);
+            responseBody.put("reports_deleted", deletedReports);
             
             if (finalQuestionIds.size() < count) {
                 responseBody.put("warning", "Not enough questions available at level " + level + ". Added " + finalQuestionIds.size() + " questions instead of " + count);
@@ -799,6 +811,75 @@ public class QuizController {
             
         } catch (Exception e) {
             return handleInternalServerError(e, "updating quiz automatically");
+        }
+    }
+    
+    /**
+     * Deletes a quiz by ID and updates the teacher's createdQuiz array
+     * This method ensures that only the teacher who created the quiz can delete it
+     */
+    @DeleteMapping("/{quizId}/delete/{teacherId}")
+    public ResponseEntity<?> deleteQuiz(
+            @PathVariable Integer quizId,
+            @PathVariable Integer teacherId) {
+        try {
+            // Check if teacher exists
+            Teacher teacher = teacherService.getTeacherByTeacherId(teacherId);
+            if (teacher == null) {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Teacher not found");
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            }
+            
+            // Check if quiz exists
+            Optional<Quiz> quizOptional = quizManagementService.getQuizById(quizId);
+            if (!quizOptional.isPresent()) {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Quiz not found");
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            }
+            
+            // Verify that the quiz was created by this teacher
+            Integer[] createdQuizIds = teacher.getCreatedQuiz();
+            boolean isQuizCreatedByTeacher = false;
+            
+            if (createdQuizIds != null) {
+                for (Integer id : createdQuizIds) {
+                    if (id.equals(quizId)) {
+                        isQuizCreatedByTeacher = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!isQuizCreatedByTeacher) {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "This teacher is not authorized to delete this quiz");
+                return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+            }
+            
+            // Delete the quiz from the database
+            quizManagementService.deleteQuiz(quizId);
+            
+            // Remove the quiz ID from teacher's createdQuiz array
+            List<Integer> updatedCreatedQuiz = new ArrayList<>();
+            for (Integer id : createdQuizIds) {
+                if (!id.equals(quizId)) {
+                    updatedCreatedQuiz.add(id);
+                }
+            }
+              // Update teacher's createdQuiz array
+            teacher.setCreatedQuiz(updatedCreatedQuiz.toArray(new Integer[0]));
+            teacherService.updateTeacher(teacher);
+            
+            // Prepare success response
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("message", "Quiz deleted successfully");
+            
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            return handleInternalServerError(e, "deleting quiz");
         }
     }
     
