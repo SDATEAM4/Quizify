@@ -7,9 +7,7 @@ import team4.quizify.service.TeacherReportService;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Concrete implementation of ReportFactory for Teacher Reports
- */
+
 @Component
 public class TeacherReportFactory implements ReportFactory {
 

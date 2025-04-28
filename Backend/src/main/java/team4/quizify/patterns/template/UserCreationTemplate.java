@@ -3,14 +3,10 @@ package team4.quizify.patterns.template;
 import org.springframework.web.multipart.MultipartFile;
 import team4.quizify.entity.User;
 
-/**
- * Template method for user creation process
- */
+
 public abstract class UserCreationTemplate {
     
-    /**
-     * Template method defining the steps for user creation
-     */
+   
     public final User createUser(String fname, String lname, String username, String password, 
                               String email, String role, MultipartFile profileImage) {
         

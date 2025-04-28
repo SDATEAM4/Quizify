@@ -1,7 +1,6 @@
 package team4.quizify.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,6 @@ import team4.quizify.entity.Student;
 import team4.quizify.entity.Teacher;
 import team4.quizify.entity.User;
 import team4.quizify.entity.QuestionBank;
-import team4.quizify.patterns.factory.QuizFactoryProducer;
 import team4.quizify.patterns.template.AutoQuizGenerationTemplate;
 import team4.quizify.patterns.template.ManualQuizGenerationTemplate;
 import team4.quizify.service.QuizManagementService;
