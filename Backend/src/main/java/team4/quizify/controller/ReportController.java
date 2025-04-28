@@ -68,5 +68,12 @@ public class ReportController {
     public ResponseEntity<List<Map<String, Object>>> getTeacherAllQuizzesReport(
             @PathVariable Integer teacherId) {
         return ResponseEntity.ok(teacherReport.generateTeacherAllQuizzesReport(teacherId));
+    }    
+    
+    //STUDENT QUIZ MARKS DISTRIBUTION REPORT BASED ON STUDENT ID
+    @GetMapping("/student/distribution/{user_id}")
+    public ResponseEntity<Map<String, Object>> getStudentQuizMarkDistributionReport(
+            @PathVariable("user_id") Integer userId) {
+        return ResponseEntity.ok(studentReport.generateStudentQuizMarkDistributionReport(userId));
     }
 }
