@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TeacherNavbar } from "../components/teacherNavbar";
+import { useAuth } from "../context/authContext";
 import {
   BarChart,
   Bar,
@@ -8,34 +9,58 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  Cell,
   ResponsiveContainer,
 } from "recharts";
 import axios from "axios";
 
 const TeacherReports = () => {
+  const { teacherId } = useAuth();
   const [quizzes, setQuizzes] = useState([]);
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
+  const [allReportsData, setAllReportsData] = useState({});
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadingReports, setLoadingReports] = useState(false);
   const [scoreDistributionData, setScoreDistributionData] = useState([]);
-  
-  // Get the teacher ID from localStorage or context
-  const teacherId = localStorage.getItem("teacherId") || 4; // Default to 4 for testing
+
+  const scoreRangeColors = [
+    "#F59E0B", // 0-20 (Red)
+    "#10B981", // 21-40 (Orange)
+    "#FFC107", // 41-60 (Yellow/Amber)
+    "#6366F1", // 61-80 (Green)
+    "#3B82F6", // 81-100 (Blue)
+  ];
+
+  // Helper function to map level numbers to verbal descriptions
+  const getLevelDescription = (level) => {
+    if (!level) return "N/A";
+
+    switch (level.toString()) {
+      case "1":
+        return "Beginner";
+      case "2":
+        return "Intermediate";
+      case "3":
+        return "Advanced";
+      default:
+        return level; // Return original value if not 1, 2, or 3
+    }
+  };
 
   // Fetch all quizzes for the logged-in teacher
   useEffect(() => {
-    document.title = 'Quizify - Teacher Reports'
+    document.title = "Quizify - Teacher Reports";
     const fetchTeacherQuizzes = async () => {
       try {
         setLoading(true);
         const response = await axios.get(
           `http://localhost:8080/Quizify/quizzes/teacher/${teacherId}`
         );
-        
+
         if (response.data && response.data.length > 0) {
           setQuizzes(response.data);
-          // Once we have quizzes, fetch the report for the first quiz
-          fetchQuizReport(response.data[0].quiz_id);
+          await fetchAllQuizReports(response.data);
         } else {
           setLoading(false);
         }
@@ -48,22 +73,57 @@ const TeacherReports = () => {
     fetchTeacherQuizzes();
   }, [teacherId]);
 
-  // Fetch report data for a specific quiz
-  const fetchQuizReport = async (quizId) => {
+  // Fetch all quiz reports at once
+  const fetchAllQuizReports = async (quizzesData) => {
     try {
-      setLoading(true);
-      const response = await axios.get(
-        `http://localhost:8080/Quizify/reports/teacher/quiz/${quizId}`
+      setLoadingReports(true);
+
+      // Create an object to store all reports
+      const reportsObject = {};
+
+      // Create an array of promises for fetching all reports
+      const reportPromises = quizzesData.map((quiz) =>
+        axios
+          .get(
+            `http://localhost:8080/Quizify/reports/teacher/quiz/${quiz.quiz_id}`
+          )
+          .then((response) => {
+            if (response.data) {
+              reportsObject[quiz.quiz_id] = response.data;
+            }
+            return response;
+          })
+          .catch((error) => {
+            console.error(
+              `Error fetching report for quiz ${quiz.quiz_id}:`,
+              error
+            );
+            return null;
+          })
       );
-      
-      if (response.data) {
-        setReportData(response.data);
-        generateScoreDistribution(response.data);
+
+      // Wait for all promises to resolve
+      await Promise.all(reportPromises);
+
+      // Set all reports data
+      setAllReportsData(reportsObject);
+
+      // Set the current report data (first quiz)
+      if (quizzesData.length > 0) {
+        const firstQuizId = quizzesData[0].quiz_id;
+        const firstQuizReport = reportsObject[firstQuizId];
+
+        if (firstQuizReport) {
+          setReportData(firstQuizReport);
+          generateScoreDistribution(firstQuizReport);
+        }
       }
-      
+
+      setLoadingReports(false);
       setLoading(false);
     } catch (error) {
-      console.error(`Error fetching report for quiz ${quizId}:`, error);
+      console.error("Error fetching all quiz reports:", error);
+      setLoadingReports(false);
       setLoading(false);
     }
   };
@@ -107,7 +167,7 @@ const TeacherReports = () => {
     if (total > 1) {
       // Determine remaining students to distribute
       const remainingStudents = total - 1;
-      
+
       // Calculate which buckets should get the remaining students
       if (avg <= 20) {
         distribution[0].students += remainingStudents;
@@ -138,9 +198,9 @@ const TeacherReports = () => {
       // Find non-zero bucket with smallest value to adjust
       const bucketsWithStudents = distribution
         .map((item, index) => ({ students: item.students, index }))
-        .filter(item => item.students > 0)
+        .filter((item) => item.students > 0)
         .sort((a, b) => a.students - b.students);
-      
+
       if (bucketsWithStudents.length > 0) {
         const adjustIndex = bucketsWithStudents[0].index;
         distribution[adjustIndex].students += total - currentTotal;
@@ -158,7 +218,17 @@ const TeacherReports = () => {
     if (currentQuizIndex > 0) {
       const newIndex = currentQuizIndex - 1;
       setCurrentQuizIndex(newIndex);
-      fetchQuizReport(quizzes[newIndex].quiz_id);
+
+      // Set the current report data from cached reports
+      const quizId = quizzes[newIndex].quiz_id;
+      const quizReport = allReportsData[quizId];
+
+      if (quizReport) {
+        setReportData(quizReport);
+        generateScoreDistribution(quizReport);
+      } else {
+        setReportData(null);
+      }
     }
   };
 
@@ -167,19 +237,36 @@ const TeacherReports = () => {
     if (currentQuizIndex < quizzes.length - 1) {
       const newIndex = currentQuizIndex + 1;
       setCurrentQuizIndex(newIndex);
-      fetchQuizReport(quizzes[newIndex].quiz_id);
+
+      // Set the current report data from cached reports
+      const quizId = quizzes[newIndex].quiz_id;
+      const quizReport = allReportsData[quizId];
+
+      if (quizReport) {
+        setReportData(quizReport);
+        generateScoreDistribution(quizReport);
+      } else {
+        setReportData(null);
+      }
     }
   };
 
   // Get current quiz info
   const getCurrentQuizInfo = () => {
     if (quizzes.length === 0) return { title: "No quizzes found", subject: "" };
-    
+
     const currentQuiz = quizzes[currentQuizIndex];
     return {
-      title: currentQuiz.title || reportData?.quizName || currentQuiz.type || "Untitled Quiz",
-      subject: currentQuiz.subject_name || reportData?.subjectName || "Unknown Subject",
-      quizId: currentQuiz.quiz_id
+      title:
+        currentQuiz.title ||
+        reportData?.quizName ||
+        currentQuiz.type ||
+        "Untitled Quiz",
+      subject:
+        currentQuiz.subject_name ||
+        reportData?.subjectName ||
+        "Unknown Subject",
+      quizId: currentQuiz.quiz_id,
     };
   };
 
@@ -197,7 +284,9 @@ const TeacherReports = () => {
             </h2>
             <div className="flex items-center space-x-4">
               <p className="text-gray-500">
-                {quizzes.length > 0 ? `${currentQuizIndex + 1} of ${quizzes.length}` : "No reports"}
+                {quizzes.length > 0
+                  ? `${currentQuizIndex + 1} of ${quizzes.length}`
+                  : "No reports"}
               </p>
               <div className="flex space-x-2">
                 <button
@@ -221,7 +310,10 @@ const TeacherReports = () => {
                 <button
                   className="bg-gray-200 p-2 rounded-full disabled:opacity-50"
                   onClick={handleNextReport}
-                  disabled={currentQuizIndex === quizzes.length - 1 || quizzes.length === 0}
+                  disabled={
+                    currentQuizIndex === quizzes.length - 1 ||
+                    quizzes.length === 0
+                  }
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -246,7 +338,9 @@ const TeacherReports = () => {
             </div>
           ) : quizzes.length === 0 ? (
             <div className="bg-white rounded-lg shadow-md p-6 text-center">
-              <p className="text-gray-500">No quizzes found for this teacher.</p>
+              <p className="text-gray-500">
+                No quizzes found for this teacher.
+              </p>
             </div>
           ) : (
             <>
@@ -258,7 +352,9 @@ const TeacherReports = () => {
                       {reportData?.quizName || getCurrentQuizInfo().title}
                     </h3>
                     <p className="text-gray-500 mt-1">
-                      Subject: {reportData?.subjectName || getCurrentQuizInfo().subject} | Quiz ID: {getCurrentQuizInfo().quizId}
+                      Subject:{" "}
+                      {reportData?.subjectName || getCurrentQuizInfo().subject}{" "}
+                      | Quiz ID: {getCurrentQuizInfo().quizId}
                     </p>
                     {reportData?.description && (
                       <p className="text-gray-600 mt-2 max-w-2xl">
@@ -274,7 +370,11 @@ const TeacherReports = () => {
                 </div>
               </div>
 
-              {reportData ? (
+              {loadingReports ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+                </div>
+              ) : reportData ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Statistical Overview */}
                   <div className="bg-white rounded-lg shadow-md p-6">
@@ -285,38 +385,49 @@ const TeacherReports = () => {
                     <div className="grid grid-cols-2 gap-6">
                       <div>
                         <p className="text-sm text-gray-500">Minimum Score</p>
-                        <p className="text-2xl font-bold">{reportData.minimumMarks}</p>
+                        <p className="text-2xl font-bold">
+                          {reportData.minimumMarks}
+                        </p>
                       </div>
 
                       <div>
                         <p className="text-sm text-gray-500">Maximum Score</p>
-                        <p className="text-2xl font-bold">{reportData.maximumMarks}</p>
+                        <p className="text-2xl font-bold">
+                          {reportData.maximumMarks}
+                        </p>
                       </div>
 
                       <div>
                         <p className="text-sm text-gray-500">Average Score</p>
                         <p className="text-2xl font-bold">
-                          {typeof reportData.averageMarks === 'number' 
-                            ? reportData.averageMarks.toFixed(2) 
+                          {typeof reportData.averageMarks === "number"
+                            ? reportData.averageMarks.toFixed(2)
                             : reportData.averageMarks}
                         </p>
                       </div>
 
                       <div>
-                        <p className="text-sm text-gray-500">Total Participants</p>
-                        <p className="text-2xl font-bold">{reportData.totalAttempts}</p>
+                        <p className="text-sm text-gray-500">
+                          Total Participants
+                        </p>
+                        <p className="text-2xl font-bold">
+                          {reportData.totalAttempts}
+                        </p>
                       </div>
 
                       <div>
                         <p className="text-sm text-gray-500">Total Marks</p>
-                        <p className="text-2xl font-bold">{reportData.totalMarks}</p>
+                        <p className="text-2xl font-bold">
+                          {reportData.totalMarks}
+                        </p>
                       </div>
 
                       <div>
                         <p className="text-sm text-gray-500">Quiz Level</p>
-                        <p className="text-2xl font-bold">{reportData.level || "N/A"}</p>
+                        <p className="text-2xl font-bold">
+                          {getLevelDescription(reportData.level)}
+                        </p>
                       </div>
-
                     </div>
                   </div>
 
@@ -354,7 +465,7 @@ const TeacherReports = () => {
                                 }}
                               />
                               <YAxis
-                                domain={[0, 'auto']} // Important: prevents negative values
+                                domain={[0, "auto"]} // Important: prevents negative values
                                 allowDecimals={false}
                                 label={{
                                   value: "Students",
@@ -366,13 +477,26 @@ const TeacherReports = () => {
                               />
                               <Tooltip />
                               <Legend verticalAlign="bottom" height={36} />
-                              <Bar dataKey="students" fill="#2c3e50" name="Students" />
+                              <Bar
+                                dataKey="students"
+                                name="Students"
+                                fill="#2c3e50"
+                              >
+                                {scoreDistributionData.map((entry, index) => (
+                                  <Cell
+                                    key={`cell-${index}`}
+                                    fill={scoreRangeColors[index]}
+                                  />
+                                ))}
+                              </Bar>
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
                       ) : (
                         <div className="flex items-center justify-center h-64">
-                          <p className="text-gray-500">No attempts for this quiz yet</p>
+                          <p className="text-gray-500">
+                            No attempts for this quiz yet
+                          </p>
                         </div>
                       )}
                     </div>
@@ -380,7 +504,9 @@ const TeacherReports = () => {
                 </div>
               ) : (
                 <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                  <p className="text-gray-500">No report data available for this quiz.</p>
+                  <p className="text-gray-500">
+                    No report data available for this quiz.
+                  </p>
                 </div>
               )}
             </>
