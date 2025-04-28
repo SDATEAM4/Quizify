@@ -9,9 +9,7 @@ import team4.quizify.patterns.adapter.StorageManager;
 import team4.quizify.repository.StudentRepository;
 import team4.quizify.service.UserService;
 
-/**
- * Concrete implementation of UserFactory for Student Users
- */
+
 @Component
 public class StudentFactory implements UserFactory {
 

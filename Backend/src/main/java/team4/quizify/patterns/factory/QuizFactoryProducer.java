@@ -3,9 +3,7 @@ package team4.quizify.patterns.factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Abstract Factory for creating different types of Quizzes
- */
+
 @Component
 public class QuizFactoryProducer {
     
@@ -18,9 +16,7 @@ public class QuizFactoryProducer {
     @Autowired
     private PracticeQuizFactory practiceQuizFactory;
     
-    /**
-     * Returns the appropriate quiz factory based on the quiz type
-     */
+    
     public QuizFactory getFactory(String quizType) {
         if (quizType == null) {
             return null;
@@ -35,9 +31,7 @@ public class QuizFactoryProducer {
         return null;
     }
     
-    /**
-     * Returns the practice quiz factory
-     */
+
     public PracticeQuizFactory getPracticeQuizFactory() {
         return practiceQuizFactory;
     }

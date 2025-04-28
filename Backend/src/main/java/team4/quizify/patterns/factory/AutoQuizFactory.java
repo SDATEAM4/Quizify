@@ -18,9 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
-/**
- * Concrete implementation of QuizFactory for Auto-generated Quizzes
- */
+
 @Component
 public class AutoQuizFactory implements QuizFactory {
 
@@ -213,9 +211,7 @@ public class AutoQuizFactory implements QuizFactory {
         return quizManagementService.saveQuiz(existingQuiz);
     }
     
-    /**
-     * Helper method to get questions based on level
-     */
+  
     private List<Question> getQuestionsByLevel(Integer subjectId, Integer level) {
         List<Question> levelQuestions = new ArrayList<>();
         

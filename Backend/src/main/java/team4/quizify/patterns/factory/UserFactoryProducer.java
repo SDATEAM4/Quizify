@@ -3,9 +3,7 @@ package team4.quizify.patterns.factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Factory Producer for User Factories
- */
+
 @Component
 public class UserFactoryProducer {
     
@@ -15,9 +13,7 @@ public class UserFactoryProducer {
     @Autowired
     private TeacherFactory teacherFactory;
     
-    /**
-     * Returns the appropriate user factory based on the user role
-     */
+   
     public UserFactory getFactory(String userRole) {
         if (userRole == null) {
             return null;
