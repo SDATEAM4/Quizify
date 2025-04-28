@@ -1,21 +1,14 @@
 package team4.quizify.patterns.template;
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Optional;
 import team4.quizify.entity.Quiz;
 import team4.quizify.entity.Question;
 
-/**
- * Template method for quiz generation process
- */
+
 public abstract class QuizGenerationTemplate {
     
-    /**
-     * Template method defining the steps for quiz generation
-     */
+ 
     public final Quiz generateQuiz(Map<String, Object> quizParams) {
         // Step 1: Validate quiz parameters
         validateQuizParameters(quizParams);

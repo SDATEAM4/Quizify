@@ -9,9 +9,7 @@ import team4.quizify.patterns.adapter.StorageManager;
 import team4.quizify.repository.StudentRepository;
 import team4.quizify.service.UserService;
 
-/**
- * Concrete implementation of user creation template for students
- */
+
 @Component
 public class StudentCreationTemplate extends UserCreationTemplate {
 

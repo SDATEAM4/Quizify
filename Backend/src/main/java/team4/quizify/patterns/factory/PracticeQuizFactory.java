@@ -5,20 +5,14 @@ import org.springframework.stereotype.Component;
 import team4.quizify.entity.PracticeQuiz;
 import team4.quizify.service.QuizService;
 import java.util.List;
-import java.util.Map;
 
-/**
- * Factory for creating Practice Quizzes
- */
 @Component
 public class PracticeQuizFactory {
     
     @Autowired
     private QuizService quizService;
     
-    /**
-     * Creates a practice quiz based on provided parameters
-     */
+   
     public List<PracticeQuiz> createPracticeQuiz(String subject, String topic, String description, 
                                                 String level, int numQuestions) {
         // Validate parameters

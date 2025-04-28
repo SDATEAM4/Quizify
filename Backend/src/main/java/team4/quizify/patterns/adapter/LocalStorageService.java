@@ -11,9 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-/**
- * Local file system storage implementation
- */
+
 @Service
 public class LocalStorageService implements StorageService {
 

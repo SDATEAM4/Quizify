@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Storage manager that selects appropriate storage adapter
- * based on configuration and requirements
- */
+
 @Service
 public class StorageManager {
 
@@ -21,9 +18,7 @@ public class StorageManager {
     @Autowired
     private LocalStorageService localStorageService;
     
-    /**
-     * Gets the appropriate storage service based on configuration
-     */
+ 
     public StorageService getStorageService() {
         if ("local".equalsIgnoreCase(storageType)) {
             return localStorageService;
@@ -32,16 +27,12 @@ public class StorageManager {
         }
     }
     
-    /**
-     * Uploads file using the configured storage service
-     */
+  
     public String uploadFile(MultipartFile file) {
         return getStorageService().uploadFile(file);
     }
     
-    /**
-     * Deletes file using the configured storage service
-     */
+  
     public boolean deleteFile(String fileIdentifier) {
         return getStorageService().deleteFile(fileIdentifier);
     }

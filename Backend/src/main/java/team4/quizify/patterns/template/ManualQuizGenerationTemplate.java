@@ -21,9 +21,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
-/**
- * Manual quiz generation template implementation
- */
 @Component
 public class ManualQuizGenerationTemplate extends QuizGenerationTemplate {
 
