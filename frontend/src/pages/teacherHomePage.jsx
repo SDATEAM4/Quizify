@@ -5,32 +5,35 @@ import { useEffect, useMemo } from "react";
 import { useAuth } from "../context/authContext.jsx";
 export const TeacherHomePage = () => {
   // State variables
-  const {user, taughtSubjects} = useAuth();
+  const { user, taughtSubjects } = useAuth();
 
-  useEffect(()=>{
-    document.title = 'Quizify - Teacher Home'
-  },[])
+  useEffect(() => {
+    document.title = "Quizify - Teacher Home";
+  }, []);
 
-    const courseImages = useMemo(() => [
-        'https://readdy.ai/api/search-image?query=abstract%20physics%20concept%20visualization%20with%20particles%2C%20waves%2C%20and%20light%20effects%2C%20elegant%20and%20minimalist%20design%2C%20soft%20warm%20colors%2C%20perfect%20for%20educational%20platform%2C%20clean%20background%2C%20high%20quality%20render&width=600&height=300&seq=2&orientation=landscape',
-        'https://readdy.ai/api/search-image?query=abstract%20mathematics%20concept%20with%20geometric%20shapes%2C%20equations%2C%20and%20mathematical%20symbols%20floating%20in%20space%2C%20clean%20minimalist%20design%2C%20soft%20colors%2C%20perfect%20for%20educational%20platform%2C%20clean%20background%2C%20high%20quality%20render&width=600&height=300&seq=3&orientation=landscape',
-        'https://readdy.ai/api/search-image?query=abstract%20history%20concept%20with%20ancient%20architecture%20silhouettes%2C%20scrolls%2C%20and%20timeline%20elements%2C%20elegant%20minimalist%20design%2C%20muted%20colors%2C%20perfect%20for%20educational%20platform%2C%20clean%20background%2C%20high%20quality%20render&width=600&height=300&seq=4&orientation=landscape',
-        'https://readdy.ai/api/search-image?query=abstract%20science%20concept%20with%20molecular%20structures%2C%20DNA%20helix%2C%20and%20chemical%20elements%2C%20modern%20minimalist%20design%2C%20cool%20colors%2C%20perfect%20for%20educational%20platform%2C%20clean%20background%2C%20high%20quality%20render&width=600&height=300&seq=5&orientation=landscape'
-      ], []);
-      
-      const getRandomImage = () => {
-        const randomIndex = Math.floor(Math.random() * courseImages.length);
-        return courseImages[randomIndex];
-      };
-      
-      // Assign random images to courses
-      const coursesWithImages = useMemo(() => {
-        return taughtSubjects.map(course => ({
-          ...course,
-          imageUrl: getRandomImage()
-        }));
-      }, [taughtSubjects]);
-  
+  const courseImages = useMemo(
+    () => [
+      "https://readdy.ai/api/search-image?query=abstract%20physics%20concept%20visualization%20with%20particles%2C%20waves%2C%20and%20light%20effects%2C%20elegant%20and%20minimalist%20design%2C%20soft%20warm%20colors%2C%20perfect%20for%20educational%20platform%2C%20clean%20background%2C%20high%20quality%20render&width=600&height=300&seq=2&orientation=landscape",
+      "https://readdy.ai/api/search-image?query=abstract%20mathematics%20concept%20with%20geometric%20shapes%2C%20equations%2C%20and%20mathematical%20symbols%20floating%20in%20space%2C%20clean%20minimalist%20design%2C%20soft%20colors%2C%20perfect%20for%20educational%20platform%2C%20clean%20background%2C%20high%20quality%20render&width=600&height=300&seq=3&orientation=landscape",
+      "https://readdy.ai/api/search-image?query=abstract%20history%20concept%20with%20ancient%20architecture%20silhouettes%2C%20scrolls%2C%20and%20timeline%20elements%2C%20elegant%20minimalist%20design%2C%20muted%20colors%2C%20perfect%20for%20educational%20platform%2C%20clean%20background%2C%20high%20quality%20render&width=600&height=300&seq=4&orientation=landscape",
+      "https://readdy.ai/api/search-image?query=abstract%20science%20concept%20with%20molecular%20structures%2C%20DNA%20helix%2C%20and%20chemical%20elements%2C%20modern%20minimalist%20design%2C%20cool%20colors%2C%20perfect%20for%20educational%20platform%2C%20clean%20background%2C%20high%20quality%20render&width=600&height=300&seq=5&orientation=landscape",
+    ],
+    []
+  );
+
+  const getRandomImage = () => {
+    const randomIndex = Math.floor(Math.random() * courseImages.length);
+    return courseImages[randomIndex];
+  };
+
+  // Assign random images to courses
+  const coursesWithImages = useMemo(() => {
+    return taughtSubjects.map((course) => ({
+      ...course,
+      imageUrl: getRandomImage(),
+    }));
+  }, [taughtSubjects]);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <TeacherNavbar />
@@ -55,7 +58,9 @@ export const TeacherHomePage = () => {
               <h3 className="text-sm font-medium text-gray-500 uppercase mb-2">
                 NAME
               </h3>
-              <p className="text-gray-800">{`${user?.fname || ''} ${user?.lname || ''}`}</p>
+              <p className="text-gray-800">{`${user?.fname || ""} ${
+                user?.lname || ""
+              }`}</p>
             </div>
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <h3 className="text-sm font-medium text-gray-500 uppercase mb-2">
@@ -67,15 +72,15 @@ export const TeacherHomePage = () => {
               <h3 className="text-sm font-medium text-gray-500 uppercase mb-2">
                 ENROLLED SUBJECTS
               </h3>
-              <p className="text-gray-800">{taughtSubjects?.length || 0} subjects</p>
+              <p className="text-gray-800">
+                {taughtSubjects?.length || 0} subjects
+              </p>
             </div>
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 md:col-span-2">
               <h3 className="text-sm font-medium text-gray-500 uppercase mb-2">
                 BIO
               </h3>
-              <p className="text-gray-800">
-                {user?.bio || "No bio available"}
-              </p>
+              <p className="text-gray-800">{user?.bio || "No bio available"}</p>
             </div>
           </div>
         </section>
@@ -85,11 +90,13 @@ export const TeacherHomePage = () => {
             My Subjects
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {coursesWithImages.map(course => (
+            {taughtSubjects.map((course) => (
               <CourseCard
                 key={course.id}
                 title={course.name}
-                imageUrl={course.imageUrl}
+                imageUrl={course.imageUrl ? course.imageUrl : getRandomImage()}
+                description={course.description}
+                fallback={getRandomImage()}
               />
             ))}
           </div>
