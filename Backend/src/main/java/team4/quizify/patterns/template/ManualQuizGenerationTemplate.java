@@ -145,14 +145,29 @@ public class ManualQuizGenerationTemplate extends QuizGenerationTemplate {
         for (int i = 0; i < selectedQuestions.size(); i++) {
             questionIds[i] = selectedQuestions.get(i).getQuestionId();
         }
-        
-        // Create quiz
+          // Create quiz with standardized level format
         Quiz quiz = new Quiz();
         quiz.setSubjectId(subjectId);
         quiz.setMarks((Integer) quizMetrics.get("totalMarks"));
-        quiz.setLevel(level == null ? "Medium" : level);
+        
+        // Normalize level to numeric format (1-4)
+        String normalizedLevel = "2"; // Default to medium/intermediate (2)
+        if (level != null) {
+            String levelLower = level.toLowerCase();
+            if (levelLower.contains("easy") || levelLower.contains("beginner") || level.equals("1")) {
+                normalizedLevel = "1";
+            } else if (levelLower.contains("medium") || levelLower.contains("intermediate") || level.equals("2")) {
+                normalizedLevel = "2";
+            } else if (levelLower.contains("hard") || levelLower.contains("advance") || level.equals("3")) {
+                normalizedLevel = "3";
+            } else if (levelLower.contains("mix") || level.equals("4")) {
+                normalizedLevel = "4";
+            }
+        }
+        
+        quiz.setLevel(normalizedLevel);
         quiz.setTimelimit(timeLimit == null ? 30 : timeLimit);
-        quiz.setType("Manual");
+        quiz.setType("Manual"); // Always use "Manual" for manually created quizzes
         quiz.setQuestionIds(questionIds);
         quiz.setTitle(title == null ? "Custom Quiz" : title);
         quiz.setDescription(description == null ? "Manually created quiz" : description);

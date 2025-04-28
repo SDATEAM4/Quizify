@@ -107,16 +107,9 @@ public class AutoQuizGenerationTemplate extends QuizGenerationTemplate {
         String description = (String) quizParams.get("description");
         Integer timeLimit = (Integer) quizParams.get("timeLimit");
         Integer level = (Integer) quizParams.get("level");
-        
-        // Determine level string from integer
-        String levelString;
+          // Ensure level is between 1-4
         if (level == null) level = 2;
-        switch (level) {
-            case 1: levelString = "Easy"; break;
-            case 3: levelString = "Hard"; break;
-            case 4: levelString = "Mixed"; break;
-            default: levelString = "Medium";
-        }
+        if (level < 1 || level > 4) level = 2; // Default to medium if invalid
         
         // Extract question IDs
         Integer[] questionIds = new Integer[selectedQuestions.size()];
@@ -124,13 +117,13 @@ public class AutoQuizGenerationTemplate extends QuizGenerationTemplate {
             questionIds[i] = selectedQuestions.get(i).getQuestionId();
         }
         
-        // Create quiz
+        // Create quiz with numeric level (1=Easy/Beginner, 2=Medium/Intermediate, 3=Hard/Advanced, 4=Mixed)
         Quiz quiz = new Quiz();
         quiz.setSubjectId(subjectId);
         quiz.setMarks((Integer) quizMetrics.get("totalMarks"));
-        quiz.setLevel(levelString);
+        quiz.setLevel(String.valueOf(level)); // Store level as string representation of number
         quiz.setTimelimit(timeLimit == null ? 30 : timeLimit);
-        quiz.setType("Auto");
+        quiz.setType("Automatic"); // Always use "Automatic" for auto-generated quizzes
         quiz.setQuestionIds(questionIds);
         quiz.setTitle(title == null ? "Auto-Generated Quiz" : title);
         quiz.setDescription(description == null ? "Automatically created quiz" : description);

@@ -192,8 +192,7 @@ public class QuizController {
     /**
      * Creates a quiz manually by selecting specific questions and adding random questions to reach the desired count
      * This method now uses the Factory and Template patterns internally
-     */
-    @PostMapping("/create/manual")
+     */    @PostMapping("/create/manual")
     public ResponseEntity<?> createManualQuiz(@RequestBody Map<String, Object> requestBody) {
         try {
             // Extract basic information for validation
@@ -215,6 +214,34 @@ public class QuizController {
                 errorResponse.put("message", "Teacher not found");
                 return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
             }
+            
+            // Process level parameter to ensure it's in the correct format (1-4)
+            Object levelObj = requestBody.get("level");
+            String levelParam = "2"; // Default to medium/intermediate
+            
+            if (levelObj != null) {
+                if (levelObj instanceof Integer) {
+                    int levelInt = (Integer) levelObj;
+                    if (levelInt >= 1 && levelInt <= 4) {
+                        levelParam = String.valueOf(levelInt);
+                    }
+                } else if (levelObj instanceof String) {
+                    String levelStr = (String) levelObj;
+                    if (levelStr.equalsIgnoreCase("easy") || levelStr.equalsIgnoreCase("beginner") || levelStr.equals("1")) {
+                        levelParam = "1";
+                    } else if (levelStr.equalsIgnoreCase("medium") || levelStr.equalsIgnoreCase("intermediate") || levelStr.equals("2")) {
+                        levelParam = "2";
+                    } else if (levelStr.equalsIgnoreCase("hard") || levelStr.equalsIgnoreCase("advance") || levelStr.equals("3")) {
+                        levelParam = "3";
+                    } else if (levelStr.equalsIgnoreCase("mixed") || levelStr.equals("4")) {
+                        levelParam = "4";
+                    }
+                }
+            }
+            
+            // Update level in the request body and ensure type is Manual
+            requestBody.put("level", levelParam);
+            requestBody.put("type", "Manual");
             
             // Use Template Method pattern
             Quiz quiz;
@@ -246,8 +273,7 @@ public class QuizController {
     /**
      * Creates a quiz automatically based on subject and difficulty level
      * This method now uses the Factory and Template patterns internally
-     */
-    @PostMapping("/create/auto")
+     */    @PostMapping("/create/auto")
     public ResponseEntity<?> createAutomaticQuiz(@RequestBody Map<String, Object> requestBody) {
         try {
             // Extract basic information for validation
@@ -269,6 +295,36 @@ public class QuizController {
                 errorResponse.put("message", "Teacher not found");
                 return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
             }
+            
+            // Handle level normalization
+            Object levelObj = requestBody.get("level");
+            Integer level = null;
+            
+            if (levelObj != null) {
+                if (levelObj instanceof Integer) {
+                    level = (Integer) levelObj;
+                } else if (levelObj instanceof String) {
+                    String levelStr = (String) levelObj;
+                    // Convert string level to numeric format
+                    if (levelStr.equalsIgnoreCase("easy") || levelStr.equalsIgnoreCase("beginner") || levelStr.equals("1")) {
+                        level = 1;
+                    } else if (levelStr.equalsIgnoreCase("medium") || levelStr.equalsIgnoreCase("intermediate") || levelStr.equals("2")) {
+                        level = 2;
+                    } else if (levelStr.equalsIgnoreCase("hard") || levelStr.equalsIgnoreCase("advance") || levelStr.equals("3")) {
+                        level = 3;
+                    } else if (levelStr.equalsIgnoreCase("mixed") || levelStr.equals("4")) {
+                        level = 4;
+                    }
+                }
+            }
+            
+            if (level == null || level < 1 || level > 4) {
+                level = 2; // Default to medium if level is invalid or not provided
+            }
+            
+            // Update level in the request body
+            requestBody.put("level", level);
+            requestBody.put("type", "Automatic"); // Ensure consistent type
             
             // Use Template Method pattern
             Quiz quiz;
@@ -595,17 +651,43 @@ public class QuizController {
             // Update the quiz
             quiz.setQuestionIds(finalQuestionIds.toArray(new Integer[0]));
             quiz.setMarks(totalMarks);
-            
-            // Update optional fields if provided
+              // Update optional fields if provided
             String title = (String) requestBody.get("title");
             String description = (String) requestBody.get("description");
             Integer timeLimit = (Integer) requestBody.get("timeLimit");
-            String level = (String) requestBody.get("level");
+            Object levelObj = requestBody.get("level");
             
             if (title != null) quiz.setTitle(title);
             if (description != null) quiz.setDescription(description);
             if (timeLimit != null) quiz.setTimelimit(timeLimit);
-            if (level != null) quiz.setLevel(level);
+            
+            // Handle level parameter to ensure it's in the correct format (1-4)
+            if (levelObj != null) {
+                String levelValue = "2"; // Default to medium/intermediate
+                
+                if (levelObj instanceof Integer) {
+                    int levelInt = (Integer) levelObj;
+                    if (levelInt >= 1 && levelInt <= 4) {
+                        levelValue = String.valueOf(levelInt);
+                    }
+                } else if (levelObj instanceof String) {
+                    String levelStr = (String) levelObj;
+                    if (levelStr.equalsIgnoreCase("easy") || levelStr.equalsIgnoreCase("beginner") || levelStr.equals("1")) {
+                        levelValue = "1";
+                    } else if (levelStr.equalsIgnoreCase("medium") || levelStr.equalsIgnoreCase("intermediate") || levelStr.equals("2")) {
+                        levelValue = "2";
+                    } else if (levelStr.equalsIgnoreCase("hard") || levelStr.equalsIgnoreCase("advance") || levelStr.equals("3")) {
+                        levelValue = "3";
+                    } else if (levelStr.equalsIgnoreCase("mixed") || levelStr.equals("4")) {
+                        levelValue = "4";
+                    }
+                }
+                
+                quiz.setLevel(levelValue);
+            }
+            
+            // Ensure type is "Manual"
+            quiz.setType("Manual");
               // Save the updated quiz
             Quiz updatedQuiz = quizManagementService.saveQuiz(quiz);
             
@@ -757,12 +839,16 @@ public class QuizController {
                     totalMarks += question.get().getMarks();
                 }
             }
-            
-            // Update the quiz
+              // Update the quiz
             quiz.setQuestionIds(combinedQuestionIds.toArray(new Integer[0]));
             quiz.setMarks(totalMarks);
-            quiz.setLevel(String.valueOf(level)); // Update level to the new one
-            quiz.setType("Automatic"); // Set or confirm the quiz type as Automatic
+            
+            // Ensure level is between 1-4
+            if (level < 1 || level > 4) {
+                level = 2; // Default to medium/intermediate if invalid
+            }
+            quiz.setLevel(String.valueOf(level)); // Set level as string representation of number
+            quiz.setType("Automatic"); // Set quiz type as Automatic
             
             // Set appropriate title and description based on level
             String levelDesc = (level == 4) ? "Mixed" : String.valueOf(level);
