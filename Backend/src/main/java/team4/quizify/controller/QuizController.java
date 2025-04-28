@@ -12,9 +12,7 @@ import team4.quizify.entity.Student;
 import team4.quizify.entity.Teacher;
 import team4.quizify.entity.User;
 import team4.quizify.entity.QuestionBank;
-import team4.quizify.patterns.factory.QuizFactory;
 import team4.quizify.patterns.factory.QuizFactoryProducer;
-import team4.quizify.patterns.singleton.AdminServiceSingleton;
 import team4.quizify.patterns.template.AutoQuizGenerationTemplate;
 import team4.quizify.patterns.template.ManualQuizGenerationTemplate;
 import team4.quizify.service.QuizManagementService;
@@ -24,7 +22,6 @@ import team4.quizify.service.StudentService;
 import team4.quizify.service.TeacherService;
 import team4.quizify.service.QuestionBankService;
 import team4.quizify.service.ReportService;
-import team4.quizify.config.MessageResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -60,15 +57,11 @@ public class QuizController {
     private QuestionBankService questionBankService;
     
     @Autowired
-    private QuizFactoryProducer quizFactoryProducer;
-    
-    @Autowired
     private ManualQuizGenerationTemplate manualQuizGenerationTemplate;
     
     @Autowired
     private AutoQuizGenerationTemplate autoQuizGenerationTemplate;
-      @Autowired
-    private ApplicationContext applicationContext;
+    
     
     @Autowired
     private ReportService reportService;

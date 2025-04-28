@@ -13,9 +13,6 @@ import team4.quizify.patterns.factory.ReportFactory;
 import team4.quizify.patterns.factory.ReportFactoryProducer;
 import team4.quizify.patterns.factory.StudentReportFactory;
 import team4.quizify.patterns.factory.TeacherReportFactory;
-import team4.quizify.service.AdminReportService;
-import team4.quizify.service.StudentReportService;
-import team4.quizify.service.TeacherReportService;
 
 import java.util.List;
 import java.util.Map;

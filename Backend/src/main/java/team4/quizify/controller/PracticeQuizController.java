@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import team4.quizify.entity.PracticeQuiz;
 import team4.quizify.patterns.factory.PracticeQuizFactory;
-import team4.quizify.patterns.singleton.OpenRouterServiceSingleton;
 import org.springframework.context.ApplicationContext;
 
 import java.util.List;

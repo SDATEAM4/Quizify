@@ -17,7 +17,6 @@ import team4.quizify.patterns.singleton.AdminServiceSingleton;
 import team4.quizify.patterns.template.StudentCreationTemplate;
 import team4.quizify.patterns.template.TeacherCreationTemplate;
 import team4.quizify.service.AdminService;
-import team4.quizify.service.CloudinaryService;
 import team4.quizify.service.StudentService;
 import team4.quizify.service.SubjectService;
 import team4.quizify.service.TeacherService;
@@ -68,7 +67,7 @@ public class AdminController {
         try {
             // Get the AdminService singleton instance
             AdminServiceSingleton adminServiceSingleton = AdminServiceSingleton.getInstance(applicationContext);
-            AdminService adminService = adminServiceSingleton.getAdminService();
+           adminServiceSingleton.getAdminService();
             
             List<User> users = userService.getAllUsers();
             if (users.isEmpty()) {
@@ -87,7 +86,6 @@ public class AdminController {
     //GET USER BY ID
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable Integer userId) {
-        // Existing implementation remains unchanged
         try {
             Optional<User> user = userService.getUserById(userId);
             if (user.isPresent()) {
@@ -139,7 +137,6 @@ public class AdminController {
     }
     
     
-    // Migrated from oldController - 2025-04
     @GetMapping("/check-duplicate")
     public ResponseEntity<?> isDuplicateValue(
             @RequestParam(required = false) String username,
@@ -156,7 +153,6 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
     
-    // Migrated from oldController - 2025-04
     @GetMapping("/user/username/{username}")
     public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
         try {
@@ -229,7 +225,6 @@ public class AdminController {
         }
     }
     
-    // Migrated from oldController - 2025-04
     @GetMapping("/user/email/{email}")
     public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
         try {
@@ -302,7 +297,6 @@ public class AdminController {
         }
     }
     
-    // Migrated from oldController - 2025-04
     @GetMapping("/student/{studentId}")
     public ResponseEntity<?> getStudentById(@PathVariable Integer studentId) {
         try {
@@ -341,7 +335,6 @@ public class AdminController {
         }
     }
     
-    // Migrated from oldController - 2025-04
     @GetMapping("/teacher/{teacherId}")
     public ResponseEntity<?> getTeacherById(@PathVariable Integer teacherId) {
         try {
@@ -380,7 +373,6 @@ public class AdminController {
         }
     }
     
-    // Migrated from oldController - 2025-04
     @PutMapping("/user/username/{username}")
     public ResponseEntity<?> updateUserByUsername(
             @PathVariable String username,
@@ -421,7 +413,6 @@ public class AdminController {
         }
     }
 
-    // Migrated from oldController - 2025-04
     @PutMapping("/user/{userId}")
     public ResponseEntity<?> updateUserProfile(
             @PathVariable Integer userId,
@@ -448,7 +439,6 @@ public class AdminController {
         }
     }
     
-    // Migrated from oldController - 2025-04
     @DeleteMapping("/user/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Integer userId) {
         try {
@@ -477,6 +467,8 @@ public class AdminController {
                     .body(Map.of("error", "Failed to delete user: " + e.getMessage()));
         }
     }
+
+
       @PostMapping("/user/addStudent")
     public ResponseEntity<?> addStudentWithSubjects(
             @RequestParam("fname") String fname,
@@ -488,7 +480,7 @@ public class AdminController {
             @RequestParam(value = "enrolledSubjects", required = false) String enrolledSubjectsStr) {
         try {
             // Create user with Student role using Template Method pattern
-            // This already creates and saves the Student record
+        
             User newUser = studentCreationTemplate.createUser(fname, lname, username, password, email, "Student", profileImage);
             
             // Parse enrolled subjects from string to Integer array
@@ -534,7 +526,6 @@ public class AdminController {
             @RequestParam(value = "subjectTaught", required = false) String subjectTaughtStr) {
         try {
             // Create user with Teacher role using Template Method pattern
-            // This already creates and saves the Teacher record
             User newUser = teacherCreationTemplate.createUser(fname, lname, username, password, email, "Teacher", profileImage);
             
             // Parse subjects taught from string to Integer array
@@ -570,7 +561,4 @@ public class AdminController {
         }
     }
     
-    // Remaining methods (removeUser, editUser, etc.) remain unchanged
-    // They should be modified to use the Singleton pattern for AdminService
-    // and the Adapter pattern for storage as needed
 }
