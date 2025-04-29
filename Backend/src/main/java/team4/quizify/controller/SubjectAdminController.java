@@ -13,6 +13,8 @@ import team4.quizify.service.CloudinaryService;
 import team4.quizify.service.StudentService;
 import team4.quizify.service.TeacherService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -155,13 +157,34 @@ public class SubjectAdminController {    @Autowired
                 return ResponseEntity.ok(Map.of(
                     "message", "Student enrolled subjects updated successfully"
                 ));
-            } 
-            
-            Teacher teacher = teacherService.getTeacherByUserId(userId);
+            }            Teacher teacher = teacherService.getTeacherByUserId(userId);
             if (teacher != null) {
+                // Get the old subjects taught by teacher
+                Integer[] oldSubjectIds = teacher.getSubjectTaught();
+                List<Integer> oldSubjectsList = oldSubjectIds != null ? 
+                        Arrays.asList(oldSubjectIds) : new ArrayList<>();
+                
+                List<Integer> newSubjectsList = Arrays.asList(subjectIds);
+                
                 // User is a teacher, update subjects taught
                 teacher.setSubjectTaught(subjectIds);
                 teacherService.updateTeacher(teacher);
+                
+                // Update the subjects' teachersId arrays
+                Integer teacherId = teacher.getTeacher_id();
+                
+                // Add the teacher to the new subjects
+                for (Integer subjectId : subjectIds) {
+                    subjectService.addTeacherToSubject(subjectId, teacherId);
+                }
+                
+                // Remove the teacher from subjects they're no longer teaching
+                for (Integer oldSubjectId : oldSubjectsList) {
+                    if (!newSubjectsList.contains(oldSubjectId)) {
+                        subjectService.removeTeacherFromSubject(oldSubjectId, teacherId);
+                    }
+                }
+                
                 return ResponseEntity.ok(Map.of(
                     "message", "Teacher subjects taught updated successfully"
                 ));

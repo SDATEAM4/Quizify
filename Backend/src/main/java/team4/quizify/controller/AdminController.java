@@ -444,13 +444,29 @@ public class AdminController {
         try {
             // Get the AdminService singleton instance
             AdminServiceSingleton adminServiceSingleton = AdminServiceSingleton.getInstance(applicationContext);
-            AdminService adminService = adminServiceSingleton.getAdminService();
-
-            // Get user first to check role
+            AdminService adminService = adminServiceSingleton.getAdminService();            // Get user first to check role
             Optional<User> userOpt = userService.getUserById(userId);
             if (userOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "User not found"));
+            }
+            
+            User user = userOpt.get();
+            
+            // If user is a teacher, remove them from subjects
+            if ("Teacher".equals(user.getRole())) {
+                Teacher teacher = teacherService.getTeacherByUserId(userId);
+                if (teacher != null) {
+                    Integer teacherId = teacher.getTeacher_id();
+                    Integer[] subjectsTaught = teacher.getSubjectTaught();
+                    
+                    if (subjectsTaught != null) {
+                        // Remove teacher from all subjects they taught
+                        for (Integer subjectId : subjectsTaught) {
+                            subjectService.removeTeacherFromSubject(subjectId, teacherId);
+                        }
+                    }
+                }
             }
             
             // Delete reports associated with the user
@@ -539,13 +555,18 @@ public class AdminController {
             } else {
                 subjectTaught = new Integer[0];
             }
-            
-            // Get the existing teacher record that was created in the template
+              // Get the existing teacher record that was created in the template
             Teacher teacher = teacherService.getTeacherByUserId(newUser.getUserId());
             if (teacher != null) {
                 // Update only the subject taught
                 teacher.setSubjectTaught(subjectTaught);
                 teacherService.updateTeacher(teacher);
+                
+                // Update each subject to include this teacher in its teachersId array
+                Integer teacherId = teacher.getTeacher_id();
+                for (Integer subjectId : subjectTaught) {
+                    subjectService.addTeacherToSubject(subjectId, teacherId);
+                }
             }
             
             // Return response with teacher ID
