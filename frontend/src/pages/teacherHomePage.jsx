@@ -40,7 +40,7 @@ export const TeacherHomePage = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6 flex-1">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">
-          Student Dashboard
+          Teacher Dashboard
         </h1>
         {/* Student Profile Section */}
         <section className="mb-10">
@@ -70,7 +70,7 @@ export const TeacherHomePage = () => {
             </div>
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
               <h3 className="text-sm font-medium text-gray-500 uppercase mb-2">
-                ENROLLED SUBJECTS
+                TAUGHT SUBJECTS
               </h3>
               <p className="text-gray-800">
                 {taughtSubjects?.length || 0} subjects

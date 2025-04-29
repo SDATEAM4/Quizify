@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import toast from 'react-hot-toast'
 import { TeacherNavbar } from "../components/teacherNavbar";
 import axios from "axios";
-
+import { useAuth } from "../context/authContext";
 export default function AddNewQuestion() {
+  const {taughtSubjects} = useAuth();
   const [questionText, setQuestionText] = useState("");
   const [options, setOptions] = useState({
     A: "",
@@ -15,27 +16,17 @@ export default function AddNewQuestion() {
   const [difficulty, setDifficulty] = useState("Easy");
   const [subject, setSubject] = useState("");
   const [marks, setMarks] = useState(5); // Default marks value
-  const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  // Fetch subjects for dropdown
+  // Fetch taughtSubjects for dropdown
   useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        document.title = 'Quizify - Teacher Add Question'
-        const response = await axios.get('http://localhost:8080/Quizify/admin/subjects');
-        setSubjects(response.data);
-        toast.success("subjects fetched succesfully")
-
-      } catch (err) {
-        toast.success("could not fetch subjects")
-        console.error('Error fetching subjects:', err);
-      }
+    const fetchtaughtSubjects = async () => {
+      document.title = 'Quizify - Teacher Add Question'
     };
 
-    fetchSubjects();
+    fetchtaughtSubjects();
   }, []);
 
   const handleOptionChange = (option, value) => {
@@ -76,6 +67,15 @@ export default function AddNewQuestion() {
       setLoading(true);
       setError(null);
       setSuccess(false);
+
+      // Check for duplicate options
+      const values = Object.values(options);
+      const uniqueValues = new Set(values.map(opt => opt.trim().toLowerCase())); // Case-insensitive check
+
+      if (uniqueValues.size < values.length) {
+        toast.error("Answer options must be unique!");
+        return;
+      }
 
       // Convert options object to array format required by API
       const optionsArray = [options.A, options.B, options.C, options.D];
@@ -149,7 +149,7 @@ export default function AddNewQuestion() {
   onChange={(e) => setSubject(e.target.value)}
 >
   <option value="">Select a subject</option>
-  {subjects.map(subj => (
+  {taughtSubjects.map(subj => (
     <option key={subj.subject_id} value={subj.subject_id}>
       {subj.name}
     </option>
