@@ -18,8 +18,10 @@ export const QuizEditView = ({ quiz, teacherId, onBack }) => {
   // The count of questions needed for this quiz
   const requiredQuestionCount = quiz?.questionsList?.length || 10;
   
-  // Transform API question format to component format
   const transformQuestion = (apiQuestion) => {
+    const optionLabels = ["a", "b", "c", "d"];
+    const correctIndex = apiQuestion.options.indexOf(apiQuestion.correctOption);
+  
     return {
       question_id: apiQuestion.questionId,
       statement: apiQuestion.statement,
@@ -31,11 +33,10 @@ export const QuizEditView = ({ quiz, teacherId, onBack }) => {
         c: apiQuestion.options[2],
         d: apiQuestion.options[3]
       },
-      correct_answer: apiQuestion.correctOption === "Option 1" ? "a" : 
-                      apiQuestion.correctOption === "Option 2" ? "b" :
-                      apiQuestion.correctOption === "Option 3" ? "c" : "d"
+      correct_answer: optionLabels[correctIndex] ?? null, // null if not found
     };
   };
+  
   
   // Fetch available questions from the subject
   useEffect(() => {

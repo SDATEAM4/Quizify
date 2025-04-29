@@ -9,7 +9,7 @@ import QuizCreationStatus from '../components/quizCreationStatus';
 import toast from 'react-hot-toast';
 import BackgroundTypography from "../components/backgroundTypography"
 const TeacherAddQuiz = () => {
-  const { teacherId } = useAuth();
+  const { teacherId,taughtSubjects} = useAuth();
   // State for quiz configuration
   const [quizConfig, setQuizConfig] = useState({
     subject: "", 
@@ -22,8 +22,7 @@ const TeacherAddQuiz = () => {
     difficulty: "easy", // Default to beginner/easy
   });
 
-  // State for subjects and questions
-  const [subjects, setSubjects] = useState([]);
+  // State for taughtSubjects and questions
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [availableQuestions, setAvailableQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,38 +44,9 @@ const TeacherAddQuiz = () => {
 
   useEffect(() => {
     document.title = 'Quizify - Teacher Add Quiz';
-    // Fetch subjects on component mount
-    fetchSubjects();
+    
   }, []);
 
-  // Fetch subjects from API
-  const fetchSubjects = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get('http://localhost:8080/Quizify/admin/subjects');
-      setSubjects(response.data);
-      
-      // Set default subject if subjects are available
-      if (response.data.length > 0) {
-        setQuizConfig(prev => ({
-          ...prev,
-          subject: response.data[0].name,
-          subjectId: response.data[0].subject_id
-        }));
-        
-        // Load questions for the default subject
-        fetchQuestions(response.data[0].subject_id);
-
-      }
-      
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to fetch subjects. Please try again later.');
-      setLoading(false);
-      toast.success("Error fetching subjects");
-      console.error('Error fetching subjects:', err);
-    }
-  };
 
   // Fetch questions for a specific subject
   const fetchQuestions = async (subjectId) => {
@@ -84,7 +54,7 @@ const TeacherAddQuiz = () => {
       setQuestionsLoading(true);
       const response = await axios.get(`http://localhost:8080/Quizify/questions/subject/${subjectId}`);
       setAvailableQuestions(response.data);
-      toast.success("subjects fetched successfully")
+      toast.success("Questions fetched successfully")
       setQuestionsLoading(false);
     } catch (err) {
       console.error('Error fetching questions:', err);
@@ -101,18 +71,28 @@ const TeacherAddQuiz = () => {
 
     // If subject changed, update subjectId and fetch questions
     if (field === 'subject') {
-      const selectedSubject = subjects.find(subject => subject.name === value);
+      const selectedSubject = taughtSubjects.find(subject => subject.name === value);
+      console.log("")
+      console.log(selectedSubject)
+      console.log("")
       if (selectedSubject) {
         setQuizConfig(prev => ({
           ...prev,
-          subjectId: selectedSubject.subject_id
+          subjectId: selectedSubject.id
         }));
-        fetchQuestions(selectedSubject.subject_id);
+        fetchQuestions(selectedSubject.id);
         // Reset selected questions when subject changes
         setSelectedQuestions([]);
       }
     }
   };
+
+  useEffect(() => {
+    if (quizConfig.mode === 'manual') {
+      fetchQuestions(quizConfig.subjectId);
+    }
+  }, [quizConfig.mode]);
+  
 
   // Calculate difficulty based on selected questions
   const calculateDifficulty = (questions) => {
@@ -340,22 +320,22 @@ toast.success(
     calculateDifficulty(newSelectedQuestions);
   };
 
-  // Show loading state while fetching subjects
-  if (loading && subjects.length === 0) {
+  // Show loading state while fetching taughtSubjects
+  if (loading && taughtSubjects.length === 0) {
     return (
       <div className="min-h-screen flex flex-col">
         <TeacherNavbar />
         <div className="flex-1 flex justify-center items-center">
           <div className="text-center p-6">
-            <p className="text-lg">Loading subjects...</p>
+            <p className="text-lg">Loading taughtSubjects...</p>
           </div>
         </div>
       </div>
     );
   }
 
-  // Show error state if subjects fetch failed
-  if (error && subjects.length === 0) {
+  // Show error state if taughtSubjects fetch failed
+  if (error && taughtSubjects.length === 0) {
     return (
       <div className="min-h-screen flex flex-col">
         <TeacherNavbar />
@@ -366,7 +346,7 @@ toast.success(
             <p className="mt-2">{error}</p>
             <button 
               className="mt-4 px-4 py-2 bg-black text-white rounded-md"
-              onClick={fetchSubjects}
+              
             >
               Try Again
             </button>
@@ -385,7 +365,7 @@ toast.success(
           {/* Quiz Configuration Section */}
           <QuizConfigSection 
             quizConfig={quizConfig}
-            subjects={subjects}
+            taughtSubjects={taughtSubjects}
             handleConfigChange={handleConfigChange}
           />
 

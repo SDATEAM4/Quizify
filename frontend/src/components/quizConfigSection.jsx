@@ -1,6 +1,6 @@
 import React from 'react';
 
-const QuizConfigSection = ({ quizConfig, subjects, handleConfigChange }) => {
+const QuizConfigSection = ({ quizConfig, taughtSubjects, handleConfigChange }) => {
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-6">
       <h2 className="text-2xl font-bold mb-4">Create New Quiz</h2>
@@ -15,8 +15,8 @@ const QuizConfigSection = ({ quizConfig, subjects, handleConfigChange }) => {
               value={quizConfig.subject}
               onChange={(e) => handleConfigChange('subject', e.target.value)}
             >
-              {subjects.map(subject => (
-                <option key={subject.subject_id} value={subject.name}>
+              {taughtSubjects.map(subject => (
+                <option key={subject.id} value={subject.name}>
                   {subject.name}
                 </option>
               ))}
