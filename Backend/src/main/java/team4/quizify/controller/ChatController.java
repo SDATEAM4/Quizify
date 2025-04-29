@@ -7,91 +7,87 @@ import team4.quizify.entity.Chat;
 import team4.quizify.service.ChatService;
 
 import java.util.List;
-
 @RestController
-
 @RequestMapping("/Quizify/chats")
 @RequiredArgsConstructor
 public class ChatController {
 
     private final ChatService chatService;
 
-    // 1. Get all students who sent a query to a teacher
-    @GetMapping("/{teacherId}")
-    public ResponseEntity<List<String>> getStudentsWhoSentQueries(@PathVariable int  teacherId) {
-        List<String> studentNames = chatService.getStudentsWhoSentQueriesToTeacher(teacherId);
-        return ResponseEntity.ok(studentNames);
-    }
 
-    // 2. Get all messages between teacher and student
-    @GetMapping("/{teacherId}/{studentId}")
-    public ResponseEntity<List<Chat>> getAllMessagesBetweenTeacherAndStudent(
-            @PathVariable int teacherId,
-            @PathVariable int studentId
+
+    //  Get all messages between two users (teacher and student)
+    @GetMapping("/{userId1}/{userId2}")
+    public ResponseEntity<List<Chat>> getAllMessagesBetweenUsers(
+            @PathVariable int userId1,
+            @PathVariable int userId2
     ) {
-        return ResponseEntity.ok(chatService.getMessagesBetweenTeacherAndStudent(teacherId, studentId));
+        return ResponseEntity.ok(chatService.getMessagesBetweenUsers(userId1, userId2));
     }
 
-    // 3. Post a message (send message)
-    @PostMapping("/{teacherId}/{studentId}/message")
+    // Post a message (sender -> receiver)
+    @PostMapping("/{senderId}/{receiverId}/message")
     public ResponseEntity<Chat> sendMessage(
-            @PathVariable int  teacherId,
-            @PathVariable int  studentId,
+            @PathVariable int senderId,
+            @PathVariable int receiverId,
             @RequestBody Chat chat
     ) {
-        chat.setSenderId(studentId);   // assuming student is sending
-        chat.setReceiverId(teacherId); // assuming teacher is receiving
+        chatService.mapSenderReceiverToUserIds(chat, senderId, receiverId);
         return ResponseEntity.ok(chatService.sendMessage(chat));
     }
-//4.Delete all messages between teacher and student
-    @DeleteMapping("/{teacherId}/{studentId}")
-    public ResponseEntity<String> deleteMessagesBetweenTeacherAndStudent(
-            @PathVariable int teacherId,
-            @PathVariable int studentId
+
+    // Delete all messages between two users
+    @DeleteMapping("/{userId1}/{userId2}")
+    public ResponseEntity<String> deleteMessagesBetweenUsers(
+            @PathVariable int userId1,
+            @PathVariable int userId2
     ) {
-        List<Chat> messages = chatService.getMessagesBetweenTeacherAndStudent(teacherId, studentId);
-
-        if (messages.isEmpty()) {
-            return ResponseEntity.status(404).body("No messages found between the given teacher and student.");
+        boolean deleted = chatService.deleteMessagesBetweenUsers(userId1, userId2);
+        if (!deleted) {
+            return ResponseEntity.status(404).body("No messages found between the given users.");
         }
-
-        chatService.deleteMessagesBetweenTeacherAndStudent(teacherId, studentId);
         return ResponseEntity.ok("All messages deleted successfully.");
     }
 
-
-    // 5. Get unresolved query status
-    @GetMapping("/{teacherId}/{studentId}/unresolved")
+    //Get unresolved query status
+    @GetMapping("/{userId1}/{userId2}/unresolved")
     public ResponseEntity<Boolean> isQueryUnresolved(
-            @PathVariable int  teacherId,
-            @PathVariable int  studentId
+            @PathVariable int userId1,
+            @PathVariable int userId2
     ) {
-        return ResponseEntity.ok(chatService.isQueryUnresolved(teacherId, studentId));
+        return ResponseEntity.ok(chatService.isQueryUnresolved(userId1, userId2));
     }
 
-    // 6. Get all teachers who taught a subject
+    // Get all teachers by subject
     @GetMapping("/subjects")
     public ResponseEntity<List<String>> getTeachersBySubject(@RequestParam Integer subjectId) {
         return ResponseEntity.ok(chatService.getTeachersBySubject(subjectId));
     }
 
-    // 7. Add unread status by teacher
-    @PatchMapping("/{teacherId}/{studentId}/unreadbyTeacher")
+    // Mark unread by teacher
+    @PatchMapping("/{senderId}/{receiverId}/unreadbyTeacher")
     public ResponseEntity<Void> markUnreadByTeacher(
-            @PathVariable int  teacherId,
-            @PathVariable int  studentId
+            @PathVariable int senderId,
+            @PathVariable int receiverId
     ) {
-        chatService.markUnreadByTeacher(teacherId, studentId);
+        chatService.markUnreadByTeacher(senderId, receiverId);
         return ResponseEntity.ok().build();
     }
 
-    // 8. Add unread status by student
-    @PatchMapping("/{teacherId}/{studentId}/unreadbyStudent")
+    //  Mark unread by student
+    @PatchMapping("/{senderId}/{receiverId}/unreadbyStudent")
     public ResponseEntity<Void> markUnreadByStudent(
-            @PathVariable int  teacherId,
-            @PathVariable int  studentId
+            @PathVariable int senderId,
+            @PathVariable int receiverId
     ) {
-        chatService.markUnreadByStudent(teacherId, studentId);
+        chatService.markUnreadByStudent(senderId, receiverId);
         return ResponseEntity.ok().build();
     }
+    // Get all opposite party names based on userId (student -> teachers or teacher -> students)
+    @GetMapping("/{userId}/oppositeUsers")
+    public ResponseEntity<List<String>> getOppositeUsers(@PathVariable int userId) {
+        return ResponseEntity.ok(chatService.getOppositePartyNames(userId));
+    }
+
+
 }

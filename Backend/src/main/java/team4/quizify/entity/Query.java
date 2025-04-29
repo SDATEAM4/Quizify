@@ -1,10 +1,7 @@
-
 package team4.quizify.entity;
 
 import jakarta.persistence.*;
-        import lombok.*;
-
-        import java.util.Arrays;
+import lombok.*;
 
 @Entity
 @Table(name = "query")
@@ -22,29 +19,6 @@ public class Query {
     private Boolean resolveStatus = false;
 
     @Column(name = "chat_ids", columnDefinition = "bigint[]")
-    @Convert(converter = Query.LongArrayInlineConverter.class)
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.ARRAY)
     private Long[] chatIds;
-
-    @Converter
-    public static class LongArrayInlineConverter implements AttributeConverter<Long[], String> {
-
-        @Override
-        public String convertToDatabaseColumn(Long[] attribute) {
-            if (attribute == null) return null;
-            return Arrays.toString(attribute)
-                    .replace("[", "{")
-                    .replace("]", "}");
-        }
-
-        @Override
-        public Long[] convertToEntityAttribute(String dbData) {
-            if (dbData == null || dbData.length() < 2) return new Long[0];
-            String[] values = dbData.substring(1, dbData.length() - 1).split(",");
-            return Arrays.stream(values)
-                    .map(String::trim)
-                    .map(Long::parseLong)
-                    .toArray(Long[]::new);
-        }
-    }
 }
-

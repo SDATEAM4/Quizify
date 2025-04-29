@@ -22,3 +22,4 @@ public class WebSocketEventListener {
         logger.info("WebSocket disconnected: " + headerAccessor.getSessionId());
     }
 }
+
