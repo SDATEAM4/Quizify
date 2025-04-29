@@ -68,7 +68,7 @@ export const QuizCard = ({ data, subject_name }) => {
             <div className="flex items-center justify-between mb-4 text-gray-600">
               <div className="flex items-center space-x-2">
                 <i className="ri-time-line"></i>
-                <span>{quiz.timelimit} minutes</span>
+                <span>{quiz.timelimit} Seconds</span>
               </div>
               <div className="flex items-center space-x-2">
                 <i className="ri-question-line"></i>
