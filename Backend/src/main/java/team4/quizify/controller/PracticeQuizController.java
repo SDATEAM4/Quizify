@@ -1,21 +1,27 @@
 package team4.quizify.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import team4.quizify.entity.PracticeQuiz;
-import team4.quizify.service.QuizService;
+import team4.quizify.patterns.factory.PracticeQuizFactory;
+import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/Quizify")
+@CrossOrigin(origins = "http://localhost:5173")   
 public class PracticeQuizController {
-      @Autowired
-    private QuizService quizService;
+    @Autowired
+    private PracticeQuizFactory practiceQuizFactory;
+    
+    @Autowired
+    private ApplicationContext applicationContext;
     
     @GetMapping("/practiceQuiz")
     public List<PracticeQuiz> getPracticeQuiz(
@@ -32,6 +38,7 @@ public class PracticeQuizController {
             numQuestions = 5;
         }
         
-        return quizService.generateQuiz(subject,topic,description, level, numQuestions);
+        // Use factory pattern to create practice quiz
+        return practiceQuizFactory.createPracticeQuiz(subject, topic, description, level, numQuestions);
     }
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
 
-const QuizHeader = ({ quizName, quizTopic, timeRemaining }) => {
+const QuizHeader = ({ quizName, quizTopic, timeRemaining, quizType }) => {
   return (
     <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
       <div>

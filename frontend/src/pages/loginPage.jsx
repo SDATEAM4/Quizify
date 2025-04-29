@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoginForm } from "../components/loginForm.jsx";
 import { ForgotPassword } from "../components/forgotPassword.jsx";
 import { OTPVerification } from "../components/otpVerification.jsx";
@@ -7,6 +7,10 @@ import BackgroundTypography from "../components/backgroundTypography.jsx";
 export const LoginPage = () => {
   const [currentView, setCurrentView] = useState("login"); // "login", "forgotPassword", "otpVerification"
   const [email, setEmail] = useState("");
+
+  useEffect(()=>{
+    document.title = 'Quizify - Login'
+  },[])
 
   const handleShowForgotPassword = () => {
     setCurrentView("forgotPassword");

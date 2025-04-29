@@ -219,4 +219,60 @@ public class StudentReportService implements team4.quizify.service.Report {
         
         return reportData;
     }
+    
+    public Map<String, Object> generateStudentQuizMarkDistributionReport(Integer userId) {
+        Map<String, Object> reportData = new HashMap<>();
+        
+        List<Report> reports = reportRepository.findByUserId(userId);
+        
+        if (reports.isEmpty()) {
+            reportData.put("message", "No reports found for this user");
+            return reportData;
+        }
+        
+        // Initialize counters for each percentage range
+        int range1 = 0; // 0-25%
+        int range2 = 0; // 25-50%
+        int range3 = 0; // 50-75%
+        int range4 = 0; // 75-100%
+        
+        for (Report report : reports) {
+            Integer quizId = report.getQuizId();
+            Integer obtainedMarks = report.getObtainMarks();
+            
+            Optional<Quiz> quizOptional = quizDataRepository.findById(quizId);
+            if (!quizOptional.isPresent()) {
+                continue;
+            }
+            
+            Quiz quiz = quizOptional.get();
+            Integer totalMarks = quiz.getMarks();
+            
+            if (totalMarks == 0) {
+                continue; // Avoid division by zero
+            }
+            
+            // Calculate percentage
+            double percentage = (double) obtainedMarks / totalMarks * 100;
+            
+            // Categorize by percentage range
+            if (percentage >= 0 && percentage < 25) {
+                range1++;
+            } else if (percentage >= 25 && percentage < 50) {
+                range2++;
+            } else if (percentage >= 50 && percentage < 75) {
+                range3++;
+            } else if (percentage >= 75 && percentage <= 100) {
+                range4++;
+            }
+        }
+        
+        // Return the distribution
+        reportData.put("a", String.valueOf(range1)); // 0-25%
+        reportData.put("b", String.valueOf(range2)); // 25-50%
+        reportData.put("c", String.valueOf(range3)); // 50-75% 
+        reportData.put("d", String.valueOf(range4)); // 75-100%
+        
+        return reportData;
+    }
 }

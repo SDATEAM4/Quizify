@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { Search, Edit2, Trash2, MessageSquare, BarChart2, RefreshCw } from 'lucide-react';
 import { TeacherNavbar } from '../components/teacherNavbar';
 import { QuizEditView } from '../components/TeacherEditQuiz';
+import { useAuth } from '../context/authContext';
+import toast from 'react-hot-toast';
+
 export const TeacherEditQuiz = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [filteredQuizzes, setFilteredQuizzes] = useState([]);
@@ -9,64 +12,52 @@ export const TeacherEditQuiz = () => {
   const [sortOption, setSortOption] = useState('totalMarks');
   const [selectedQuizId, setSelectedQuizId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [quizToDelete, setQuizToDelete] = useState(null);
+  const { teacherId } = useAuth(); // Get teacherId from AuthContext
 
-  // Simulate API call to fetch quizzes
+  // Fetch quizzes from API
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
         setLoading(true);
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 800));
+        const response = await fetch(`http://localhost:8080/Quizify/quizzes/teacher/${teacherId}`);
         
-        // Mock data - in a real app, you'd fetch this from your API
-        const mockQuizzes = [
-          {
-            id: 1,
-            title: "Mathematics Quiz: Algebra",
-            category: "Mathematics",
-            questions: 10,
-            totalMarks: 50,
-            timeInMinutes: 45
-          },
-          {
-            id: 2,
-            title: "Science Quiz: Physics Basics",
-            category: "Science",
-            questions: 15,
-            totalMarks: 75,
-            timeInMinutes: 60
-          },
-          {
-            id: 3,
-            title: "History Quiz: World War II",
-            category: "History",
-            questions: 20,
-            totalMarks: 100,
-            timeInMinutes: 90
-          },
-          {
-            id: 4,
-            title: "English Quiz: Literary Analysis",
-            category: "English",
-            questions: 12,
-            totalMarks: 60,
-            timeInMinutes: 75
-          }
-        ];
+        if (!response.ok) {
+          throw new Error('Failed to fetch quizzes');
+        }
         
-        setQuizzes(mockQuizzes);
-        setFilteredQuizzes(mockQuizzes);
+        const data = await response.json();
+        
+        // Transform the API data to match our component's structure
+        const formattedQuizzes = data.map(quiz => ({
+          id: quiz.quiz_id,
+          title: quiz.title,
+          category: quiz.subject_name,
+          questions: quiz.questions.length,
+          totalMarks: quiz.marks,
+          timeInMinutes: quiz.timelimit,
+          level: quiz.level,
+          description: quiz.description,
+          subjectId: quiz.subject_id,
+          questionsList: quiz.questions
+        }));
+        
+        setQuizzes(formattedQuizzes);
+        setFilteredQuizzes(formattedQuizzes);
+        document.title = 'Quizify - Teacher Edit Quiz';
         setLoading(false);
       } catch (error) {
         console.error("Error fetching quizzes:", error);
-        setError("Failed to load quizzes. Please try again.");
+        toast.error("Failed to load quizzes. Please try again.");
         setLoading(false);
       }
     };
 
-    fetchQuizzes();
-  }, []);
+    if (teacherId) {
+      fetchQuizzes();
+    }
+  }, [teacherId]);
 
   // Filter and sort quizzes
   useEffect(() => {
@@ -97,14 +88,32 @@ export const TeacherEditQuiz = () => {
     setFilteredQuizzes(result);
   }, [quizzes, searchQuery, sortOption]);
 
-  const handleDeleteQuiz = async (id) => {
+  const initiateDeleteQuiz = (id) => {
+    setQuizToDelete(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteQuiz = async () => {
     try {
-      // Simulate API call to delete quiz
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setQuizzes(quizzes.filter(quiz => quiz.id !== id));
+      setLoading(true);
+      const response = await fetch(`http://localhost:8080/Quizify/quizzes/${quizToDelete}/delete/${teacherId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete quiz');
+      }
+      toast.success("Quiz deleted successfully");
+      setQuizzes(quizzes.filter(quiz => quiz.id !== quizToDelete));
+      setShowDeleteConfirm(false);
+      setQuizToDelete(null);
+      setLoading(false);
     } catch (error) {
       console.error("Error deleting quiz:", error);
-      setError("Failed to delete quiz. Please try again.");
+      toast.error("Could not delete quiz. Please try again.");
+      setShowDeleteConfirm(false);
+      setQuizToDelete(null);
+      setLoading(false);
     }
   };
 
@@ -114,14 +123,88 @@ export const TeacherEditQuiz = () => {
 
   const handleBackToList = () => {
     setSelectedQuizId(null);
+    // Refresh the quiz list after editing
+    if (teacherId) {
+      fetchQuizzes();
+    }
   };
+
+  // Function to fetch quizzes (for refreshing after edit)
+  const fetchQuizzes = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:8080/Quizify/quizzes/teacher/${teacherId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch quizzes');
+      }
+      
+      const data = await response.json();
+      
+      // Transform the API data
+      const formattedQuizzes = data.map(quiz => ({
+        id: quiz.quiz_id,
+        title: quiz.title,
+        category: quiz.subject_name,
+        questions: quiz.questions.length,
+        totalMarks: quiz.marks,
+        timeInMinutes: quiz.timelimit,
+        level: quiz.level,
+        description: quiz.description,
+        subjectId: quiz.subject_id,
+        questionsList: quiz.questions
+      }));
+      
+      setQuizzes(formattedQuizzes);
+      setFilteredQuizzes(formattedQuizzes);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching quizzes:", error);
+      toast.error("Failed to load quizzes. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  // Delete confirmation dialog
+const DeleteConfirmation = () => {
+  if (!showDeleteConfirm) return null;
+  
+  const selectedQuiz = quizzes.find(quiz => quiz.id === quizToDelete);
+  
+  return (
+    <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+        <h3 className="text-lg font-semibold mb-4">Confirm Delete</h3>
+        <p className="mb-6">Are you sure you want to delete "{selectedQuiz?.title}"? This action cannot be undone.</p>
+        <div className="flex justify-end space-x-3">
+          <button 
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+            onClick={() => {
+              setShowDeleteConfirm(false);
+              setQuizToDelete(null);
+            }}
+          >
+            Cancel
+          </button>
+          <button 
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            onClick={handleDeleteQuiz}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
   // If a quiz is selected for editing, show the QuizEditView
   if (selectedQuizId !== null) {
+    const selectedQuiz = quizzes.find(quiz => quiz.id === selectedQuizId);
     return (
       <div className="min-w-screen max-h-screen">
         <TeacherNavbar />
-        <QuizEditView quizId={selectedQuizId} onBack={handleBackToList} />
+        <QuizEditView quiz={selectedQuiz} teacherId={teacherId} onBack={handleBackToList} />
       </div>
     );
   }
@@ -135,12 +218,6 @@ export const TeacherEditQuiz = () => {
             <h1 className="text-2xl font-bold text-gray-800">Edit Quizzes</h1>
             <p className="text-gray-600">Select a quiz to edit or modify its settings</p>
           </div>
-
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
-              <p>{error}</p>
-            </div>
-          )}
 
           <div className="flex items-center justify-between mb-6">
             <div className="relative w-1/2">
@@ -184,6 +261,7 @@ export const TeacherEditQuiz = () => {
                           <span>{quiz.questions} questions</span>
                           <span>{quiz.totalMarks} marks</span>
                           <span>{quiz.timeInMinutes} minutes</span>
+                          <span>{quiz.level} level</span>
                         </div>
                       </div>
                       <div className="flex space-x-2">
@@ -195,8 +273,8 @@ export const TeacherEditQuiz = () => {
                           Edit
                         </button>
                         <button
-                          className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                          onClick={() => handleDeleteQuiz(quiz.id)}
+                          className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center"
+                          onClick={() => initiateDeleteQuiz(quiz.id)}
                         >
                           <Trash2 size={16} />
                         </button>
@@ -213,6 +291,7 @@ export const TeacherEditQuiz = () => {
           )}
         </div>
       </div>
+      <DeleteConfirmation />
     </div>
   );
 };

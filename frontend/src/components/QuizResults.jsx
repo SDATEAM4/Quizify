@@ -2,17 +2,48 @@ import React, { useState } from 'react';
 import { Save, Home } from 'lucide-react';
 import AnswerKey from './AnswerKey';
 import { useNavigate } from 'react-router-dom';
-const QuizResults = ({ quizName, stats, dataSet, quizType,isCorrect }) => {
-  const { percentage, correctCount, incorrectCount, totalQuestions, formattedTime } = stats;
-  const [viewAnswerKey, setViewAnswerKey] = useState(false); 
-  const handleSaveResults = () => {
-    alert("Result saved!");
+import { useAuth } from '../context/authContext';
+
+const QuizResults = ({ quizName, stats, dataSet, quizType, isCorrect,quiz_id }) => {
+  const { percentage, correctCount, incorrectCount, totalQuestions, formattedTime, obtainedMarks, totalMarks, points } = stats;
+  const [viewAnswerKey, setViewAnswerKey] = useState(false);
+  const { user } = useAuth();
+  const userid = user?.Uid; // ✅ your Uid is now in 'uid' variable
+  const handleSaveResults = async () => {
+    try {
+     
+      console.log("quiz ID:", quiz_id); // Check the userId value
+      
+  
+      const response = await fetch('http://localhost:8080/Quizify/scores', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        
+        },
+        body: JSON.stringify( {
+          userId: userid, 
+          obtainMarks: obtainedMarks,
+          quizId: quiz_id,
+          points: points
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to save results1');
+      }
+  
+      const data = await response.json();
+      alert("Result saved successfully!");
+      
+    } catch (error) {
+      console.error('Error saving results:', error);
+      alert("Failed to save results. Please try again.");
+    }
   };
   const navigate = useNavigate();
 
-
   return viewAnswerKey === false ? (
-   
     <div className="bg-white rounded-xl p-10 shadow-lg text-center">
       <h1 className="text-3xl font-bold text-slate-800 mb-2">Quiz Completed!</h1>
       <p className="text-base text-slate-500 mb-10">Here's how you performed on {quizName}</p>
@@ -42,6 +73,20 @@ const QuizResults = ({ quizName, stats, dataSet, quizType,isCorrect }) => {
           <div className="text-sm text-slate-500 mb-3">Time Taken</div>
           <div className="text-2xl font-bold text-slate-800">{formattedTime}</div>
         </div>
+
+        {quizType === "NormalQuiz" && (
+          <>
+            <div className="bg-slate-50 p-5 rounded-lg">
+              <div className="text-sm text-slate-500 mb-3">Marks</div>
+              <div className="text-2xl font-bold text-blue-600">{obtainedMarks}/{totalMarks}</div>
+            </div>
+
+            <div className="bg-slate-50 p-5 rounded-lg">
+              <div className="text-sm text-slate-500 mb-3">Points</div>
+              <div className="text-2xl font-bold text-purple-600">{points}</div>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="flex justify-center gap-4 flex-wrap">
@@ -54,7 +99,7 @@ const QuizResults = ({ quizName, stats, dataSet, quizType,isCorrect }) => {
             </button>
           ) : (
             <button className="flex items-center justify-center px-6 py-3 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
-              onClick={() =>{ setViewAnswerKey(true);}}>
+              onClick={() => { setViewAnswerKey(true); }}>
               <Save size={18} className="mr-2" />
               <span>View Answer Key</span>
             </button>
@@ -67,9 +112,7 @@ const QuizResults = ({ quizName, stats, dataSet, quizType,isCorrect }) => {
         </button>
       </div>
     </div>
-) : (
-    
-    //<div>hello bhai</div>
+  ) : (
     <AnswerKey dataSet={dataSet} isCorrect={isCorrect} myfunction={setViewAnswerKey} />
   );
 };

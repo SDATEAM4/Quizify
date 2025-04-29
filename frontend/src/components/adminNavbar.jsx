@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { FaChartBar, FaSignOutAlt, FaUserCog, FaUserPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "../context/authContext";
 export const AdminNavBar = () => {
   const [activeTab, setActiveTab] = useState("addUser");
   const navigate = useNavigate();  
   // This would be your navigation handler with useNavigate
-  
-
+  const {logout} = useAuth();
+  const handleLogout = async() =>{
+    logout()
+    navigate('/')
+  }
   return (
-    <header className="bg-black text-white shadow-md">
+    <header className="bg-black text-white min-h-[50px] shadow-md min-w-screen z-20">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="text-2xl font-bold">Quizify Admin</div>
         <nav className="hidden md:flex items-center space-x-8">
@@ -38,6 +41,20 @@ export const AdminNavBar = () => {
             <FaUserCog className="mr-2" /> Manage User
             {activeTab !== "quiz" && <span className="hover-underline-animation"></span>}
           </button>
+
+
+          <button
+            className={`cursor-pointer py-2 flex items-center relative group ${
+              activeTab === "subject" ? "border-b-2 border-white" : ""
+            }`}
+            onClick={() => {
+              setActiveTab('subject')
+              navigate('/admin/addSubject')
+            }}
+          >
+            <FaUserCog className="mr-2" /> Add Subject
+            {activeTab !== "quiz" && <span className="hover-underline-animation"></span>}
+          </button>
           
           <button
             className={`cursor-pointer py-2 flex items-center relative group ${
@@ -58,6 +75,7 @@ export const AdminNavBar = () => {
         <div className="flex flexro items-center space-x-3">  
           <button
             className="bg-red-600 p-2 rounded-md hover:bg-white hover:text-red-500 transition-all duration-300 flex flex-row items-center gap-1"
+            onClick={handleLogout}
           >
             <FaSignOutAlt/>Log out
           </button>

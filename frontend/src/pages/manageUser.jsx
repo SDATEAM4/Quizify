@@ -1,19 +1,10 @@
-import { useState } from "react";
-import ManageUserCard from '../components/managerUserCard'
-import {
-  FaSearch
-} from "react-icons/fa";
+import { useEffect, useState } from "react";
+import ManageUserCard from '../components/managerUserCard';
+import { FaSearch } from "react-icons/fa";
 import { AdminNavBar } from "../components/adminNavbar";
-// Mock data for demonstration purposes
-const mockUserData = {
-  username: "AnonAbdur",
-  firstname: "Abd Ur Rehman",
-  lastname: "Naeem",
-  email: "naeemabdulrehman77@gmail.com",
-  password: "securepassword123",
-  subjects: ["Mathematics", "Physics", "Computer Science"],
-  profileImage: "https://res.cloudinary.com/dslcy5hj2/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1744826723/lost-and-found/gyu2rkub2zgkhavondne.jpg",
-};
+import BackgroundTypography from "../components/backgroundTypography";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function ManageUserComponent() {
   const [searchUsername, setSearchUsername] = useState("");
@@ -24,23 +15,92 @@ export default function ManageUserComponent() {
   const [isEditing, setIsEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  
+  useEffect(()=>{
+    document.title = 'Quizify - Admin Manager User'
+  },[])
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
-
-    // In a real application, you would fetch user data from your backend
-    // For demonstration, we'll use the mock data
-    if (searchUsername.trim().length > 0) {
-      // Simulate API call
-      setTimeout(() => {
-        setUserData(mockUserData);
-        setSubjects(mockUserData.subjects);
+    
+    if (searchUsername.trim().length === 0) {
+      toast.error("Please enter a username");
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/Quizify/admin/user/username/${searchUsername}`
+      );
+      
+      console.log("User Data Response:", response.data);
+      
+      // Process the response data
+      if (response.data) {
+        let processedUserData;
+        
+        // Check if the response has user property (for students/teachers)
+        if (response.data.user) {
+          const user = response.data.user;
+          
+          // Prepare subjects based on role
+          let userSubjects = [];
+          if (response.data.enrolledSubjectsWithNames) {
+            // This is a student
+            userSubjects = response.data.enrolledSubjectsWithNames;
+          } else if (response.data.subjectsTaughtWithNames) {
+            // This is a teacher
+            userSubjects = response.data.subjectsTaughtWithNames;
+          }
+          
+          processedUserData = {
+            id: user.userId,
+            username: user.username,
+            firstName: user.fname,
+            lastName: user.lname,
+            email: user.email,
+            password: user.password, // We don't show actual password
+            bio: user.bio || "No bio available",
+            role: user.role,
+            profileImageUrl: user.profileImageUrl || null,
+            subjects: userSubjects,
+            studentId: response.data.studentId || null,
+            teacherId: response.data.teacherId || null
+          };
+        } else {
+          // Direct user data (possibly admin)
+          const user = response.data;
+          processedUserData = {
+            id: user.userId,
+            username: user.username,
+            firstName: user.fname,
+            lastName: user.lname,
+            email: user.email,
+            password: "●●●●●●●●", // We don't show actual password
+            bio: user.bio || "No bio available",
+            role: user.role,
+            profileImageUrl: user.profileImageUrl || null,
+            subjects: []
+          };
+        }
+        
+        setUserData(processedUserData);
+        setSubjects(processedUserData.subjects);
         setShowUserCard(true);
         setIsEditing(false);
         setConfirmDelete(false);
-      }, 500);
+      } else {
+        toast.error("No user found with that username");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      toast.error(error.response?.data?.message || "Error fetching user data");
+      setShowUserCard(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,39 +109,54 @@ export default function ManageUserComponent() {
     setNewPassword("");
   };
 
-  const handleSave = () => {
-    // In a real application, you would save changes to your backend
-    const updatedUserData = {
-      ...userData,
-      password: newPassword || userData.password,
-      subjects: subjects,
-    };
+  const handleSave = async () => {
+    
+    try{
+      if(newPassword!=''){
 
-    setUserData(updatedUserData);
-    setIsEditing(false);
-    setSuccessMessage("User details updated successfully!");
-
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      setSuccessMessage("");
-    }, 3000);
+        await axios.put(`http://localhost:8080/Quizify/forgot-password/reset?email=${userData.email}&newPassword=${newPassword}`)
+        toast.success("Password changed successfully")
+      }
+      // setting courses now
+      try{
+        const idsString = subjects.map(course => course.id).join(',');
+        console.log(idsString)
+        await axios.put(`http://localhost:8080/Quizify/admin/subjects/overwrite-user-subjects?userId=${userData.id}&subjects=${idsString}`)
+        console.log(userData.id)
+        toast.success("Courses updated successfully")
+      }
+      catch(error){
+        toast.error("Could not update courses")
+      }
+    }
+    catch(error){
+      error.message
+      toast.error("Could not update password")
+    }
   };
 
   const toggleDeleteConfirmation = () => {
     setConfirmDelete(!confirmDelete);
   };
 
-  const handleDelete = () => {
-    // In a real application, you would delete the user from your backend
-    setSuccessMessage("User deleted successfully!");
-    setShowUserCard(false);
-    setUserData(null);
-    setSearchUsername("");
+  const handleDelete = async () => {
+    try {
+      // Example API call to delete user
+      // await axios.delete(`http://localhost:8080/Quizify/admin/user/delete/${userData.id}`);
+      
+      setSuccessMessage("User deleted successfully!");
+      setShowUserCard(false);
+      setUserData(null);
+      setSearchUsername("");
 
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      setSuccessMessage("");
-    }, 3000);
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error("Failed to delete user");
+    }
   };
 
   const handleCancel = () => {
@@ -92,9 +167,10 @@ export default function ManageUserComponent() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center flex-col ">
+    <div className="min-h-screen flex justify-center flex-col">
       <AdminNavBar />
-      <div className="flex justify-center items-center min-h-screen">
+      <BackgroundTypography/>
+      <div className="flex justify-center items-center min-h-screen z-20">
         <div className="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto">
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Manage User</h1>
           <p className="text-gray-600 mb-6">
@@ -124,16 +200,23 @@ export default function ManageUserComponent() {
               <button
                 type="submit"
                 className="ml-2 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 flex items-center"
+                disabled={isLoading}
               >
-                <FaSearch className="mr-2" /> Search
+                {isLoading ? (
+                  <span>Searching...</span>
+                ) : (
+                  <>
+                    <FaSearch className="mr-2" /> Search
+                  </>
+                )}
               </button>
             </div>
           </form>
 
           {/* User Card */}
           {showUserCard && userData && (
-              <ManageUserCard 
-              userData={mockUserData}
+            <ManageUserCard 
+              userData={userData}
               isEditing={isEditing}
               handleCancel={handleCancel}
               handleDelete={handleDelete}
@@ -141,8 +224,11 @@ export default function ManageUserComponent() {
               toggleDeleteConfirmation={toggleDeleteConfirmation}
               handleEdit={handleEdit}
               confirmDelete={confirmDelete}
+              setNewPassword={setNewPassword}
+              newPassword={newPassword}
+              subjects={subjects}
+              setSubjects={setSubjects}
             />
-            
           )}
         </div>
       </div>

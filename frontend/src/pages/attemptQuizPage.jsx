@@ -3,143 +3,92 @@ import { SubjectTabs } from "../components/subjectTabs";
 import { QuizCard } from "../components/quizCard";
 import { Footer } from "../components/footer";
 import { NavBar } from "../components/navbar";
-import {QuizDialog} from "../components/practiceQuizDialog"; 
+import { QuizDialog } from "../components/practiceQuizDialog";
+import { useAuth } from '../context/authContext';
 
 export const AttemptQuizPage = () => {
-  const quizData = [
-    {
-      id: 1,
-      subject: "Mathematics",
-      title: "Advanced Calculus",
-      description: "Test your knowledge of derivatives, integrals, and limits",
-      duration: 30, // minutes
-      questionCount: 10,
-      difficulty: "Advanced",
-      image: "/images/math-calculus-background.jpg",
-      icon: "calculator", // For the subject icon
-    },
-    {
-      id: 2,
-      subject: "Mathematics",
-      title: "Linear Algebra Fundamentals",
-      description: "Master matrices, vectors, and linear transformations",
-      duration: 25, // minutes
-      questionCount: 8,
-      difficulty: "Intermediate",
-      image: "/images/linear-algebra-background.jpg",
-      icon: "calculator",
-    },
-    {
-      id: 3,
-      subject: "Mathematics",
-      title: "Probability & Statistics",
-      description: "Explore statistical concepts and probability theory",
-      duration: 35, // minutes
-      questionCount: 12,
-      difficulty: "Advanced",
-      image: "/images/probability-stats-background.jpg",
-      icon: "calculator",
-    },
-    {
-      id: 4,
-      subject: "Physics",
-      title: "Classical Mechanics",
-      description: "Understand Newton's laws and mechanical systems",
-      duration: 40, // minutes
-      questionCount: 15,
-      difficulty: "Intermediate",
-      image: "/images/physics-mechanics-background.jpg",
-      icon: "settings",
-    },
-    {
-      id: 5,
-      subject: "Physics",
-      title: "Electromagnetism",
-      description: "Study electric and magnetic fields and their interactions",
-      duration: 45, // minutes
-      questionCount: 18,
-      difficulty: "Advanced",
-      image: "/images/physics-em-background.jpg",
-      icon: "settings",
-    },
-    {
-      id: 6,
-      subject: "Chemistry",
-      title: "Organic Chemistry",
-      description: "Learn about carbon compounds and their reactions",
-      duration: 35, // minutes
-      questionCount: 14,
-      difficulty: "Advanced",
-      image: "/images/organic-chemistry-background.jpg",
-      icon: "flask",
-    },
-    {
-      id: 7,
-      subject: "Chemistry",
-      title: "Periodic Table Elements",
-      description: "Explore properties and patterns of chemical elements",
-      duration: 20, // minutes
-      questionCount: 10,
-      difficulty: "Beginner",
-      image: "/images/periodic-table-background.jpg",
-      icon: "flask",
-    },
-    {
-      id: 8,
-      subject: "Biology",
-      title: "Cell Biology",
-      description: "Discover the fundamental unit of all living organisms",
-      duration: 30, // minutes
-      questionCount: 12,
-      difficulty: "Intermediate",
-      image: "/images/cell-biology-background.jpg",
-      icon: "dna",
-    },
-    {
-      id: 9,
-      subject: "Biology",
-      title: "Human Anatomy",
-      description: "Study the structure and systems of the human body",
-      duration: 50, // minutes
-      questionCount: 20,
-      difficulty: "Advanced",
-      image: "/images/human-anatomy-background.jpg",
-      icon: "dna",
-    },
-  ];
 
+  const { user, studentId } = useAuth();
+  console.log("Student ID:", studentId);
+  const [DATA, setDATA] = useState([]);
+  const [response, setResponse] = useState([]);
   const [activePage, setActivePage] = useState("attemptQuiz");
-  const [activeSubject, setActiveSubject] = useState("");
+  const [activesubject_name, setActivesubject_name] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const uniqueSubjects = [...new Set(quizData.map((q) => q.subject))];
-    if (uniqueSubjects.length) {
-      setActiveSubject(uniqueSubjects[0]);
-    }
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`http://localhost:8080/Quizify/quizzes/student/${studentId}`);
+        const json = await res.json();
+        setDATA(json);
+
+        const filtered = json.filter((quiz) => quiz.attemptedQuiz === false);
+        setResponse(filtered);
+
+        const uniquesubject_names = [...new Set(filtered.map((q) => q.subject_name))];
+        if (uniquesubject_names.length) {
+          setActivesubject_name(uniquesubject_names[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching quiz data:", error);
+        alert("Failed to load quizzes. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+    document.title = 'Quizify - Attempt Quiz';
   }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <NavBar />
-      {activePage === "attemptQuiz" ? (
-        <div className="container mx-auto px-4 py-8">
-          <SubjectTabs
-            data={quizData}
-            activeSubject={activeSubject}
-            onSubjectChange={setActiveSubject}
-            onPracticeMode={() => setActivePage("practiceMode")}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <QuizCard data={quizData} subject={activeSubject} />
+
+      <main className="flex-1 relative">
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 backdrop-blur-sm z-50">
+            <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+              <h1 className="text-9xl font-bold text-white">Quizify</h1>
+            </div>
+            <div className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center space-y-6 relative z-10">
+              <div className="w-16 h-16 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div>
+              <h2 className="text-2xl font-bold text-gray-800">Loading Quizzes...</h2>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="container mx-auto px-4 py-8">
-          <QuizDialog quizData={quizData} setPage={() => setActivePage("attemptQuiz")} />
-        </div>
-      )}
+        )}
+
+        {!loading && response.length === 0 ? (
+          <div className="flex flex-col items-center justify-center min-h-[70vh] text-center w-full">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">No Quizzes Available</h2>
+            <p className="text-lg text-gray-600 mb-6">
+              There are currently no quizzes for you to attempt. Please check back later!
+            </p>
+          </div>
+        ) : (
+          activePage === "attemptQuiz" ? (
+            <div className="container mx-auto px-4 py-8">
+              <SubjectTabs
+                data={response}
+                activesubject_name={activesubject_name}
+                onsubject_nameChange={setActivesubject_name}
+                onPracticeMode={() => setActivePage("practiceMode")}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <QuizCard data={response} subject_name={activesubject_name} />
+              </div>
+            </div>
+          ) : (
+            <div className="container mx-auto px-4 py-8">
+              <QuizDialog quizData={response} setPage={() => setActivePage("attemptQuiz")} />
+            </div>
+          )
+        )}
+      </main>
+
       <Footer />
     </div>
   );
 };
-

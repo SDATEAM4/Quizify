@@ -1,7 +1,6 @@
 import { FaUser, FaUserCircle, FaLock, FaEyeSlash, FaEye } from 'react-icons/fa';
 import { HiOutlineMail } from 'react-icons/hi';
 import { useState } from 'react';
-import { UserRoleSelector } from './userRoleSelector';
 export const AddUserForm = ({firstname,setfirstname,lastname,setlastname,email,setemail,username,setUsername,password,passwordStrength,handlePasswordChange}) =>{
   // User role state
   const [showPassword, setShowPassword] = useState(false);
@@ -9,7 +8,6 @@ export const AddUserForm = ({firstname,setfirstname,lastname,setlastname,email,s
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  const [selectedRole, setSelectedRole] = useState('teacher');
   return (
     <>
     <div className="mb-4">
@@ -57,7 +55,7 @@ export const AddUserForm = ({firstname,setfirstname,lastname,setlastname,email,s
               id="email"
               type="email"
               className="pl-10 w-full rounded-md border border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter first name"
+              placeholder="Enter email"
               value={email}
               onChange={(e) => setemail(e.target.value)}
             />
@@ -128,12 +126,6 @@ export const AddUserForm = ({firstname,setfirstname,lastname,setlastname,email,s
           </p>
         </div>
       )}
-
-          {/* Role Selection  */}
-          <div className='mt-2'>
-
-          <UserRoleSelector selectedRole={selectedRole} setSelectedRole={setSelectedRole}/>
-          </div>
         </div>
     </>
   )

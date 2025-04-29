@@ -1,43 +1,26 @@
 import { AdminNavBar } from "../components/adminNavbar"
 import AddUserComponent from "../components/addUserModal"
-import { useAuth } from "../context/authContext"
-import { useEffect } from "react";
-
+import BackgroundTypography from '../components/backgroundTypography'
+import { useEffect } from "react"
 export const AdminAddUserPage = () => {
-  const {user, login} = useAuth();
   
-  useEffect(() => {
-    // only on first render
-    login("", "");
-  }, []);
-  
-  useEffect(() => {
-    if (user) {
-      console.log("👤 User Info:");
-      console.log(user.username);
-      console.log(user.fname);
-      console.log(user.lname);
-      console.log(user.bio);
-      console.log(user.email);
-      console.log(user.role);
-      console.log(user.Uid);
-    }
-  }, [user]);
-  
-
+  useEffect(()=>{
+    document.title = 'Quizify - Admin Add User'
+  })
   return (
-    <div className="min-h-screen w-full bg-white flex flex-col">
+    <div className="min-h-screen w-full bg-white flex flex-col -z-0">
       {/* Navbar section - fixed height */}
       <div className="w-full">
         <AdminNavBar/>
       </div>
       
       {/* Content section - scrollable */}
-      <div className="flex-1 w-full overflow-y-auto p-6">
+      <div className="flex-1 w-full overflow-y-auto mt-[100px] p-6 z-10">
         <div className="max-w-4xl mx-auto">
           <AddUserComponent/>
         </div>
       </div>
+      <BackgroundTypography/>
     </div>
   )
 }

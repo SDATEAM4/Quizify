@@ -1,32 +1,52 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 
-export const SelectCourses = ({ selectedCourses, setSelectedCourses, label, availableCourses}) => {
+export const SelectCourses = ({ selectedCourses, setSelectedCourses, label,}) => {
   const [searchTerm, setSearchTerm] = useState("");
-  
-  // Add a course to selected courses
-  const addCourse = (course) => {
-    // Check if course is already selected
-    if (!selectedCourses.find(c => c.id === course.id)) {
-      setSelectedCourses([...selectedCourses, course]);
+const [availableCourses, setAvailableCourses] = useState([]);
+
+// Add a course to selected courses
+useEffect(() => {
+  const fetchCourses = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/Quizify/admin/subjects");
+      const data = await response.json();
+      const filteredData = data.map(course => ({
+        subject_id: course.subject_id,
+        name: course.name
+      }));
+      setAvailableCourses(filteredData);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
     }
-    setSearchTerm("");
   };
+
+  fetchCourses(); // 💥 You forgot to call the function!
+}, []);
+
+  
+const addCourse = (course) => {
+  if (!selectedCourses.find(c => c.id === course.subject_id)) {
+    setSelectedCourses([...selectedCourses, { id: course.subject_id, name: course.name }]);
+  }
+  setSearchTerm("");
+};
 
   // Remove a course from selected courses
   const removeCourse = (courseId) => {
     setSelectedCourses(selectedCourses.filter(course => course.id !== courseId));
   };
 
-  // Filter courses based on search term
   const filteredCourses = availableCourses.filter(course => 
     course.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    !selectedCourses.find(c => c.id === course.id)
+    !selectedCourses.find(c => c.id === course.subject_id)
   );
+  
 
   return (
-    <div className="mb-6">
-      <label className="block text-gray-700 text-sm font-bold mb-2">
+    <div className="mb-6 bg-gray-50 p-4 min-w-100  rounded-lg shadow-md">
+      <p className="text-sm text-gray-500 mb-2">Subjects</p>
+      <label className="block text-gray-500 text-sm  mb-2">
         {label || "Select Courses"}
       </label>
       

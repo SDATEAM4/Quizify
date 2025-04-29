@@ -7,6 +7,8 @@ import team4.quizify.entity.Student;
 import team4.quizify.entity.User;
 import team4.quizify.repository.StudentRepository;
 
+import java.util.List;
+
 @Service
 public class StudentService {
 
@@ -64,5 +66,45 @@ public class StudentService {
         if (student != null) {
             studentRepository.delete(student);
         }
+    }
+
+    /**
+     * Remove a quiz from all students' attemptedQuiz arrays
+     * 
+     * @param quizId The ID of the quiz to remove
+     * @return The number of students affected
+     */
+    public int removeQuizFromAllStudentsAttempted(Integer quizId) {
+        List<Student> allStudents = studentRepository.findAll();
+        int count = 0;
+        
+        for (Student student : allStudents) {
+            Integer[] attemptedQuizzes = student.getAttemptedQuiz();
+            
+            if (attemptedQuizzes != null && attemptedQuizzes.length > 0) {
+                // Create a list to store quizzes that will remain
+                List<Integer> updatedAttemptedQuizzes = new java.util.ArrayList<>();
+                boolean quizFound = false;
+                
+                // Add all quiz IDs except the one to remove
+                for (Integer id : attemptedQuizzes) {
+                    if (!id.equals(quizId)) {
+                        updatedAttemptedQuizzes.add(id);
+                    } else {
+                        quizFound = true;
+                    }
+                }
+                
+                // If the quiz was found in this student's attempted quizzes
+                if (quizFound) {
+                    // Update the student's attemptedQuiz array
+                    student.setAttemptedQuiz(updatedAttemptedQuizzes.toArray(new Integer[0]));
+                    studentRepository.save(student);
+                    count++;
+                }
+            }
+        }
+        
+        return count;
     }
 }

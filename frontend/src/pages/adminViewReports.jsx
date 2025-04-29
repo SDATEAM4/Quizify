@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { AdminNavBar } from '../components/adminNavbar';
 import axios from 'axios';
-
+import BackgroundTypography from '../components/backgroundTypography';
 export default function ViewReports() {
   const [subjectsData, setSubjectsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,6 +11,7 @@ export default function ViewReports() {
   const [expandedSubject, setExpandedSubject] = useState(null);
 
   useEffect(() => {
+    document.title = 'Quizify - Admin Reports'
     const fetchReports = async () => {
       try {
         setLoading(true);
@@ -45,7 +46,7 @@ export default function ViewReports() {
   return (
     <div>
       <AdminNavBar />
-    
+      <BackgroundTypography/>
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800">View Reports</h1>
@@ -54,12 +55,12 @@ export default function ViewReports() {
 
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-gray-700">Subject Reports</h2>
-          <div className="relative">
+          <div className="relative z-20 bg-white">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search subjects..."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="pl-10 pr-4 py-2 border border-black rounded-lg focus:outline-none text-black focus:ring-2 focus:ring-blue-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -81,7 +82,7 @@ export default function ViewReports() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredSubjects.map(subject => (
-              <div key={subject.subjectId} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div key={subject.subjectId} className="bg-white p-6 z-20 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center mb-4">
                   <div className="bg-blue-100 rounded-full p-2 mr-3">
                     <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
