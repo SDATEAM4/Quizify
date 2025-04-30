@@ -1,6 +1,4 @@
-// subject_nameTabs.jsx
 import React from "react";
-
 
 export const SubjectTabs = ({ data, activesubject_name, onsubject_nameChange, onPracticeMode }) => {
   const iconMap = {
@@ -18,30 +16,50 @@ export const SubjectTabs = ({ data, activesubject_name, onsubject_nameChange, on
   };
 
   return (
-    <div className="display flex justify-between w-full">
-      <div className="flex flex-wrap gap-4 mb-8">
+    <div className="w-full flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+      
+      {/* Mobile Dropdown */}
+      <div className="sm:hidden w-full">
+        <select
+          value={activesubject_name}
+          onChange={(e) => onsubject_nameChange(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-gray-700 bg-white"
+        >
+          <option value="" disabled>Select Subject</option>
+          {uniquesubject_names.map((subject_name) => (
+            <option key={subject_name} value={subject_name}>
+              {subject_name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Desktop Tabs */}
+      <div className="hidden sm:flex flex-wrap gap-4">
         {uniquesubject_names.map((subject_name) => (
           <button
             key={subject_name}
-            className={`tab-button flex items-center justify-center px-6 py-3 rounded-lg transition-all hover:cursor-pointer hover:bg-black hover:text-white ${subject_name === activesubject_name
-              ? "bg-black text-white"
-              : "bg-white text-gray-700 shadow-sm"
-              }`}
+            className={`tab-button flex items-center justify-center px-6 py-3 rounded-lg transition-all hover:cursor-pointer hover:bg-black hover:text-white ${
+              subject_name === activesubject_name
+                ? "bg-black text-white"
+                : "bg-white text-gray-700 shadow-sm"
+            }`}
             onClick={() => onsubject_nameChange(subject_name)}
           >
-            {/* <div className="w-6 h-6 flex items-center justify-center mr-2">
-            <i className={getIconClass(subject_name)}></i>
-          </div> */}
             {subject_name}
           </button>
         ))}
       </div>
-      <button className="tab-button flex items-center justify-center px-6 py-3 rounded-lg transition-all border border-gray-300 hover:cursor-pointer hover:bg-black hover:text-white flex-wrap gap-4 mb-8 bg-white text-gray-700 shadow-sm" onClick={onPracticeMode}>
-        Practice-Mode
-      </button>
 
+      {/* Practice Mode Button */}
+      <div className="w-full sm:w-auto">
+        <button
+          className="tab-button w-full sm:w-auto flex items-center justify-center px-6 py-3 rounded-lg transition-all border border-gray-300 hover:cursor-pointer hover:bg-black hover:text-white bg-white text-gray-700 shadow-sm"
+          onClick={onPracticeMode}
+        >
+          Practice-Mode
+        </button>
+      </div>
     </div>
   );
 };
-
-

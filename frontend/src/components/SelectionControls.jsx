@@ -11,7 +11,8 @@ const SelectionControls = ({
     onChartChange
 }) => {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+            {/* Subject Selection */}
             <div className="w-full">
                 <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
                     Subject
@@ -38,6 +39,7 @@ const SelectionControls = ({
                 </div>
             </div>
 
+            {/* Quiz Selection */}
             <div className="w-full">
                 <label htmlFor="quiz" className="block text-sm font-medium text-gray-700 mb-2">
                     Quiz Title
@@ -65,23 +67,26 @@ const SelectionControls = ({
                 </div>
             </div>
 
-            <div className="md:col-span-2 flex space-x-4 mt-2">
+            {/* Chart Toggle Buttons */}
+            <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 mt-2 w-full">
                 <button
                     onClick={() => onChartChange('bar')}
-                    className={`hover:cursor-pointer px-4 py-2 rounded-md transition-colors duration-200 ${activeChart === 'bar'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                        }`}
+                    className={`w-full sm:w-auto px-4 py-2 rounded-md transition-colors duration-200 ${
+                        activeChart === 'bar'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    }`}
                     disabled={!selectedQuiz}
                 >
                     Marks
                 </button>
                 <button
                     onClick={() => onChartChange('pie')}
-                    className={`hover:cursor-pointer px-4 py-2 rounded-md transition-colors duration-200 ${activeChart === 'pie'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                        }`}
+                    className={`w-full sm:w-auto px-4 py-2 rounded-md transition-colors duration-200 ${
+                        activeChart === 'pie'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    }`}
                     disabled={!selectedQuiz}
                 >
                     Performance

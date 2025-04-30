@@ -9,11 +9,13 @@ import {
   FaBars,
   FaChevronDown
 } from 'react-icons/fa';
+import { useAuth } from "../context/authContext"; // Make sure this path is correct
 
 export const NavBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   const navItems = [
     { icon: <FaHome className="mr-2" />, label: "Home", route: "student/home", tab: "home" },
@@ -23,7 +25,6 @@ export const NavBar = () => {
     { icon: <FaChartBar className="mr-2" />, label: "View Reports", route: "student/viewReports", tab: "reports" }
   ];
 
-  // Dynamically detect active tab from URL
   const activeTab = navItems.find(item => location.pathname.includes(item.route))?.tab;
 
   const handleNavigation = (route) => {
@@ -46,7 +47,9 @@ export const NavBar = () => {
               `}
               onClick={() => handleNavigation(item.route)}
             >
-              {item.icon} {item.label}
+              {item.icon}
+              {item.label}
+              <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
             </button>
           ))}
         </nav>
@@ -60,7 +63,9 @@ export const NavBar = () => {
               className="h-full w-full object-cover"
             />
           </div>
-          <span className="hidden lg:inline text-sm xl:text-base">John Doe</span>
+          <span className="hidden lg:inline text-sm xl:text-base">
+            {user?.fname} {user?.lname}
+          </span>
           <FaChevronDown className="text-xs hidden sm:inline lg:hidden" />
         </div>
 
@@ -80,13 +85,14 @@ export const NavBar = () => {
             {navItems.map((item) => (
               <button
                 key={item.route}
-                className={`cursor-pointer py-3 px-2 flex items-center rounded
+                className={`cursor-pointer py-3 px-2 flex items-center rounded relative group
                   ${activeTab === item.tab ? "bg-gray-800 font-semibold" : ""}
                 `}
                 onClick={() => handleNavigation(item.route)}
               >
                 {item.icon}
                 <span className="ml-2">{item.label}</span>
+                <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
               </button>
             ))}
             <div className="py-3 px-2 flex items-center border-t border-gray-700">
@@ -97,7 +103,7 @@ export const NavBar = () => {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <span>John Doe</span>
+              <span>{user?.fname} {user?.lname}</span>
             </div>
           </div>
         </div>
