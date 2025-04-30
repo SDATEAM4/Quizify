@@ -45,7 +45,7 @@ export const TeacherHomePage = () => {
         {/* Student Profile Section */}
         <section className="mb-10">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Student Profile
+            Teacher Profile
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
