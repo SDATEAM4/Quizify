@@ -8,6 +8,7 @@ import QuestionSelectionSection from '../components/questionSelectionSection';
 import QuizCreationStatus from '../components/quizCreationStatus';
 import toast from 'react-hot-toast';
 import BackgroundTypography from "../components/backgroundTypography"
+import { Footer } from '../components/footer';
 const TeacherAddQuiz = () => {
   const { teacherId,taughtSubjects} = useAuth();
   // State for quiz configuration
@@ -413,7 +414,7 @@ toast.success(
           </div>
         </div>
       </div>
-      
+          <Footer/>
     </div>
   );
 };

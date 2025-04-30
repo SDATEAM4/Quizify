@@ -12,6 +12,38 @@ export const AuthProvider = ({ children }) => {
   const [studentId, setStudentId] = useState(null);
   const [teacherId, setTeacherId] = useState(null);
 
+  const refreshUser = async () => {
+    if (!user) return;
+  
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/Quizify/admin/user/username/${user.username}`
+      );
+      
+      const data = res.data;
+      if (data && data.user) {
+        const userData = data.user;
+        const updatedUser = {
+          Uid: userData.userId,
+          fname: userData.fname,
+          lname: userData.lname,
+          username: userData.username,
+          email: userData.email,
+          role: userData.role,
+          profileImageUrl: userData.profileImageUrl || null,
+          bio: userData.bio || null,
+        };
+        console.log(userData)
+        setUser(updatedUser); // 🧠 Boom! This updates the context
+  
+        // Update localStorage too
+        localStorage.setItem("quizify_user", JSON.stringify(updatedUser));
+      }
+    } catch (err) {
+      console.error("Failed to refresh user data", err);
+    }
+  };
+  
   // Check for saved auth state when component mounts
   useEffect(() => {
     const loadStoredAuth = () => {
@@ -192,7 +224,8 @@ const login = async (identifier, password) => {
         enrolledSubjects,
         taughtSubjects,
         studentId,
-        teacherId
+        teacherId,
+        refreshUser
       }}>
       {children}
     </AuthContext.Provider>
