@@ -10,26 +10,26 @@ import {
 const CustomizeProfile = ({ userData, onSave, onCancel }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    firstname: userData?.firstname || "",
-    lastname: userData?.lastname || "",
+    fname: userData?.fname || "",
+    lname: userData?.lname || "",
     bio: userData?.bio || "",
     password: "",
-    profileImage: userData?.profileImage || ""
+    profileImageUrl: userData?.profileImageUrl || ""
   });
   const [passwordStrength, setPasswordStrength] = useState("");
-  const [previewImage, setPreviewImage] = useState(userData?.profileImage || "");
+  const [previewImage, setPreviewImage] = useState(userData?.profileImageUrl || "");
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (userData) {
       setFormData({
-        firstname: userData.firstname || "",
-        lastname: userData.lastname || "",
+        fname: userData.fname || "",
+        lname: userData.lname  || "",
         bio: userData.bio || "",
         password: "",
-        profileImage: userData.profileImage || ""
+        profileImageUrl: userData.profileImageUrl || ""
       });
-      setPreviewImage(userData.profileImage || "");
+      setPreviewImage(userData.profileImageUrl || "");
     }
   }, [userData]);
 
@@ -55,21 +55,18 @@ const CustomizeProfile = ({ userData, onSave, onCancel }) => {
     setShowPassword(!showPassword);
   };
 
-  const handleProfileImageClick = () => {
+  const handleprofileImageUrlClick = () => {
     fileInputRef.current.click();
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-        setFormData({ ...formData, profileImage: reader.result });
-      };
-      reader.readAsDataURL(file);
+      setPreviewImage(URL.createObjectURL(file)); // For preview only
+      setFormData({ ...formData, profileImageUrl: file }); // Actual File object
     }
   };
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -84,10 +81,10 @@ const CustomizeProfile = ({ userData, onSave, onCancel }) => {
           <div className="flex flex-col items-center">
             <div 
               className="w-32 h-32 overflow-hidden rounded-full shadow-md mb-2 relative cursor-pointer group"
-              onClick={handleProfileImageClick}
+              onClick={handleprofileImageUrlClick}
             >
               <img
-                src={previewImage || "/default-profile.jpg"}
+                src={previewImage || "/fallback.jpg"}
                 alt="User Profile"
                 className="w-full h-full object-cover"
               />
@@ -115,8 +112,8 @@ const CustomizeProfile = ({ userData, onSave, onCancel }) => {
                 <label className="text-sm text-gray-500 mb-1 block">First Name</label>
                 <input
                   type="text"
-                  name="firstname"
-                  value={formData.firstname}
+                  name="fname"
+                  value={formData.fname}
                   onChange={handleInputChange}
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -125,8 +122,8 @@ const CustomizeProfile = ({ userData, onSave, onCancel }) => {
                 <label className="text-sm text-gray-500 mb-1 block">Last Name</label>
                 <input
                   type="text"
-                  name="lastname"
-                  value={formData.lastname}
+                  name="lname"
+                  value={formData.lname}
                   onChange={handleInputChange}
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -191,14 +188,14 @@ const CustomizeProfile = ({ userData, onSave, onCancel }) => {
           <button
             type="button"
             onClick={onCancel}
-            className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-t-2xl"
+            className="cursor-pointer p-2  text-yellow-600 bg-yellow-50 flex items-center relative group shadow-sm rounded-md"
           >
             <FaTimesCircle className="mr-2" /> Cancel
-            <span className="bg-blue-500 hover-underline-animation"></span>
+            <span className="bg-yellow-400 hover-underline-animation"></span>
           </button>
           <button
             type="submit"
-            className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-t-2xl"
+            className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-md text-green-700 bg-green-100"
           >
             <span className="bg-green-600 hover-underline-animation"></span>
             <FaSave className="mr-2" /> Save Changes

@@ -3,6 +3,7 @@ import toast from 'react-hot-toast'
 import { TeacherNavbar } from "../components/teacherNavbar";
 import axios from "axios";
 import { useAuth } from "../context/authContext";
+import { Footer } from "../components/footer";
 export default function AddNewQuestion() {
   const {taughtSubjects} = useAuth();
   const [questionText, setQuestionText] = useState("");
@@ -67,7 +68,10 @@ export default function AddNewQuestion() {
       setLoading(true);
       setError(null);
       setSuccess(false);
-
+      console.log("test")
+      console.log(subject)
+      console.log(taughtSubjects)
+      console.log("test")
       // Check for duplicate options
       const values = Object.values(options);
       const uniqueValues = new Set(values.map(opt => opt.trim().toLowerCase())); // Case-insensitive check
@@ -150,7 +154,7 @@ export default function AddNewQuestion() {
 >
   <option value="">Select a subject</option>
   {taughtSubjects.map(subj => (
-    <option key={subj.subject_id} value={subj.subject_id}>
+    <option key={subj.id} value={subj.id}>
       {subj.name}
     </option>
   ))}
@@ -298,6 +302,7 @@ export default function AddNewQuestion() {
         </form>
       </div>
       </div>
+      <Footer/>
     </div>
   );
 }

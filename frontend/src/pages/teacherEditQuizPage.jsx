@@ -4,6 +4,7 @@ import { TeacherNavbar } from '../components/teacherNavbar';
 import { QuizEditView } from '../components/TeacherEditQuiz';
 import { useAuth } from '../context/authContext';
 import toast from 'react-hot-toast';
+import { Footer } from '../components/footer';
 
 export const TeacherEditQuiz = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -260,7 +261,7 @@ const DeleteConfirmation = () => {
                           <span className="bg-gray-100 px-2 py-1 rounded">{quiz.category}</span>
                           <span>{quiz.questions} questions</span>
                           <span>{quiz.totalMarks} marks</span>
-                          <span>{quiz.timeInMinutes} minutes</span>
+                          <span>{Math.round(quiz.timeInMinutes/60)} minutes</span>
                           <span>{quiz.level} level</span>
                         </div>
                       </div>
@@ -292,6 +293,7 @@ const DeleteConfirmation = () => {
         </div>
       </div>
       <DeleteConfirmation />
+      <Footer/>
     </div>
   );
 };

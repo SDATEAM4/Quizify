@@ -9,6 +9,7 @@ import ScoreDistributionChart from "../components/scoreDistribution";
 import QuizStatsSummary from "../components/quizStat";
 import LoadingSpinner from "../components/loadingSpinner";
 import NoDataMessage from "../components/noDataMessage";
+import { Footer } from "../components/footer";
 
 const TeacherReports = () => {
   const { teacherId } = useAuth();
@@ -123,6 +124,7 @@ const TeacherReports = () => {
           )}
         </div>
       </div>
+      <Footer/>
     </div>
   );
 };
