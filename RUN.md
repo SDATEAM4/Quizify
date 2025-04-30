@@ -36,7 +36,7 @@ Before starting, ensure you have the following installed:
 
 Install the following extensions to enhance your development experience:
 
-### Java Development Extensions
+### Java Development Extensions (Optional)
 - **Extension Pack for Java** (`vscjava.vscode-java-pack`)
 - **Spring Boot Tools** (`vmware.vscode-spring-boot`)
 - **Spring Initializr** (`vscjava.vscode-spring-initializr`)
@@ -47,7 +47,7 @@ Install the following extensions to enhance your development experience:
 - **SQLTools** (`mtxr.sqltools`)
 - **SQLTools PostgreSQL Driver** (`mtxr.sqltools-driver-pg`)
 
-### Frontend Development
+### Frontend Development (Optional)
 - **ES7+ React/Redux/React-Native snippets** (`dsznajder.es7-react-js-snippets`)
 - **ESLint** (`dbaeumer.vscode-eslint`)
 - **Prettier - Code formatter** (`esbenp.prettier-vscode`)
@@ -55,7 +55,7 @@ Install the following extensions to enhance your development experience:
 - **Tailwind Documentation** (`austenc.tailwind-docs`)
 - **PostCSS Language Support** (`csstools.postcss`)
 
-### General Development
+### General Development (Optional)
 - **Code Runner** (`formulahendry.code-runner`)
 - **REST Client** (`humao.rest-client`)
 
