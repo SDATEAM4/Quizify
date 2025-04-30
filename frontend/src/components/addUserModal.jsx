@@ -117,18 +117,16 @@ export default function AddUserComponent() {
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
         <button
           type="button"
-          className={`px-4 py-2 rounded-md flex items-center ${
-            userType === "teacher" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
-          }`}
+          className={`px-4 py-2 rounded-md flex items-center ${userType === "teacher" ? "bg-black text-white" : "bg-gray-200 text-gray-700"
+            }`}
           onClick={() => setUserType("teacher")}
         >
           <FaChalkboardTeacher className="mr-2" /> Teacher
         </button>
         <button
           type="button"
-          className={`px-4 py-2 rounded-md flex items-center ${
-            userType === "student" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
-          }`}
+          className={`px-4 py-2 rounded-md flex items-center ${userType === "student" ? "bg-black text-white" : "bg-gray-200 text-gray-700"
+            }`}
           onClick={() => setUserType("student")}
         >
           <FaUserGraduate className="mr-2" /> Student
@@ -182,17 +180,23 @@ export default function AddUserComponent() {
             className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-md hover:bg-yellow-200"
             onClick={handleClear}
           >
-            <FaTrash className="mr-2" /> Clear
+            <span className="flex items-center">
+              <FaTrash className="mr-2" />
+              Clear
+            </span>
           </button>
           <button
             type="submit"
             className="px-4 py-2 bg-green-100 text-green-700 rounded-md hover:bg-green-200"
             disabled={loading}
           >
-            <FaUserPlus className="mr-2" />
-            {loading ? "Processing..." : `Add ${userType === "teacher" ? "Teacher" : "Student"}`}
+            <span className="flex items-center">
+              <FaUserPlus className="mr-2" />
+              {loading ? "Processing..." : `Add ${userType === "teacher" ? "Teacher" : "Student"}`}
+            </span>
           </button>
         </div>
+
       </form>
     </div>
   );

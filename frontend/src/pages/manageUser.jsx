@@ -17,35 +17,35 @@ export default function ManageUserComponent() {
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     document.title = 'Quizify - Admin Manager User'
-  },[])
+  }, [])
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    
+
     if (searchUsername.trim().length === 0) {
       toast.error("Please enter a username");
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       const response = await axios.get(
         `http://localhost:8080/Quizify/admin/user/username/${searchUsername}`
       );
-      
+
       console.log("User Data Response:", response.data);
-      
+
       // Process the response data
       if (response.data) {
         let processedUserData;
-        
+
         // Check if the response has user property (for students/teachers)
         if (response.data.user) {
           const user = response.data.user;
-          
+
           // Prepare subjects based on role
           let userSubjects = [];
           if (response.data.enrolledSubjectsWithNames) {
@@ -55,7 +55,7 @@ export default function ManageUserComponent() {
             // This is a teacher
             userSubjects = response.data.subjectsTaughtWithNames;
           }
-          
+
           processedUserData = {
             id: user.userId,
             username: user.username,
@@ -86,7 +86,7 @@ export default function ManageUserComponent() {
             subjects: []
           };
         }
-        
+
         setUserData(processedUserData);
         setSubjects(processedUserData.subjects);
         setShowUserCard(true);
@@ -110,26 +110,26 @@ export default function ManageUserComponent() {
   };
 
   const handleSave = async () => {
-    
-    try{
-      if(newPassword!=''){
+
+    try {
+      if (newPassword != '') {
 
         await axios.put(`http://localhost:8080/Quizify/forgot-password/reset?email=${userData.email}&newPassword=${newPassword}`)
         toast.success("Password changed successfully")
       }
       // setting courses now
-      try{
+      try {
         const idsString = subjects.map(course => course.id).join(',');
         console.log(idsString)
         await axios.put(`http://localhost:8080/Quizify/admin/subjects/overwrite-user-subjects?userId=${userData.id}&subjects=${idsString}`)
         console.log(userData.id)
         toast.success("Courses updated successfully")
       }
-      catch(error){
+      catch (error) {
         toast.error("Could not update courses")
       }
     }
-    catch(error){
+    catch (error) {
       error.message
       toast.error("Could not update password")
     }
@@ -143,7 +143,7 @@ export default function ManageUserComponent() {
     try {
       // Example API call to delete user
       // await axios.delete(`http://localhost:8080/Quizify/admin/user/delete/${userData.id}`);
-      
+
       setSuccessMessage("User deleted successfully!");
       setShowUserCard(false);
       setUserData(null);
@@ -165,39 +165,43 @@ export default function ManageUserComponent() {
     setSubjects(userData.subjects);
     setConfirmDelete(false);
   };
-
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="relative min-h-screen flex flex-col">
       <AdminNavBar />
       <BackgroundTypography />
-      <div className="flex justify-center items-center flex-grow px-4 py-8">
-        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 w-full max-w-4xl">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Manage User</h1>
-          <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
+
+      {/* Content Overlay */}
+      <div className="flex-grow flex justify-center items-start py-10 px-4 sm:px-0">
+
+        <div className="bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full mx-4 sm:mx-auto">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Manage User</h1>
+          <p className="text-gray-600 mb-6">
             Search for a user to view, edit or delete their account
           </p>
-  
+
           {/* Success Message */}
           {successMessage && (
-            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded text-sm">
+            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded">
               <p>{successMessage}</p>
             </div>
           )}
-  
+
           {/* Search Form */}
-          <form onSubmit={handleSearch} className="mb-4 sm:mb-6">
-            <div className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="text"
-                value={searchUsername}
-                onChange={(e) => setSearchUsername(e.target.value)}
-                placeholder="Enter username"
-                className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                required
-              />
+          <form onSubmit={handleSearch} className="mb-6">
+            <div className="flex items-center">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={searchUsername}
+                  onChange={(e) => setSearchUsername(e.target.value)}
+                  placeholder="Enter username"
+                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  required
+                />
+              </div>
               <button
                 type="submit"
-                className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 flex items-center justify-center text-sm"
+                className="ml-2 bg-white text-black border border-black p-2 rounded-lg hover:bg-black hover:text-white flex items-center"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -210,7 +214,7 @@ export default function ManageUserComponent() {
               </button>
             </div>
           </form>
-  
+
           {/* User Card */}
           {showUserCard && userData && (
             <ManageUserCard
@@ -232,5 +236,5 @@ export default function ManageUserComponent() {
       </div>
     </div>
   );
-  
+
 }
