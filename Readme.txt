@@ -26,14 +26,14 @@ Before starting, ensure you have the following installed:
 
 ## REQUIRED VS CODE EXTENSIONS
 
-### Java Development Extensions
+### Java Development Extensions (Optional)
 - Extension Pack for Java
 - Spring Boot Tools
 - Spring Initializr
 - Maven for Java
 - Debugger for Java
 
-### Frontend Development
+### Frontend Development (Optional)
 - ES7+ React/Redux/React-Native snippets
 - ESLint
 - Prettier - Code formatter
