@@ -6,6 +6,7 @@ import ReportNavigation from "../components/reportNavigation";
 import QuizInfoCard from "../components/quizInfoCard";
 import StatisticalOverviewChart from "../components/stasticalOverview";
 import ScoreDistributionChart from "../components/scoreDistribution";
+import QuizStatsSummary from "../components/quizStat";
 import LoadingSpinner from "../components/loadingSpinner";
 import NoDataMessage from "../components/noDataMessage";
 
@@ -21,7 +22,7 @@ const TeacherReports = () => {
     scoreDistributionData,
     passFailData,
     timeSpentData,
-    fetchAllQuizReports
+    fetchAllQuizReports,
   } = useQuizReports(teacherId);
 
   React.useEffect(() => {
@@ -63,8 +64,15 @@ const TeacherReports = () => {
     if (quizzes.length === 0) return { title: "No quizzes found", subject: "" };
     const currentQuiz = quizzes[currentQuizIndex];
     return {
-      title: currentQuiz.title || reportData?.quizName || currentQuiz.type || "Untitled Quiz",
-      subject: currentQuiz.subject_name || reportData?.subjectName || "Unknown Subject",
+      title:
+        currentQuiz.title ||
+        reportData?.quizName ||
+        currentQuiz.type ||
+        "Untitled Quiz",
+      subject:
+        currentQuiz.subject_name ||
+        reportData?.subjectName ||
+        "Unknown Subject",
       quizId: currentQuiz.quiz_id,
     };
   };
@@ -95,15 +103,19 @@ const TeacherReports = () => {
               {loadingReports ? (
                 <LoadingSpinner />
               ) : reportData ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  {/* First column - New chart component */}
-                  <StatisticalOverviewChart reportData={reportData} />
-                  {/* Second column */}
-                  <ScoreDistributionChart
-                    data={scoreDistributionData}
-                    totalAttempts={reportData.totalAttempts}
-                  />
-                </div>
+                <>
+                  {/* Stats Summary Box at the top */}
+                  <QuizStatsSummary reportData={reportData} />
+                  
+                  {/* Charts Grid - Both will have identical heights now */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <StatisticalOverviewChart reportData={reportData} />
+                    <ScoreDistributionChart
+                      data={scoreDistributionData}
+                      totalAttempts={reportData.totalAttempts}
+                    />
+                  </div>
+                </>
               ) : (
                 <NoDataMessage message="No report data available for this quiz." />
               )}

@@ -8,7 +8,9 @@ export const TeacherNavbar = () => {
   const location = useLocation();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("");
-
+  const handleCustomizeProfile = () =>{
+    navigate('/customizeProfile')
+  }
   useEffect(() => {
     if (location.pathname.includes("/teacher/home")) setActiveTab("home");
     else if (location.pathname.includes("/teacher/createQuiz")) setActiveTab("quizCreate");
@@ -52,6 +54,7 @@ export const TeacherNavbar = () => {
               src={user.profileImageUrl || "img/fallback.png"}
               alt="Profile"
               className="h-full w-full object-cover"
+              onClick={handleCustomizeProfile}
             />
           </div>
           <span className="hidden md:inline">{user.username}</span>

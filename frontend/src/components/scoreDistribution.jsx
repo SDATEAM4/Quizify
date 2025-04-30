@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -13,20 +13,25 @@ import {
 import { scoreRangeColors } from "./reportDataUtil";
 
 const ScoreDistributionChart = ({ data, totalAttempts }) => {
+  useEffect(() => {
+    console.log(totalAttempts);
+    console.log(data);
+  });
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-4">
         Score Distribution
       </h2>
       {totalAttempts > 0 ? (
-        <div className=" bg-white mt-20 mr-10" >
+        <div className="h-64 mt-10">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
               margin={{
                 top: 5,
                 right: 30,
-                left: 60,
+                left: 20,
                 bottom: 40,
               }}
             >
@@ -37,33 +42,26 @@ const ScoreDistributionChart = ({ data, totalAttempts }) => {
                   value: "Marks",
                   position: "insideBottom",
                   dy: 40,
-                  dx: -30,
+                  dx:-20,
                   style: { fontSize: 14 },
                 }}
               />
               <YAxis
-                domain={[0, "auto"]} // Important: prevents negative values
+                domain={[0, "auto"]}
                 allowDecimals={false}
                 label={{
                   value: "Students",
                   angle: -90,
-                  position: "outsideLeft",
-                  dx: -25,
+                  position: "insideLeft",
+                  dx: -10,
                   style: { fontSize: 14 },
                 }}
               />
               <Tooltip />
               <Legend verticalAlign="bottom" height={36} />
-              <Bar
-                dataKey="students"
-                name="Students"
-                fill="#2c3e50"
-              >
+              <Bar dataKey="students" name="Students" fill="#2c3e50">
                 {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={scoreRangeColors[index]}
-                  />
+                  <Cell key={`cell-${index}`} fill={scoreRangeColors[index]} />
                 ))}
               </Bar>
             </BarChart>
@@ -71,9 +69,7 @@ const ScoreDistributionChart = ({ data, totalAttempts }) => {
         </div>
       ) : (
         <div className="flex items-center justify-center h-64">
-          <p className="text-gray-500">
-            No attempts for this quiz yet
-          </p>
+          <p className="text-gray-500">No attempts for this quiz yet</p>
         </div>
       )}
     </div>
