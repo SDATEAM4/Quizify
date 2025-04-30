@@ -13,17 +13,9 @@ public class StorageManager {
     
     @Autowired
     private CloudinaryStorageAdapter cloudinaryStorageAdapter;
-    
-    @Autowired
-    private LocalStorageService localStorageService;
-    
 
     public StorageService getStorageService() {
-        if ("local".equalsIgnoreCase(storageType)) {
-            return localStorageService;
-        } else {
             return cloudinaryStorageAdapter;
-        }
     }
     
  
@@ -31,8 +23,4 @@ public class StorageManager {
         return getStorageService().uploadFile(file);
     }
     
-    
-    public boolean deleteFile(String fileIdentifier) {
-        return getStorageService().deleteFile(fileIdentifier);
-    }
 }

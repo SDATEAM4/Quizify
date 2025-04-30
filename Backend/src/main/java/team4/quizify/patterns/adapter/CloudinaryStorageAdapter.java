@@ -18,9 +18,4 @@ public class CloudinaryStorageAdapter implements StorageService {
     public String uploadFile(MultipartFile file) {
         return cloudinaryService.uploadFile(file);
     }
-
-    @Override
-    public boolean deleteFile(String fileIdentifier) {
-        return false;
-    }
 }
