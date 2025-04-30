@@ -7,75 +7,62 @@ import {
   FaBars,
   FaTimes,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 
 export const AdminNavBar = () => {
-  const [activeTab, setActiveTab] = useState("addUser");
-  const [menuOpen, setMenuOpen] = useState(false); // For mobile menu toggle
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAuth();
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     logout();
     navigate("/");
   };
 
-  const handleNavClick = (tab, path) => {
-    setActiveTab(tab);
+  const handleNavClick = (path) => {
     navigate(path);
-    setMenuOpen(false); // Close mobile menu on navigation
+    setMenuOpen(false);
   };
+
+  const currentPath = location.pathname;
+  const isActive = (path) => currentPath === path;
+
+  const navLinks = [
+    { label: "Add User", icon: <FaUserPlus />, path: "/admin/addUser" },
+    { label: "Manage User", icon: <FaUserCog />, path: "/admin/manageUser" },
+    { label: "Add Subject", icon: <FaUserCog />, path: "/admin/addSubject" },
+    { label: "View Reports", icon: <FaChartBar />, path: "/admin/viewReports" },
+  ];
 
   return (
     <header className="bg-black text-white shadow-md z-20 w-full">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="text-2xl font-bold">Quizify Admin</div>
 
-        {/* Desktop Nav */}
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          <button
-            className={`cursor-pointer py-2 flex items-center relative group ${
-              activeTab === "addUser" ? "border-b-2 border-white" : ""
-            }`}
-            onClick={() => handleNavClick("addUser", "/admin/addUser")}
-          >
-            <FaUserPlus className="mr-2" /> Add User
-          </button>
-
-          <button
-            className={`cursor-pointer py-2 flex items-center relative group ${
-              activeTab === "manageUser" ? "border-b-2 border-white" : ""
-            }`}
-            onClick={() => handleNavClick("manageUser", "/admin/manageUser")}
-          >
-            <FaUserCog className="mr-2" /> Manage User
-          </button>
-
-          <button
-            className={`cursor-pointer py-2 flex items-center relative group ${
-              activeTab === "subject" ? "border-b-2 border-white" : ""
-            }`}
-            onClick={() => handleNavClick("subject", "/admin/addSubject")}
-          >
-            <FaUserCog className="mr-2" /> Add Subject
-          </button>
-
-          <button
-            className={`cursor-pointer py-2 flex items-center relative group ${
-              activeTab === "viewReports" ? "border-b-2 border-white" : ""
-            }`}
-            onClick={() => handleNavClick("viewReports", "/admin/viewReports")}
-          >
-            <FaChartBar className="mr-2" /> View Reports
-          </button>
+          {navLinks.map(({ label, icon, path }) => (
+            <button
+              key={label}
+              onClick={() => handleNavClick(path)}
+              className={`relative group py-2 flex items-center transition-all duration-200 ${
+                isActive(path) ? "border-b-2 border-white" : ""
+              }`}
+            >
+              {icon}
+              <span className="ml-2">{label}</span>
+              <span className="absolute left-0 -bottom-0.5 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+            </button>
+          ))}
         </nav>
 
-        {/* Logout Button - Always visible */}
+        {/* Logout Button */}
         <div className="hidden md:flex items-center space-x-3">
           <button
-            className="bg-red-600 p-2 rounded-md hover:bg-white hover:text-red-500 transition-all duration-300 flex items-center gap-1"
             onClick={handleLogout}
+            className="bg-red-600 p-2 rounded-md hover:bg-white hover:text-red-600 transition-all duration-300 flex items-center gap-1"
           >
             <FaSignOutAlt />
             Log out
@@ -94,37 +81,23 @@ export const AdminNavBar = () => {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden bg-black border-t border-gray-700 px-4 pb-4 space-y-3">
+          {navLinks.map(({ label, icon, path }) => (
+            <button
+              key={label}
+              onClick={() => handleNavClick(path)}
+              className={`w-full flex items-center gap-2 py-2 px-3 rounded-md transition-all ${
+                isActive(path)
+                  ? "bg-white text-black font-semibold"
+                  : "text-gray-300 hover:bg-gray-800"
+              }`}
+            >
+              {icon}
+              {label}
+            </button>
+          ))}
           <button
-            className="w-full flex items-center gap-2 py-2"
-            onClick={() => handleNavClick("addUser", "/admin/addUser")}
-          >
-            <FaUserPlus />
-            Add User
-          </button>
-          <button
-            className="w-full flex items-center gap-2 py-2"
-            onClick={() => handleNavClick("manageUser", "/admin/manageUser")}
-          >
-            <FaUserCog />
-            Manage User
-          </button>
-          <button
-            className="w-full flex items-center gap-2 py-2"
-            onClick={() => handleNavClick("subject", "/admin/addSubject")}
-          >
-            <FaUserCog />
-            Add Subject
-          </button>
-          <button
-            className="w-full flex items-center gap-2 py-2"
-            onClick={() => handleNavClick("viewReports", "/admin/viewReports")}
-          >
-            <FaChartBar />
-            View Reports
-          </button>
-          <button
-            className="w-full flex items-center gap-2 py-2 text-red-400 hover:text-red-200"
             onClick={handleLogout}
+            className="w-full flex items-center gap-2 py-2 text-red-400 hover:text-red-200"
           >
             <FaSignOutAlt />
             Log out
