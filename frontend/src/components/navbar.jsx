@@ -56,11 +56,12 @@ export const NavBar = () => {
 
         {/* Profile */}
         <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 rounded-full bg-gray-300 overflow-hidden">
+          <div className="h-8 w-8 rounded-full bg-gray-300 overflow-hidden hover:cursor-pointer">
             <img
               src="https://readdy.ai/api/search-image?query=professional%20headshot%20portrait%20of%20a%20person%20with%20neutral%20expression%2C%20high%20quality%2C%20realistic%2C%20professional%20photography%2C%20soft%20lighting%2C%20clean%20background%2C%20minimalist%20style%2C%20business%20attire&width=100&height=100&seq=1&orientation=squarish"
               alt="Profile"
               className="h-full w-full object-cover"
+              onClick={() => navigate("/customizeProfile")}
             />
           </div>
           <span className="hidden lg:inline text-sm xl:text-base">
@@ -101,6 +102,7 @@ export const NavBar = () => {
                   src="https://readdy.ai/api/search-image?query=professional%20headshot%20portrait%20of%20a%20person%20with%20neutral%20expression%2C%20high%20quality%2C%20realistic%2C%20professional%20photography%2C%20soft%20lighting%2C%20clean%20background%2C%20minimalist%20style%2C%20business%20attire&width=100&height=100&seq=1&orientation=squarish"
                   alt="Profile"
                   className="h-full w-full object-cover"
+                  onClick={() => navigate("/customizeProfile")}
                 />
               </div>
               <span>{user?.fname} {user?.lname}</span>
