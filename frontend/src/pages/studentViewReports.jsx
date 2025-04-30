@@ -120,16 +120,17 @@ const StudentViewReport = () => {
 
             <main className="flex-1 relative">
                 {loading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 backdrop-blur-sm z-50">
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 backdrop-blur-sm z-50 px-4">
                         <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-                            <h1 className="text-9xl font-bold text-white">Quizify</h1>
+                            <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-bold text-white text-center">Quizify</h1>
                         </div>
-                        <div className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center space-y-6 relative z-10">
-                            <div className="w-16 h-16 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div>
-                            <h2 className="text-2xl font-bold text-gray-800">Loading Report...</h2>
+                        <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-sm sm:max-w-md flex flex-col items-center space-y-4 sm:space-y-6 relative z-10">
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div>
+                            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 text-center">Loading Report...</h2>
                         </div>
                     </div>
                 )}
+
 
                 {!loading && (
                     <>

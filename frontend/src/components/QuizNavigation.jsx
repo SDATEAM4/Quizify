@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const QuizNavigation = ({ onPrevious, onNext, onEndQuiz, hasPrevious, hasNext }) => {
   return (
-    <div className="flex justify-between mb-6">
+    <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
       <button 
         className={`flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
           ${hasPrevious 
@@ -17,7 +17,7 @@ const QuizNavigation = ({ onPrevious, onNext, onEndQuiz, hasPrevious, hasNext })
       </button>
       
       <button 
-        className="bg-red-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-red-600 transition-colors duration-200"
+        className="bg-red-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-red-600 transition-colors duration-200 min-w-[110px]"
         onClick={onEndQuiz}
       >
         End Quiz

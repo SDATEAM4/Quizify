@@ -28,11 +28,8 @@ const Leaderboard = () => {
     fetchLeaderboardData();
   }, []);
 
-  // Sort based on position, then points if positions are same
   const sortedData = [...leaderboardData].sort((a, b) => {
-    if (a.position !== b.position) {
-      return a.position - b.position;
-    }
+    if (a.position !== b.position) return a.position - b.position;
     return b.points - a.points;
   });
 
@@ -43,12 +40,12 @@ const Leaderboard = () => {
       <main className="flex-1 relative">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 backdrop-blur-sm z-50">
-            <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-              <h1 className="text-9xl font-bold text-white">Quizify</h1>
+            <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none px-4 text-center">
+              <h1 className="text-6xl sm:text-8xl md:text-9xl font-bold text-white">Quizify</h1>
             </div>
-            <div className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center space-y-6 relative z-10">
-              <div className="w-16 h-16 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div>
-              <h2 className="text-2xl font-bold text-gray-800">Loading Leaderboard...</h2>
+            <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col items-center space-y-6 relative z-10 w-11/12 sm:w-auto">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center">Loading Leaderboard...</h2>
             </div>
           </div>
         )}
@@ -56,19 +53,16 @@ const Leaderboard = () => {
         {!loading && (
           <div className="container mx-auto px-4 py-8">
             <header className="mb-8 text-center">
-              <h1 className="text-3xl font-bold text-gray-800 flex items-center justify-center gap-2">
-                <Trophy className="h-8 w-8 text-yellow-500" />
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center justify-center gap-2">
+                <Trophy className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-500" />
                 Leaderboard
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-sm sm:text-base text-gray-600 mt-2">
                 See who's leading the pack in our quiz competition
               </p>
             </header>
 
-            {/* Podium for top 3 performers */}
             <PodiumDisplay topUsers={sortedData.slice(0, 3)} />
-
-            {/* Table for all participants */}
             <LeaderboardTable users={sortedData} />
           </div>
         )}
