@@ -3,7 +3,7 @@ import { FaUserPlus, FaCheck, FaTrash, FaChalkboardTeacher, FaUserGraduate } fro
 import { SelectCourses } from "./selectCourses";
 import { AddUserForm } from "./addUserForms";
 import toast from "react-hot-toast";
-import axios from 'axios';
+import axios from "axios";
 
 export default function AddUserComponent() {
   const [username, setUsername] = useState("");
@@ -16,9 +16,9 @@ export default function AddUserComponent() {
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [availableSubjects, setAvailableSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [userType, setUserType] = useState("teacher");
-  
+
   const checkPasswordStrength = (password) => {
     if (password.length === 0) return "";
     if (password.length < 6) return "weak";
@@ -26,20 +26,14 @@ export default function AddUserComponent() {
     if (password.length >= 10) return "strong";
   };
 
-  // Fetch subjects on component mount
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
         const response = await axios.get("http://localhost:8080/Quizify/admin/subjects");
-        
-        // Transform the API response to match our component's expected format
-        const formattedSubjects = response.data.map(subject => ({
+        const formattedSubjects = response.data.map((subject) => ({
           id: subject.subject_id,
-          name: subject.name
+          name: subject.name,
         }));
-        
-        console.log(formattedSubjects)
-        toast.success("Courses fetched successfully")
         setAvailableSubjects(formattedSubjects);
         setLoading(false);
       } catch (err) {
@@ -71,38 +65,26 @@ export default function AddUserComponent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if(password.length >12){
-      toast.error("Password must have less than 11 characters")
+    if (!username || !password || !firstname || !lastname || !email) {
+      toast.error("All fields are required");
       return;
     }
 
-    // Validation
-    if (!username || !password || !firstname || !lastname || !email) {
-      alert("All fields are required");
-      return;
-    }
-    
     if (selectedSubjects.length === 0) {
-      alert("Please select at least one subject");
+      toast.error("Please select at least one subject");
       return;
     }
 
     setLoading(true);
-    
+
     try {
-      // Create FormData for the API request
       const formData = new FormData();
-      
-      // Add basic user information
       formData.append("fname", firstname);
       formData.append("lname", lastname);
       formData.append("username", username);
       formData.append("password", password);
       formData.append("email", email);
-      
-      // Add subject IDs as a comma-separated string
-      const subjectIds = selectedSubjects.map(subject => subject.id).join(",");
-      
+      const subjectIds = selectedSubjects.map((subject) => subject.id).join(",");
       if (userType === "teacher") {
         formData.append("subjectTaught", subjectIds);
         await axios.post("http://localhost:8080/Quizify/admin/user/addTeacher", formData);
@@ -110,68 +92,54 @@ export default function AddUserComponent() {
         formData.append("enrolledSubjects", subjectIds);
         await axios.post("http://localhost:8080/Quizify/admin/user/addStudent", formData);
       }
-      
-      // Show success message
+
       setShowSuccessMessage(true);
-      toast.success("User added successfully")
-      // Reset form after successful submission
+      toast.success("User added successfully");
       handleClear();
-      
-      // Hide success message after 3 seconds
+
       setTimeout(() => {
         setShowSuccessMessage(false);
       }, 3000);
     } catch (err) {
       console.error("Error adding user:", err);
-      toast.error(err.message)
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white mt-2 rounded-lg shadow-md p-6 max-w-8/12 mx-auto">
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">Add New User</h1>
-      <p className="text-gray-600 mb-6">
-        Create a new user account
-      </p>
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+      <h1 className="text-2xl font-bold text-gray-800 mb-4">Add New User</h1>
+      <p className="text-gray-600 mb-6">Create a new user account</p>
 
-      {/* User Type Selection */}
-      <div className="mb-6">
-        <div className="flex space-x-4">
-          <button
-            type="button"
-            className={`px-4 py-2 rounded-md flex flex-row items-center ${
-              userType === "teacher"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setUserType("teacher")}
-          >
-            <FaChalkboardTeacher className="mr-2"/> Teacher
-          </button>
-          <button
-            type="button"
-            className={`px-4 py-2 rounded-md flex flex-row items-center ${
-              userType === "student"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-            onClick={() => setUserType("student")}
-          >
-            <FaUserGraduate className="mr-2"/>
-            Student
-          </button>
-        </div>
+      {/* User Type Buttons */}
+      <div className="mb-6 flex flex-col sm:flex-row gap-4">
+        <button
+          type="button"
+          className={`px-4 py-2 rounded-md flex items-center ${
+            userType === "teacher" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
+          }`}
+          onClick={() => setUserType("teacher")}
+        >
+          <FaChalkboardTeacher className="mr-2" /> Teacher
+        </button>
+        <button
+          type="button"
+          className={`px-4 py-2 rounded-md flex items-center ${
+            userType === "student" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
+          }`}
+          onClick={() => setUserType("student")}
+        >
+          <FaUserGraduate className="mr-2" /> Student
+        </button>
       </div>
 
       {/* Success Message */}
       {showSuccessMessage && (
         <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded">
-          <div className="flex items-center">
-            <FaCheck className="mr-2" />
-            <span>{userType === "teacher" ? "Teacher" : "Student"} added successfully!</span>
-          </div>
+          <FaCheck className="mr-2" />
+          {userType === "teacher" ? "Teacher" : "Student"} added successfully!
         </div>
       )}
 
@@ -182,57 +150,50 @@ export default function AddUserComponent() {
         </div>
       )}
 
-      {loading && availableSubjects.length === 0 ? (
-        <div className="text-center p-6">Loading subjects...</div>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <AddUserForm
-            username={username}
-            setUsername={setUsername}
-            firstname={firstname}
-            setfirstname={setFirstname}
-            lastname={lastname}
-            setlastname={setLastname}
-            email={email}
-            setemail={setEmail}
-            password={password}
-            setPassword={setPassword}
-            passwordStrength={passwordStrength}
-            handlePasswordChange={handlePasswordChange}
-          />
+      <form onSubmit={handleSubmit}>
+        {/* Add User Form Component */}
+        <AddUserForm
+          username={username}
+          setUsername={setUsername}
+          firstname={firstname}
+          setfirstname={setFirstname}
+          lastname={lastname}
+          setlastname={setLastname}
+          email={email}
+          setemail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          passwordStrength={passwordStrength}
+          handlePasswordChange={handlePasswordChange}
+        />
 
-          <SelectCourses
-            selectedCourses={selectedSubjects}
-            setSelectedCourses={setSelectedSubjects}
-            availableCourses={availableSubjects}
-            label={userType === "teacher" ? "Select Subjects to Teach" : "Select Subjects for Enrollment"}
-            />
-           
-          {/* Submit and Clear Buttons */}
-          <div className="flex justify-between">
-            <button
-              className="cursor-pointer p-2 rounded-md bg-yellow-50 text-yellow-600 flex items-center relative group shadow-sm"
-              onClick={handleClear}
-              type="reset"
-              disabled={loading}
-            >
-              
-              <	FaTrash className="mr-2 bgbl" /> Clear Details
-              <span className="bg-yellow-300 hover-underline-animation"></span>
-            </button>
-            
-            <button
-              type="submit"
-              className="cursor-pointer p-2 flex bg-green-100 text-green-800 items-center relative group shadow-sm rounded-md"
-              disabled={loading}
-            >
-              <FaUserPlus className="mr-2" /> 
-              {loading ? "Processing..." : `Add ${userType === "teacher" ? "Teacher" : "Student"}`}
-              <span className="bg-green-500 hover-underline-animation"></span>
-            </button>
-          </div>
-        </form>
-      )}
+        {/* Select Courses Component */}
+        <SelectCourses
+          selectedCourses={selectedSubjects}
+          setSelectedCourses={setSelectedSubjects}
+          availableCourses={availableSubjects}
+          label={userType === "teacher" ? "Select Subjects to Teach" : "Select Subjects for Enrollment"}
+        />
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
+          <button
+            type="reset"
+            className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-md hover:bg-yellow-200"
+            onClick={handleClear}
+          >
+            <FaTrash className="mr-2" /> Clear
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-green-100 text-green-700 rounded-md hover:bg-green-200"
+            disabled={loading}
+          >
+            <FaUserPlus className="mr-2" />
+            {loading ? "Processing..." : `Add ${userType === "teacher" ? "Teacher" : "Student"}`}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

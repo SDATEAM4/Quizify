@@ -187,25 +187,25 @@ const AddSubjectPage = () => {
     <div className="min-h-screen bg-gray-50">
       <AdminNavBar />
       <BackgroundTypography />
-      
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 z-20 relative">
+  
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8">
           {/* Page Header */}
           <div className="mb-6">
-            <h1 className="text-3xl font-bold">
+            <h1 className="text-2xl sm:text-3xl font-bold">
               {formMode === "add" ? "Add New Subject" : "Edit Subject"}
             </h1>
-            <p className="text-gray-600 mt-2">
-              {formMode === "add" 
-                ? "Create a new subject for quizzes and assignments" 
+            <p className="text-gray-600 mt-2 text-sm sm:text-base">
+              {formMode === "add"
+                ? "Create a new subject for quizzes and assignments"
                 : "Update existing subject information"}
             </p>
           </div>
-
+  
           {/* Message display */}
           {message.text && (
             <div
-              className={`mb-6 p-4 rounded-lg ${
+              className={`mb-6 p-4 rounded-lg text-sm sm:text-base ${
                 message.type === "error"
                   ? "bg-red-50 text-red-700 border border-red-200"
                   : "bg-green-50 text-green-700 border border-green-200"
@@ -214,7 +214,7 @@ const AddSubjectPage = () => {
               {message.text}
             </div>
           )}
-
+  
           {/* Add/Edit Subject Form */}
           <form onSubmit={handleSubmit}>
             {/* Subject Name */}
@@ -232,11 +232,11 @@ const AddSubjectPage = () => {
                 value={subjectData.name}
                 onChange={handleInputChange}
                 placeholder="Enter subject name"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                 required
               />
             </div>
-
+  
             {/* Subject Description */}
             <div className="mb-6">
               <label
@@ -252,26 +252,25 @@ const AddSubjectPage = () => {
                 onChange={handleInputChange}
                 placeholder="Enter subject description"
                 rows="4"
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
               ></textarea>
             </div>
-
+  
             {/* Form Actions */}
-            <div className="mt-6 pt-4 border-t flex flex-wrap justify-end gap-3">
+            <div className="mt-6 pt-4 border-t flex flex-col sm:flex-row sm:justify-end gap-3">
               <button
                 type="button"
                 onClick={resetForm}
-                className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100"
+                className="p-2 flex items-center justify-center rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 text-sm sm:text-base"
                 disabled={isSubmitting}
               >
                 <FaTimesCircle className="mr-2" /> {formMode === "edit" ? "Cancel" : "Reset"}
-                <span className="bg-gray-700 hover-underline-animation"></span>
               </button>
               <button
                 type="submit"
-                className={`cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg ${
-                  formMode === "add" 
-                    ? "bg-green-50 text-green-700 hover:bg-green-100" 
+                className={`p-2 flex items-center justify-center rounded-lg text-sm sm:text-base ${
+                  formMode === "add"
+                    ? "bg-green-50 text-green-700 hover:bg-green-100"
                     : "bg-blue-50 text-blue-700 hover:bg-blue-100"
                 }`}
                 disabled={isSubmitting}
@@ -283,12 +282,10 @@ const AddSubjectPage = () => {
                     {formMode === "add" ? (
                       <>
                         <FaPlus className="mr-2" /> Add Subject
-                        <span className="bg-green-700 hover-underline-animation"></span>
                       </>
                     ) : (
                       <>
                         <FaSave className="mr-2" /> Update Subject
-                        <span className="bg-blue-700 hover-underline-animation"></span>
                       </>
                     )}
                   </>
@@ -297,18 +294,18 @@ const AddSubjectPage = () => {
             </div>
           </form>
         </div>
-
+  
         {/* Subject List Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 z-20 relative">
-          <h2 className="text-2xl font-bold mb-6">Manage Subjects</h2>
-          
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6">Manage Subjects</h2>
+  
           {loading ? (
             <div className="text-center py-8">Loading subjects...</div>
           ) : error ? (
             <div className="text-center py-8 text-red-600">{error}</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border border-gray-200">
+              <table className="min-w-full bg-white border border-gray-200 text-sm sm:text-base">
                 <thead>
                   <tr className="bg-gray-50">
                     <th className="py-3 px-4 text-left border-b">ID</th>
@@ -331,7 +328,7 @@ const AddSubjectPage = () => {
                         <td className="py-3 px-4 border-b">{subject.name}</td>
                         <td className="py-3 px-4 border-b">{subject.description || "-"}</td>
                         <td className="py-3 px-4 border-b text-center">
-                          <div className="flex justify-center space-x-2">
+                          <div className="flex justify-center flex-wrap gap-2">
                             <button
                               onClick={() => handleEdit(subject)}
                               className="p-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
@@ -359,6 +356,7 @@ const AddSubjectPage = () => {
       </div>
     </div>
   );
+  
 };
 
 export default AddSubjectPage;

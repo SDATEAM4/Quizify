@@ -167,39 +167,37 @@ export default function ManageUserComponent() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center flex-col">
+    <div className="min-h-screen flex flex-col">
       <AdminNavBar />
-      <BackgroundTypography/>
-      <div className="flex justify-center items-center min-h-screen z-20">
-        <div className="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Manage User</h1>
-          <p className="text-gray-600 mb-6">
+      <BackgroundTypography />
+      <div className="flex justify-center items-center flex-grow px-4 py-8">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 w-full max-w-4xl">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Manage User</h1>
+          <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
             Search for a user to view, edit or delete their account
           </p>
-
+  
           {/* Success Message */}
           {successMessage && (
-            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded">
+            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded text-sm">
               <p>{successMessage}</p>
             </div>
           )}
-
+  
           {/* Search Form */}
-          <form onSubmit={handleSearch} className="mb-6">
-            <div className="flex items-center">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={searchUsername}
-                  onChange={(e) => setSearchUsername(e.target.value)}
-                  placeholder="Enter username"
-                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
+          <form onSubmit={handleSearch} className="mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                value={searchUsername}
+                onChange={(e) => setSearchUsername(e.target.value)}
+                placeholder="Enter username"
+                className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                required
+              />
               <button
                 type="submit"
-                className="ml-2 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 flex items-center"
+                className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 flex items-center justify-center text-sm"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -212,10 +210,10 @@ export default function ManageUserComponent() {
               </button>
             </div>
           </form>
-
+  
           {/* User Card */}
           {showUserCard && userData && (
-            <ManageUserCard 
+            <ManageUserCard
               userData={userData}
               isEditing={isEditing}
               handleCancel={handleCancel}
@@ -234,4 +232,5 @@ export default function ManageUserComponent() {
       </div>
     </div>
   );
+  
 }

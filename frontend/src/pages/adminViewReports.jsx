@@ -53,19 +53,23 @@ export default function ViewReports() {
           <p className="text-gray-600 mt-1">Manage and analyze subject performance data</p>
         </div>
 
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-700">Subject Reports</h2>
-          <div className="relative z-20 bg-white">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search subjects..."
-              className="pl-10 pr-4 py-2 border border-black rounded-lg focus:outline-none text-black focus:ring-2 focus:ring-blue-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+  <h2 className="text-lg sm:text-xl font-semibold text-gray-700 text-center sm:text-left">
+    Subject Reports
+  </h2>
+
+  <div className="relative w-full sm:w-auto z-20 bg-white">
+    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+    <input
+      type="text"
+      placeholder="Search subjects..."
+      className="w-full sm:w-[250px] pl-10 pr-4 py-2 border border-black rounded-lg focus:outline-none text-black focus:ring-2 focus:ring-blue-500"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+    />
+  </div>
+</div>
+
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
