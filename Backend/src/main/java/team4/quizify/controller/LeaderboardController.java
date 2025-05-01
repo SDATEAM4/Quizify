@@ -11,9 +11,9 @@ import team4.quizify.service.LeaderboardService;
 import java.util.List;
 import java.util.Map;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/Quizify")
-@CrossOrigin(origins = "*")
 public class LeaderboardController {
 
     @Autowired

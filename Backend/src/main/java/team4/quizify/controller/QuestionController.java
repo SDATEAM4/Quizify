@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Quizify/questions")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class QuestionController {
 
     private final QuestionService questionService;
