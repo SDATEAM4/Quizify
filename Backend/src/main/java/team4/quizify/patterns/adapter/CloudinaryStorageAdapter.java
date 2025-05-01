@@ -10,6 +10,7 @@ public class CloudinaryStorageAdapter implements StorageService {
 
     private final CloudinaryService cloudinaryService;
     
+    
     public CloudinaryStorageAdapter(CloudinaryService cloudinaryService) {
         this.cloudinaryService = cloudinaryService;
     }
