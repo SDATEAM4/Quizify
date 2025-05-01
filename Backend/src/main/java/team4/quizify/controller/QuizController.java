@@ -342,8 +342,7 @@ public class QuizController {
             return handleInternalServerError(e, "creating automatic quiz");
         }
     }
-      
-    
+
     @GetMapping("/student/{studentId}")
     public ResponseEntity<?> getQuizzesWithQuestionsByStudent(@PathVariable Integer studentId) {
         try {
