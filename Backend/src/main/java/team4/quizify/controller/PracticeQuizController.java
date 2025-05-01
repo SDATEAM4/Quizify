@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import team4.quizify.entity.PracticeQuiz;
 import team4.quizify.patterns.factory.PracticeQuizFactory;
-import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 
@@ -19,9 +18,6 @@ import java.util.List;
 public class PracticeQuizController {
     @Autowired
     private PracticeQuizFactory practiceQuizFactory;
-    
-    @Autowired
-    private ApplicationContext applicationContext;
     
     @GetMapping("/practiceQuiz")
     public List<PracticeQuiz> getPracticeQuiz(

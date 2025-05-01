@@ -39,21 +39,18 @@ public class AuthController {
             
             Optional<User> userOptional = username != null ?
                     authService.loginWithUsername(username, password) :
-                    authService.loginWithEmail(email, password);
-
-            if (userOptional.isPresent()) {
+                    authService.loginWithEmail(email, password);            if (userOptional.isPresent()) {
                 // Return success message, not user details
                 Map<String, String> response = new HashMap<>();
                 response.put("message", "User logged in");
                 return ResponseEntity.ok(response);
             } else {
                 Map<String, String> response = new HashMap<>();
-                response.put("error", "Invalid credentials");
+                response.put("error", "Error,Try again");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-            }
-        } catch (Exception e) {
+            }        } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
-            response.put("message", "Internal error while fetching data");
+            response.put("error", "An unexpected error occurred");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -80,10 +77,9 @@ public class AuthController {
             } else {
                 response.put("error", "User not found with the provided email");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-        } catch (Exception e) {
+            }        } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
-            response.put("message", "Internal error while sending OTP");
+            response.put("error", "An unexpected error occurred");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -110,10 +106,9 @@ public class AuthController {
             } else {
                 response.put("error", "Invalid or expired OTP");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-        } catch (Exception e) {
+            }        } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
-            response.put("message", "Internal error while verifying OTP");
+            response.put("error", "An unexpected error occurred");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -147,18 +142,16 @@ public class AuthController {
             } else {
                 response.put("error", "User not found with the provided email");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-        } catch (Exception e) {
+            }        } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
-            response.put("message", "Internal error while resetting password");
+            response.put("error", "An unexpected error occurred");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-    
-    @ExceptionHandler({Exception.class})
+      @ExceptionHandler({Exception.class})
     public ResponseEntity<?> handleAnyException(Exception e) {
         Map<String, String> response = new HashMap<>();
-        response.put("message", "Internal error while fetching data");
+        response.put("error", "An unexpected error occurred");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }

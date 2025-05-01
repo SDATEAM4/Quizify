@@ -135,7 +135,6 @@ public class QuizController {
         }
     }
     
-    // Migrated from oldController - 2025-04
     @GetMapping("/{quizId}")
     public ResponseEntity<?> getQuizById(@PathVariable Integer quizId) {
         try {
@@ -187,12 +186,9 @@ public class QuizController {
         }
     }
     
-    // Other GET methods remain unchanged...
+   
     
-    /**
-     * Creates a quiz manually by selecting specific questions and adding random questions to reach the desired count
-     * This method now uses the Factory and Template patterns internally
-     */    @PostMapping("/create/manual")
+    @PostMapping("/create/manual")
     public ResponseEntity<?> createManualQuiz(@RequestBody Map<String, Object> requestBody) {
         try {
             // Extract basic information for validation
@@ -270,10 +266,8 @@ public class QuizController {
         }
     }
     
-    /**
-     * Creates a quiz automatically based on subject and difficulty level
-     * This method now uses the Factory and Template patterns internally
-     */    @PostMapping("/create/auto")
+     
+    @PostMapping("/create/auto")
     public ResponseEntity<?> createAutomaticQuiz(@RequestBody Map<String, Object> requestBody) {
         try {
             // Extract basic information for validation
@@ -348,8 +342,7 @@ public class QuizController {
             return handleInternalServerError(e, "creating automatic quiz");
         }
     }
-    
-    // Migrated from oldController - 2025-04
+
     @GetMapping("/student/{studentId}")
     public ResponseEntity<?> getQuizzesWithQuestionsByStudent(@PathVariable Integer studentId) {
         try {
@@ -403,28 +396,18 @@ public class QuizController {
                     quizData.put("user_id", user.getUserId());
                     quizData.put("username", user.getUsername());
                     quizData.put("student_id", studentId);
-                    
-                    // Check if quiz has been attempted
+                      // Check if quiz has been attempted
                     boolean attempted = attemptedQuizIds.contains(quiz.getQuizId());
                     quizData.put("attemptedQuiz", attempted);
                     
-                    // Get questions for this quiz
-                    List<Map<String, Object>> questionsList = new ArrayList<>();
+                    // Add question count instead of detailed question information
+                    int questionCount = quiz.getQuestionIds() != null ? quiz.getQuestionIds().length : 0;
+                    quizData.put("questions", questionCount);
                     
-                    if (quiz.getQuestionIds() != null) {
-                        for (Integer questionId : quiz.getQuestionIds()) {
-                            Optional<Question> questionOptional = questionService.getQuestionById(questionId);
-                            
-                            if (questionOptional.isPresent()) {
-                                Question question = questionOptional.get();
-                                Map<String, Object> questionData = formatQuestionData(question);
-                                questionsList.add(questionData);
-                            }
-                        }
+                    // Only add quizzes that have not been attempted
+                    if (!attempted) {
+                        quizzesList.add(quizData);
                     }
-                    
-                    quizData.put("questions", questionsList);
-                    quizzesList.add(quizData);
                 }
             }
             
@@ -434,7 +417,6 @@ public class QuizController {
         }
     }
     
-    // Migrated from oldController - 2025-04
     @PostMapping("/{quizId}/remove-questions")
     public ResponseEntity<?> removeQuestionsFromQuiz(
             @PathVariable Integer quizId,
@@ -523,7 +505,7 @@ public class QuizController {
         }
     }
     
-    // Migrated from oldController - 2025-04
+    
     @PostMapping("/{quizId}/edit/manual")
     public ResponseEntity<?> editQuizManually(
             @PathVariable Integer quizId,
@@ -714,7 +696,7 @@ public class QuizController {
         }
     }
     
-    // Migrated from oldController - 2025-04
+    
     @PostMapping("/{quizId}/edit/auto")
     public ResponseEntity<?> editQuizAutomatically(
             @PathVariable Integer quizId,
@@ -891,10 +873,7 @@ public class QuizController {
         }
     }
     
-    /**
-     * Deletes a quiz by ID and updates the teacher's createdQuiz array
-     * This method ensures that only the teacher who created the quiz can delete it
-     */
+   
     @DeleteMapping("/{quizId}/delete/{teacherId}")
     public ResponseEntity<?> deleteQuiz(
             @PathVariable Integer quizId,
