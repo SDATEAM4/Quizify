@@ -72,7 +72,7 @@ export const QuizCard = ({ data, subject_name }) => {
               </div>
               <div className="flex items-center space-x-2">
                 <i className="ri-question-line"></i>
-                <span>{quiz.questions.length} Questions</span>
+                <span>{quiz.questions} Questions</span>
               </div>
             </div>
 
