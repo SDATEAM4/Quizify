@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import team4.quizify.entity.Subject;
 import team4.quizify.entity.Student;
 import team4.quizify.entity.Teacher;
+import team4.quizify.entity.User;
 import team4.quizify.service.SubjectService;
 import team4.quizify.service.CloudinaryService;
 import team4.quizify.service.StudentService;
@@ -220,6 +221,48 @@ public class SubjectAdminController {    @Autowired
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to delete subject"));
+        }
+    }
+    
+   
+    @GetMapping("/{subjectId}/teachers")
+    public ResponseEntity<?> getTeachersOfSubject(@PathVariable Integer subjectId) {
+        try {
+            // Check if subject exists
+            Optional<Subject> subjectOpt = subjectService.getSubjectById(subjectId);
+            if (subjectOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Subject not found"));
+            }
+            
+            Subject subject = subjectOpt.get();
+            Integer[] teacherIds = subject.getTeachersId();
+            
+            // If no teachers assigned to this subject
+            if (teacherIds == null || teacherIds.length == 0) {
+                return ResponseEntity.ok(List.of());
+            }
+            
+            // Retrieve teacher details for each teacher ID
+            List<Map<String, Object>> teacherDetails = new ArrayList<>();
+            for (Integer teacherId : teacherIds) {
+                Teacher teacher = teacherService.getTeacherByTeacherId(teacherId);
+                if (teacher != null) {
+                    User user = teacher.getUser();                    Map<String, Object> teacherData = Map.of(
+                        "teacherId", teacher.getTeacher_id(),
+                        "userId", user.getUserId(),
+                        "firstName", user.getFname(),
+                        "lastName", user.getLname(),
+                        "username", user.getUsername()
+                    );
+                    teacherDetails.add(teacherData);
+                }
+            }
+            
+            return ResponseEntity.ok(teacherDetails);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to retrieve subject teachers: " + e.getMessage()));
         }
     }
 }
