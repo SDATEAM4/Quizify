@@ -10,6 +10,7 @@ import team4.quizify.repository.ChatRepository;
 import team4.quizify.repository.QueryRepository;
 import team4.quizify.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -47,24 +48,42 @@ public class QueryService {
 
         User user = userOpt.get();
         List<Query> queries;
-        List<Integer> relatedUserIds;
 
         if ("student".equalsIgnoreCase(user.getRole())) {
             queries = queryRepository.findBySenderIdAndResolveStatusFalse(userId);
-            relatedUserIds = queries.stream().map(Query::getReceiverId).distinct().toList();
         } else if ("teacher".equalsIgnoreCase(user.getRole())) {
             queries = queryRepository.findByReceiverIdAndResolveStatusFalse(userId);
-            relatedUserIds = queries.stream().map(Query::getSenderId).distinct().toList();
         } else {
             throw new RuntimeException("Invalid role");
         }
 
-        List<User> relatedUsers = userRepository.findAllById(relatedUserIds);
-        return relatedUsers.stream().map(u -> {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Query query : queries) {
+            int oppositeUserId = ("student".equalsIgnoreCase(user.getRole())) ? query.getReceiverId() : query.getSenderId();
+            Optional<User> oppositeUserOpt = userRepository.findById(oppositeUserId);
+            if (oppositeUserOpt.isEmpty()) continue;
+
+            User oppositeUser = oppositeUserOpt.get();
+
+            // Fetch chats associated with this query
+            List<Chat> chats = chatRepository.findAllById(Arrays.asList(query.getChatIds()));
+            // Determine the latest timestamp
+            LocalDateTime latestTimestamp = chats.stream()
+                    .map(Chat::getTimestamp)
+                    .max(LocalDateTime::compareTo)
+                    .orElse(null);
+
             Map<String, Object> map = new HashMap<>();
-            map.put("userId", u.getUserId());
-            map.put("fullName", u.getFname() + " " + u.getLname());
-            return map;
-        }).toList();
+            map.put("userId", oppositeUser.getUserId());
+            map.put("fullName", oppositeUser.getFname() + " " + oppositeUser.getLname());
+            map.put("subjectId", query.getSubjectId());
+            map.put("latestTimestamp", latestTimestamp);
+
+            result.add(map);
+        }
+
+        return result;
     }
+
 }

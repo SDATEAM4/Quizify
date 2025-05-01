@@ -1,35 +1,30 @@
 package team4.quizify.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.time.LocalDateTime;
-@Data
+
 @Entity
 @Table(name = "chat")
-
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Chat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chat_id")
     private Long chatId;
 
-    @Column(nullable = false)
-    private int senderId;
+    @Column(name = "sender_id", nullable = false)
+    private Integer senderId;
 
-    @Column(nullable = false)
-    private int  receiverId;
+    @Column(name = "receiver_id", nullable = false)
+    private Integer receiverId;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(name = "message", nullable = false, columnDefinition = "VARCHAR(255)")
     private String message;
 
+    @Column(name = "timestamp", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime timestamp = LocalDateTime.now();
-
-    private Integer subjectId;
-
-
 }

@@ -5,12 +5,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team4.quizify.entity.Chat;
+import team4.quizify.entity.Query;
+import team4.quizify.entity.User;
+import team4.quizify.repository.ChatRepository;
+import team4.quizify.repository.QueryRepository;
+import team4.quizify.repository.UserRepository;
 import team4.quizify.service.ChatService;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
+import java.util.Optional;
 @RestController
 @RequestMapping("/Quizify/chats")
 @RequiredArgsConstructor
@@ -34,11 +39,12 @@ public class ChatController {
     public ResponseEntity<?> sendMessage(
             @PathVariable int senderId,
             @PathVariable int receiverId,
+            @RequestParam(required = false) Integer subjectId,
             @RequestBody Chat chat
     ) {
         try {
             chatService.mapSenderReceiverToUserIds(chat, senderId, receiverId);
-            return ResponseEntity.ok(chatService.sendMessage(chat));
+            return ResponseEntity.ok(chatService.sendMessage(chat, subjectId));
         } catch (Exception e) {
             return handleException();
         }
