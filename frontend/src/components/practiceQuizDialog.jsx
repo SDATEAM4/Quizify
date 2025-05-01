@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Calculator, Settings, FlaskRound as Flask, Dna, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import toast from "react-hot-toast";
+
 
 export const QuizDialog = ({ quizData, setPage }) => {
   const [selectedsubject_name, setSelectedsubject_name] = useState('');
@@ -70,6 +72,10 @@ export const QuizDialog = ({ quizData, setPage }) => {
 
       const data = await res.json();
       const dataset = transformDataset(data);
+      if (dataset.length === 0) {
+        toast.error("Server is busy. Please try again later!");
+        return;
+      }
 
       navigate("/quizGenerator", {
         state: {
