@@ -80,5 +80,20 @@ public class QueryService {    private final QueryRepository queryRepository;
         return result;
     }
 
+    @Transactional
+    public boolean resolveQueryByUsers(Integer senderId, Integer receiverId) {
+        Optional<Query> optionalQuery = queryRepository.findBySenderIdAndReceiverIdAndResolveStatusFalse(senderId, receiverId);
+        if (optionalQuery.isEmpty()) {
+            return false;
+        }
 
+        Query query = optionalQuery.get();
+
+        Long[] chatIds = query.getChatIds();
+        List<Chat> chatsToDelete = chatRepository.findAllById(Arrays.asList(chatIds));
+        chatRepository.deleteAll(chatsToDelete);
+
+        queryRepository.delete(query);
+        return true;
+    }
 }

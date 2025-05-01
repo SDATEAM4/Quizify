@@ -26,12 +26,12 @@ public class QueryController {
         } catch (Exception e) {
             return handleException();
         }
-    }
-
-    @DeleteMapping("/resolve/{queryId}")
-    public ResponseEntity<?> resolveQuery(@PathVariable Long queryId) {
+    }    
+    
+    @DeleteMapping("/resolve")
+    public ResponseEntity<?> resolveQuery(@RequestParam Integer senderId, @RequestParam Integer receiverId) {
         try {
-            boolean resolved = queryService.resolveQueryAndDeleteChats(queryId);
+            boolean resolved = queryService.resolveQueryByUsers(senderId, receiverId);
             if (!resolved) {
                 return ResponseEntity.status(404).body("Query not found or already resolved.");
             }
@@ -50,6 +50,7 @@ public class QueryController {
             return handleException();
         }
     }
+
 
     private ResponseEntity<Map<String, String>> handleException() {
         Map<String, String> error = new HashMap<>();
