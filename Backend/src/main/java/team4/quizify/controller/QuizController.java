@@ -348,8 +348,7 @@ public class QuizController {
             return handleInternalServerError(e, "creating automatic quiz");
         }
     }
-    
-    // Migrated from oldController - 2025-04
+      // Migrated from oldController - 2025-04
     @GetMapping("/student/{studentId}")
     public ResponseEntity<?> getQuizzesWithQuestionsByStudent(@PathVariable Integer studentId) {
         try {
@@ -403,28 +402,18 @@ public class QuizController {
                     quizData.put("user_id", user.getUserId());
                     quizData.put("username", user.getUsername());
                     quizData.put("student_id", studentId);
-                    
-                    // Check if quiz has been attempted
+                      // Check if quiz has been attempted
                     boolean attempted = attemptedQuizIds.contains(quiz.getQuizId());
                     quizData.put("attemptedQuiz", attempted);
                     
-                    // Get questions for this quiz
-                    List<Map<String, Object>> questionsList = new ArrayList<>();
+                    // Add question count instead of detailed question information
+                    int questionCount = quiz.getQuestionIds() != null ? quiz.getQuestionIds().length : 0;
+                    quizData.put("questions", questionCount);
                     
-                    if (quiz.getQuestionIds() != null) {
-                        for (Integer questionId : quiz.getQuestionIds()) {
-                            Optional<Question> questionOptional = questionService.getQuestionById(questionId);
-                            
-                            if (questionOptional.isPresent()) {
-                                Question question = questionOptional.get();
-                                Map<String, Object> questionData = formatQuestionData(question);
-                                questionsList.add(questionData);
-                            }
-                        }
+                    // Only add quizzes that have not been attempted
+                    if (!attempted) {
+                        quizzesList.add(quizData);
                     }
-                    
-                    quizData.put("questions", questionsList);
-                    quizzesList.add(quizData);
                 }
             }
             
