@@ -1,10 +1,7 @@
 package team4.quizify.patterns.template;
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Optional;
 import team4.quizify.entity.Quiz;
 import team4.quizify.entity.Question;
 

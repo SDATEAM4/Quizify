@@ -131,7 +131,7 @@ public class ChatService
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) throw new RuntimeException("User not found");
 
-        User user = userOpt.get();
+        userOpt.get();
         List<Chat> chats = chatRepository.findBySenderIdOrReceiverId(userId, userId);
 
         return chats.stream()

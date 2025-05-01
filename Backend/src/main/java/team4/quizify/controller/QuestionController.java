@@ -140,7 +140,7 @@ public class QuestionController {
             updatedQuestion.setCorrectOption(question.getCorrectOption());
             updatedQuestion.setOptions(question.getOptions());
             
-            Question result = questionService.updateQuestion(updatedQuestion);
+           questionService.updateQuestion(updatedQuestion);
             
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Question updated successfully");

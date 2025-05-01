@@ -1,6 +1,5 @@
 package team4.quizify.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team4.quizify.entity.QuestionBank;
 import team4.quizify.repository.QuestionBankRepository;
@@ -13,7 +12,6 @@ public class QuestionBankService {
 
     private final QuestionBankRepository questionBankRepository;
 
-    @Autowired
     public QuestionBankService(QuestionBankRepository questionBankRepository) {
         this.questionBankRepository = questionBankRepository;
     }
