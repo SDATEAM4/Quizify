@@ -46,7 +46,7 @@ public class AuthController {
                 return ResponseEntity.ok(response);
             } else {
                 Map<String, String> response = new HashMap<>();
-                response.put("error", "Error,Try again");
+                response.put("error", "Ivalid credentials");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }        } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
