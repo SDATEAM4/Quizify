@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { TeacherNavbar } from '../components/teacherNavbar';
 import axios from 'axios';
@@ -9,10 +9,11 @@ import QuizCreationStatus from '../components/quizCreationStatus';
 import toast from 'react-hot-toast';
 import BackgroundTypography from "../components/backgroundTypography"
 import { Footer } from '../components/footer';
+
 const TeacherAddQuiz = () => {
-  const { teacherId,taughtSubjects} = useAuth();
+  const { teacherId, taughtSubjects } = useAuth();
   const [quizConfig, setQuizConfig] = useState({
-    subject: "", 
+    subject: "",
     subjectId: 0,
     title: "",
     description: "",
@@ -36,6 +37,69 @@ const TeacherAddQuiz = () => {
     quizId: null
   });
 
+  // 1) Memoize fetchQuestions so we can reference it safely in effects
+  const fetchQuestions = useCallback(async (subjectId) => {
+    try {
+      setQuestionsLoading(true);
+      const { data } = await axios.get(
+        `http://localhost:8080/Quizify/questions/subject/${subjectId}`
+      );
+      setAvailableQuestions(data);
+    } catch (err) {
+      console.error('Error fetching questions:', err);
+      toast.error("Failed to load questions");
+    } finally {
+      setQuestionsLoading(false);
+    }
+  }, []);
+
+  // 2) Auto-select and fetch on first subject arrival
+  useEffect(() => {
+    // If we only teach one subject, pick it
+    if (taughtSubjects.length === 1) {
+      const only = taughtSubjects[0];
+      setQuizConfig(q => ({
+        ...q,
+        subject: only.name,
+        subjectId: only.id
+      }));
+    }
+    // If multiple, you might choose to default to the first:
+    else if (taughtSubjects.length > 1 && quizConfig.subject === "") {
+      const first = taughtSubjects[0];
+      setQuizConfig(q => ({
+        ...q,
+        subject: first.name,
+        subjectId: first.id
+      }));
+    }
+  }, [taughtSubjects]);
+
+  // 3) Whenever subjectId changes to a real value, always fetch questions
+  useEffect(() => {
+    if (quizConfig.subjectId) {
+      fetchQuestions(quizConfig.subjectId);
+    }
+  }, [quizConfig.subjectId, fetchQuestions]);
+
+  useEffect(() => {
+    const selectedSubject = taughtSubjects.find(subject => subject.name === quizConfig.subject);
+    if (selectedSubject) {
+      setQuizConfig(prev => ({ ...prev, subjectId: selectedSubject.id }));
+      if (quizConfig.mode === 'manual') {
+        fetchQuestions(selectedSubject.id);
+      }
+      setSelectedQuestions([]);
+    }
+  }, [quizConfig.subject]);
+  
+  useEffect(() => {
+    if (quizConfig.mode === 'manual' && quizConfig.subjectId !== 0) {
+      fetchQuestions(quizConfig.subjectId);
+    }
+  }, [quizConfig.mode]);
+  
+
   // Calculated difficulty based on selected questions
   const [calculatedDifficulty, setCalculatedDifficulty] = useState({
     score: 0,
@@ -45,53 +109,25 @@ const TeacherAddQuiz = () => {
   useEffect(() => {
     document.title = 'Quizify - Teacher Add Quiz';
     
-  }, []);
-
-
-  // Fetch questions for a specific subject
-  const fetchQuestions = async (subjectId) => {
-    try {
-      setQuestionsLoading(true);
-      const response = await axios.get(`http://localhost:8080/Quizify/questions/subject/${subjectId}`);
-      setAvailableQuestions(response.data);
-      toast.success("Questions fetched successfully")
-      setQuestionsLoading(false);
-    } catch (err) {
-      console.error('Error fetching questions:', err);
-      setQuestionsLoading(false);
+    // Auto-select the first subject if only one is available
+    if (taughtSubjects && taughtSubjects.length === 1) {
+      const singleSubject = taughtSubjects[0];
+      setQuizConfig(prev => ({
+        ...prev,
+        subject: singleSubject.name,
+        subjectId: singleSubject.id
+      }));
     }
-  };
+  }, [taughtSubjects]);
 
-  // Handle quiz configuration changes
+  
+
   const handleConfigChange = (field, value) => {
-    setQuizConfig({
-      ...quizConfig,
+    setQuizConfig(prev => ({
+      ...prev,
       [field]: value
-    });
-
-    // If subject changed, update subjectId and fetch questions
-    if (field === 'subject') {
-      const selectedSubject = taughtSubjects.find(subject => subject.name === value);
-      console.log("")
-      console.log(selectedSubject)
-      console.log("")
-      if (selectedSubject) {
-        setQuizConfig(prev => ({
-          ...prev,
-          subjectId: selectedSubject.id
-        }));
-        fetchQuestions(selectedSubject.id);
-        // Reset selected questions when subject changes
-        setSelectedQuestions([]);
-      }
-    }
+    }));
   };
-
-  useEffect(() => {
-    if (quizConfig.mode === 'manual' && quizConfig.subjectId!=0) {
-      fetchQuestions(quizConfig.subjectId);
-    }
-  }, [quizConfig.mode]);
   
 
   // Calculate difficulty based on selected questions
@@ -103,18 +139,19 @@ const TeacherAddQuiz = () => {
       });
       return;
     }
-    
+
     const totalLevel = questions.reduce((sum, question) => sum + question.level, 0);
     const avgLevel = totalLevel / questions.length;
+
     // Normalize to 0-100 scale (assuming level is between 1-3)
     const score = (avgLevel / 3) * 100;
-    
+
     // Determine difficulty label
     let label;
     if (score <= 33) label = "Easy";
     else if (score <= 66) label = "Medium";
     else label = "Hard";
-    
+
     setCalculatedDifficulty({
       score,
       label
@@ -168,9 +205,10 @@ const TeacherAddQuiz = () => {
       };
 
       console.log(payload)
+
       // Send request to create automatic quiz
       const response = await axios.post('http://localhost:8080/Quizify/quizzes/create/auto', payload);
-      
+
       // Handle response
       if (response.data.quiz_id) {
         setQuizCreationStatus({
@@ -180,13 +218,13 @@ const TeacherAddQuiz = () => {
           warning: response.data.warning || null,
           quizId: response.data.quiz_id
         });
-        
+
         // Show success message
-toast.success(
-  response.data.warning
-    ? `Quiz created with ${response.data.actual_questions} questions instead of ${response.data.requested_questions}. ${response.data.warning}`
-    : `Quiz created successfully  !`
-);
+        toast.success(
+          response.data.warning
+            ? `Quiz created with ${response.data.actual_questions} questions instead of ${response.data.requested_questions}. ${response.data.warning}`
+            : `Quiz created successfully !`
+        );
       }
     } catch (err) {
       setQuizCreationStatus({
@@ -223,15 +261,15 @@ toast.success(
         title: quizConfig.title || `Custom ${quizConfig.subject} Quiz`,
         description: quizConfig.description || `Manually created quiz for ${quizConfig.subject}`,
         timeLimit: quizConfig.timeLimit, // Convert seconds to minutes
-        level: calculatedDifficulty.label.toLowerCase() === "medium" ? "2" : 
-               calculatedDifficulty.label.toLowerCase() === "hard" ? "3" : '1'
+        level: calculatedDifficulty.label.toLowerCase() === "medium" ? "2" :
+          calculatedDifficulty.label.toLowerCase() === "hard" ? "3" : '1'
       };
 
-
       console.log(payload)
+
       // Send request to create manual quiz
       const response = await axios.post('http://localhost:8080/Quizify/quizzes/create/manual', payload);
-      
+
       // Handle response
       if (response.data.quiz_id) {
         setQuizCreationStatus({
@@ -241,7 +279,6 @@ toast.success(
           warning: response.data.warning || null,
           quizId: response.data.quiz_id
         });
-        
         toast.success(
           response.data.warning
             ? `Quiz created with ${response.data.actual_questions} questions (${response.data.requested_questions} selected + ${response.data.actual_questions - response.data.requested_questions} auto-filled). ${response.data.warning}`
@@ -256,7 +293,7 @@ toast.success(
         warning: null,
         quizId: null
       });
-      toast.error("Error creating manual quiz:" ,err);
+      toast.error("Error creating manual quiz:", err);
       console.error('Error creating manual quiz:', err);
     }
   };
@@ -287,8 +324,8 @@ toast.success(
     const selectedIds = new Set(selectedQuestions.map(q => q.questionId));
     
     // Get target difficulty level
-    const targetLevel = calculatedDifficulty.label.toLowerCase() === "n/a" 
-      ? quizConfig.difficulty.toLowerCase() 
+    const targetLevel = calculatedDifficulty.label.toLowerCase() === "n/a"
+      ? quizConfig.difficulty.toLowerCase()
       : calculatedDifficulty.label.toLowerCase();
     
     // Map difficulty label to numeric level
@@ -315,7 +352,6 @@ toast.success(
     // Select additional questions
     const additionalQuestions = candidateQuestions.slice(0, remainingCount);
     const newSelectedQuestions = [...selectedQuestions, ...additionalQuestions];
-    
     setSelectedQuestions(newSelectedQuestions);
     calculateDifficulty(newSelectedQuestions);
   };
@@ -344,9 +380,8 @@ toast.success(
             <AlertCircle className="mx-auto mb-4 text-red-500" size={40} />
             <p className="text-lg font-semibold text-red-700">Error</p>
             <p className="mt-2">{error}</p>
-            <button 
+            <button
               className="mt-4 px-4 py-2 bg-black text-white rounded-md"
-              
             >
               Try Again
             </button>
@@ -363,15 +398,15 @@ toast.success(
       <div className="flex-1 flex justify-center items-center z-20">
         <div className="w-full max-w-4xl p-6">
           {/* Quiz Configuration Section */}
-          <QuizConfigSection 
+          <QuizConfigSection
             quizConfig={quizConfig}
             taughtSubjects={taughtSubjects}
             handleConfigChange={handleConfigChange}
           />
-
+          
           {/* Quiz Creation Status */}
           <QuizCreationStatus status={quizCreationStatus} />
-
+          
           {/* Questions Selection Section - Only show in manual mode */}
           {quizConfig.mode === "manual" && (
             <QuestionSelectionSection
@@ -384,25 +419,27 @@ toast.success(
               removeQuestion={removeQuestion}
             />
           )}
-
+          
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 mt-4">
-            <button 
+            <button
               className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200"
               onClick={() => window.history.back()}
             >
               Cancel
               <span className="bg-gray-800 hover-underline-animation"></span>
             </button>
+            
             {quizConfig.mode === 'manual' && selectedQuestions.length > 0 && selectedQuestions.length < quizConfig.questionCount && (
-              <button 
+              <button
                 className="px-4 py-2 rounded-md bg-blue-600 text-white"
                 onClick={autoFillQuestions}
               >
                 Auto Fill Remaining
               </button>
             )}
-            <button 
+            
+            <button
               className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-green-50 text-green-700 hover:bg-green-100"
               onClick={generateQuiz}
               disabled={quizCreationStatus.loading}
@@ -413,7 +450,7 @@ toast.success(
           </div>
         </div>
       </div>
-          <Footer/>
+      <Footer/>
     </div>
   );
 };

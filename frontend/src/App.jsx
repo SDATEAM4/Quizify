@@ -1,4 +1,3 @@
-// filepath: d:\UNIVERSITY-PROGRAMMING\4th Semester\SDA-PROJECT\Quizify\frontend\src\App.jsx
 import { Routes, Route } from "react-router-dom";
 import { StudentHomePage } from "./pages/homePage";
 import { LoginPage } from "./pages/loginPage";
@@ -20,33 +19,177 @@ import StudentViewReport from "./pages/studentViewReports";
 import TeacherChatApp from "./pages/teacherChat";
 import StudentChatApp from "./pages/studentChat";
 import Leaderboard from "./pages/Leaderboard";
+import { ProtectedRoute, PublicRoute } from "./routes/protectedRoutes";
+
 function App() {
   return (
     <AuthProvider>
-      <Toaster position="top-right"/>
-    <Routes>
-      <Route path="/" element={<LoginPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/student/home" element={<StudentHomePage />} />
-      <Route path="/student/queries" element={<StudentChatApp />} />
-      <Route path="/attemptQuiz" element={<AttemptQuizPage />} />{" "}
-      {/* Fixed usage */}
-      <Route path="/admin/addUser" element={<AdminAddUserPage />} />
-      <Route path="/quizGenerator" element={<QuizGenerator />} />{" "}
-      {/* Fixed usage */}
-      <Route path="/admin/manageUser" element={<ManageUserComponent />} />
-      <Route path="/admin/viewReports" element={<ViewReportsAdmin />} />
-      <Route path="/teacher/viewReports" element={<TeacherReports />} />
-      <Route path="/admin/addSubject" element={<AddSubjectPage />} />
-      <Route path="/teacher/addQuestion" element={<AddNewQuestion />} />
-      <Route path="/teacher/editQuiz" element={<TeacherEditQuiz />} />
-      <Route path="/teacher/home" element={<TeacherHomePage />} />
-      <Route path="/teacher/queries" element={<TeacherChatApp />} />
-      <Route path="/teacher/createQuiz" element={<TeacherAddQuiz />} />
-      <Route path="/customizeProfile" element={<CustomizeProfile />} />
-      <Route path="/student/leaderboard" element={<Leaderboard />} />
-      <Route path="/student/viewReports" element={< StudentViewReport/>} />
-    </Routes>
+      <Toaster position="top-right" />
+      <Routes>
+        {/* Public routes (accessible without authentication) */}
+        <Route 
+          path="/" 
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          } 
+        />
+        <Route 
+          path="/login" 
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          } 
+        />
+
+        {/* Student routes */}
+        <Route 
+          path="/student/home" 
+          element={
+            <ProtectedRoute allowedRoles={["Student"]}>
+              <StudentHomePage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/student/queries" 
+          element={
+            <ProtectedRoute allowedRoles={["Student"]}>
+              <StudentChatApp />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/attemptQuiz" 
+          element={
+            <ProtectedRoute allowedRoles={["Student"]}>
+              <AttemptQuizPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/student/leaderboard" 
+          element={
+            <ProtectedRoute allowedRoles={["Student"]}>
+              <Leaderboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/student/viewReports" 
+          element={
+            <ProtectedRoute allowedRoles={["Student"]}>
+              <StudentViewReport />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Teacher routes */}
+        <Route 
+          path="/teacher/home" 
+          element={
+            <ProtectedRoute allowedRoles={["Teacher"]}>
+              <TeacherHomePage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/teacher/queries" 
+          element={
+            <ProtectedRoute allowedRoles={["Teacher"]}>
+              <TeacherChatApp />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/teacher/addQuestion" 
+          element={
+            <ProtectedRoute allowedRoles={["Teacher"]}>
+              <AddNewQuestion />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/teacher/editQuiz" 
+          element={
+            <ProtectedRoute allowedRoles={["Teacher"]}>
+              <TeacherEditQuiz />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/teacher/createQuiz" 
+          element={
+            <ProtectedRoute allowedRoles={["Teacher"]}>
+              <TeacherAddQuiz />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/teacher/viewReports" 
+          element={
+            <ProtectedRoute allowedRoles={["Teacher"]}>
+              <TeacherReports />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Admin routes */}
+        <Route 
+          path="/admin/addUser" 
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AdminAddUserPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/manageUser" 
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <ManageUserComponent />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/viewReports" 
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <ViewReportsAdmin />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/addSubject" 
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AddSubjectPage />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Shared routes (accessible by multiple roles) */}
+        <Route 
+          path="/customizeProfile" 
+          element={
+            <ProtectedRoute allowedRoles={["Student", "Teacher", "Admin"]}>
+              <CustomizeProfile />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Quiz generator may need special permissions */}
+        <Route 
+          path="/quizGenerator" 
+          element={
+            <ProtectedRoute allowedRoles={["Teacher", "Admin"]}>
+              <QuizGenerator />
+            </ProtectedRoute>
+          } 
+        />
+      </Routes>
     </AuthProvider>
   );
 }

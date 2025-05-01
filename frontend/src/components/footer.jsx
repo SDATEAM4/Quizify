@@ -19,7 +19,7 @@ export const Footer = () => {
         </div>
         <div className="flex items-center justify-center sm:justify-end">
           <button
-            className="text-white flex items-center cursor-pointer whitespace-nowrap"
+            className="text-white flex items-center cursor-pointer whitespace-nowrap hover:bg-red-600 hover:text-white p-4 rounded-md"
             onClick={handleLogout}
           >
             <FaSignOutAlt className="mr-2" />
