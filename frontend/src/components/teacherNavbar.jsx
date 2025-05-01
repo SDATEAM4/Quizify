@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaHome, FaQuestionCircle, FaChartBar, FaPlusCircle, FaEdit, FaCommentDots } from "react-icons/fa";
+import { FaHome, FaQuestionCircle, FaChartBar, FaPlusCircle, FaEdit, FaCommentDots, FaBars, FaChevronDown } from "react-icons/fa";
 import { useAuth } from "../context/authContext";
 
 export const TeacherNavbar = () => {
@@ -8,9 +8,12 @@ export const TeacherNavbar = () => {
   const location = useLocation();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("");
-  const handleCustomizeProfile = () =>{
-    navigate('/customizeProfile')
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleCustomizeProfile = () => {
+    navigate('/customizeProfile');
   }
+
   useEffect(() => {
     if (location.pathname.includes("/teacher/home")) setActiveTab("home");
     else if (location.pathname.includes("/teacher/createQuiz")) setActiveTab("quizCreate");
@@ -39,7 +42,8 @@ export const TeacherNavbar = () => {
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="text-2xl font-bold">Quizify</div>
 
-        <nav className="hidden md:flex items-center space-x-8">
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center space-x-8">
           {navButton("Home", <FaHome />, "home", "/teacher/home")}
           {navButton("Create Quiz", <FaPlusCircle />, "quizCreate", "/teacher/createQuiz")}
           {navButton("Edit Quiz", <FaEdit />, "editQuiz", "/teacher/editQuiz")}
@@ -48,6 +52,7 @@ export const TeacherNavbar = () => {
           {navButton("View Reports", <FaChartBar />, "reports", "/teacher/viewReports")}
         </nav>
 
+        {/* Profile and Mobile Menu Toggle */}
         <div className="flex items-center space-x-3">
           <div className="h-8 w-8 rounded-full bg-gray-300 overflow-hidden">
             <img
@@ -57,15 +62,30 @@ export const TeacherNavbar = () => {
               onClick={handleCustomizeProfile}
             />
           </div>
-          <span className="hidden md:inline">{user.username}</span>
-          <i className="fas fa-chevron-down text-xs"></i>
+          <span className="hidden lg:inline">{user.username}</span>
+          <FaChevronDown className="text-xs hidden sm:inline lg:hidden" />
         </div>
 
-        {/* Mobile menu button */}
-        <button className="md:hidden text-white focus:outline-none">
-          <i className="fas fa-bars text-xl"></i>
+        {/* Mobile Menu Button */}
+        <button 
+          className="lg:hidden text-white focus:outline-none"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          <FaBars className="text-xl" />
         </button>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-black text-white space-y-4 px-4 py-3">
+          {navButton("Home", <FaHome />, "home", "/teacher/home")}
+          {navButton("Create Quiz", <FaPlusCircle />, "quizCreate", "/teacher/createQuiz")}
+          {navButton("Edit Quiz", <FaEdit />, "editQuiz", "/teacher/editQuiz")}
+          {navButton("Add Question", <FaQuestionCircle />, "addQuestion", "/teacher/addQuestion")}
+          {navButton("Student Queries", <FaCommentDots />, "queries", "/teacher/queries")}
+          {navButton("View Reports", <FaChartBar />, "reports", "/teacher/viewReports")}
+        </div>
+      )}
     </header>
   );
 };
