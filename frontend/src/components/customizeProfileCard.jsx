@@ -14,7 +14,8 @@ const CustomizeProfile = ({ userData, onSave, onCancel }) => {
     lname: userData?.lname || "",
     bio: userData?.bio || "",
     password: "",
-    profileImageUrl: userData?.profileImageUrl || ""
+    profileImageUrl: userData?.profileImageUrl || "",
+    profileImage: null, // add this
   });
   const [passwordStrength, setPasswordStrength] = useState("");
   const [previewImage, setPreviewImage] = useState(userData?.profileImageUrl || "");
@@ -63,7 +64,8 @@ const CustomizeProfile = ({ userData, onSave, onCancel }) => {
     const file = e.target.files[0];
     if (file) {
       setPreviewImage(URL.createObjectURL(file)); // For preview only
-      setFormData({ ...formData, profileImageUrl: file }); // Actual File object
+   setFormData({ ...formData, profileImageUrl: URL.createObjectURL(file), profileImage: file });
+
     }
   };
   
