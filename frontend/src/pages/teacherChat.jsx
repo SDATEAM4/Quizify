@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Search, Send, X, CheckCircle } from 'lucide-react';
+import { Search, Send, X, CheckCircle, RefreshCcw } from 'lucide-react';
 import { TeacherNavbar } from '../components/teacherNavbar';
 import { Footer } from '../components/footer';
 import { useAuth } from '../context/authContext';
+import toast from 'react-hot-toast';
 
 // Main component
 export default function TeacherChatApp() {
@@ -13,6 +14,70 @@ export default function TeacherChatApp() {
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+    // Refresh current chat to get any new messages
+    // Refresh current chat to get any new messages
+const refreshCurrentChat = async () => {
+  if (!activeChat) return;
+  
+  setRefreshing(true);
+  try {
+    // Get fresh chat data from the server
+    const response = await fetch(
+      `http://localhost:8080/Quizify/chats/${user.Uid}/${activeChat.studentId}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to refresh chat");
+    }
+
+    const messages = await response.json();
+    
+    // Format messages for display
+    const formattedMessages = messages.map((msg) => ({
+      id: msg.chatId,
+      sender: msg.senderId === user.Uid ? 'teacher' : 'student',
+      content: msg.message,
+      time: new Date(msg.timestamp).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      timestamp: msg.timestamp,
+    }));
+
+    // Update the active chat with fresh messages
+    setActiveChat(prev => ({
+      ...prev,
+      messages: formattedMessages
+    }));
+
+    // Also update in the chats list
+    const updatedChats = chats.map(chat => {
+      if (chat.id === activeChat.id) {
+        return {
+          ...chat,
+          messages: formattedMessages,
+          lastMessage: formattedMessages.length > 0 
+            ? formattedMessages[formattedMessages.length - 1].content 
+            : chat.lastMessage,
+          timestamp: formattedMessages.length > 0
+            ? formatTimestamp(formattedMessages[formattedMessages.length - 1].timestamp)
+            : chat.timestamp
+        };
+      }
+      return chat;
+    });
+    
+    setChats(updatedChats);
+    toast.success("Chat refreshed!");
+  } catch (error) {
+    console.error("Error refreshing chat:", error);
+    toast.error("Failed to refresh. Please try again.");
+  } finally {
+    setRefreshing(false);
+  }
+};
+  
 
   // Load chat history with the same flow as StudentChatApp
   const loadChatHistory = async () => {
@@ -292,7 +357,17 @@ export default function TeacherChatApp() {
                   
                 </div>
                 <div className="flex space-x-2">
-
+                <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      refreshCurrentChat();
+                    }}
+                    className={`p-2 rounded-md ${refreshing ? 'animate-spin' : ''}`}
+                    title="Refresh chat"
+                    disabled={refreshing}
+                  >
+                    <RefreshCcw size={20} />
+                  </button>
                   <button 
                     onClick={() => setActiveChat(null)}
                     className="p-1 rounded-md hover:bg-gray-100"

@@ -62,7 +62,7 @@ export const TeacherNavbar = () => {
               onClick={handleCustomizeProfile}
             />
           </div>
-          <span className="hidden lg:inline">{user.username}</span>
+          <span className="hidden lg:inline">{user?.fname} {user?.lname}</span>
           <FaChevronDown className="text-xs hidden sm:inline lg:hidden" />
         </div>
 

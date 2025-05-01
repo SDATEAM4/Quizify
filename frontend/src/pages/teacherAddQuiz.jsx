@@ -11,7 +11,6 @@ import BackgroundTypography from "../components/backgroundTypography"
 import { Footer } from '../components/footer';
 const TeacherAddQuiz = () => {
   const { teacherId,taughtSubjects} = useAuth();
-  // State for quiz configuration
   const [quizConfig, setQuizConfig] = useState({
     subject: "", 
     subjectId: 0,
@@ -89,7 +88,7 @@ const TeacherAddQuiz = () => {
   };
 
   useEffect(() => {
-    if (quizConfig.mode === 'manual') {
+    if (quizConfig.mode === 'manual' && quizConfig.subjectId!=0) {
       fetchQuestions(quizConfig.subjectId);
     }
   }, [quizConfig.mode]);
@@ -165,7 +164,7 @@ const TeacherAddQuiz = () => {
         level: mapDifficultyToLevel(quizConfig.difficulty),
         title: quizConfig.title || `${quizConfig.difficulty} ${quizConfig.subject} Quiz`,
         description: quizConfig.description || `Automatically generated ${quizConfig.difficulty} quiz for ${quizConfig.subject}`,
-        timeLimit: quizConfig.timeLimit / 60 // Convert seconds to minutes
+        timeLimit: quizConfig.timeLimit// Convert seconds to minutes
       };
 
       console.log(payload)
@@ -186,7 +185,7 @@ const TeacherAddQuiz = () => {
 toast.success(
   response.data.warning
     ? `Quiz created with ${response.data.actual_questions} questions instead of ${response.data.requested_questions}. ${response.data.warning}`
-    : `Quiz created successfully with ${response.data.actual_questions} questions!`
+    : `Quiz created successfully  !`
 );
       }
     } catch (err) {
@@ -223,7 +222,7 @@ toast.success(
         teacherId: teacherId,
         title: quizConfig.title || `Custom ${quizConfig.subject} Quiz`,
         description: quizConfig.description || `Manually created quiz for ${quizConfig.subject}`,
-        timeLimit: quizConfig.timeLimit / 60, // Convert seconds to minutes
+        timeLimit: quizConfig.timeLimit, // Convert seconds to minutes
         level: calculatedDifficulty.label.toLowerCase() === "medium" ? "2" : 
                calculatedDifficulty.label.toLowerCase() === "hard" ? "3" : '1'
       };
@@ -246,7 +245,7 @@ toast.success(
         toast.success(
           response.data.warning
             ? `Quiz created with ${response.data.actual_questions} questions (${response.data.requested_questions} selected + ${response.data.actual_questions - response.data.requested_questions} auto-filled). ${response.data.warning}`
-            : `Quiz created successfully with ${response.data.actual_questions} questions!`
+            : `Quiz created successfully`
         );
       }
     } catch (err) {

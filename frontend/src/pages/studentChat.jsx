@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Send, X, PlusCircle, CheckCircle } from "lucide-react";
+import { Search, Send, X, PlusCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { NavBar } from "../components/navbar";
 import { Footer } from "../components/footer";
 import { useAuth } from "../context/authContext";
@@ -18,6 +18,7 @@ export default function StudentChatApp() {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [subjectTeachers, setSubjectTeachers] = useState([]);
   const [teachersLoading, setTeachersLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Load chat history with the new flow
   const loadChatHistory = async () => {
@@ -169,64 +170,67 @@ export default function StudentChatApp() {
   };
 
   // Send a message to the backend
-  const handleSendMessage = async () => {
-    if (!message.trim() || !activeChat) return;
+const handleSendMessage = async () => {
+  if (!message.trim() || !activeChat) return;
 
-    try {
-      const response = await fetch(
-        `http://localhost:8080/Quizify/chats/${user.Uid}/${activeChat.teacherId}/message`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message: message.trim(),
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to send message");
-      }
-
-      // Update the UI optimistically
-      const now = new Date();
-      const newMessage = {
-        id: Date.now(), // temporary ID
-        sender: "student",
-        content: message,
-        time: now.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
+  try {
+    const response = await fetch(
+      `http://localhost:8080/Quizify/chats/${user.Uid}/${activeChat.teacherId}/message`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: message.trim(),
         }),
-        timestamp: now.toISOString(),
-      };
+      }
+    );
 
-      const updatedChats = chats.map((chat) => {
-        if (chat.id === activeChat.id) {
-          return {
-            ...chat,
-            messages: [...chat.messages, newMessage],
-            lastMessage: message,
-            timestamp: formatTimestamp(now),
-          };
-        }
-        toast.success("Message Sent!");
-        return chat;
-      });
-
-      setChats(updatedChats);
-      setMessage("");
-
-      // You could reload the chat to get the server-assigned ID
-      // loadChatWithTeacher(activeChat.teacherId);
-    } catch (error) {
-      toast.success("Could not send message!");
-      console.error("Error sending message:", error);
-      // alert('Failed to send message. Please try again.');
+    if (!response.ok) {
+      throw new Error("Failed to send message");
     }
-  };
+
+    // Update the UI optimistically
+    const now = new Date();
+    const newMessage = {
+      id: Date.now(), // temporary ID
+      sender: "student",
+      content: message,
+      time: now.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      timestamp: now.toISOString(),
+    };
+
+    // Update the active chat with the new message
+    const updatedActiveChat = {
+      ...activeChat,
+      messages: [...activeChat.messages, newMessage],
+      lastMessage: message,
+      timestamp: formatTimestamp(now),
+    };
+    
+    setActiveChat(updatedActiveChat);
+
+    // Update the chats list too
+    const updatedChats = chats.map((chat) => {
+      if (chat.id === activeChat.id) {
+        return updatedActiveChat;
+      }
+      return chat;
+    });
+
+    setChats(updatedChats);
+    setMessage("");
+    toast.success("Message Sent!");
+
+  } catch (error) {
+    toast.error("Could not send message!");
+    console.error("Error sending message:", error);
+  }
+};
 
   // Resolve a query (delete message)
   const resolveQuery = async (teacherId) => {
@@ -249,6 +253,26 @@ export default function StudentChatApp() {
     } catch (error) {
       console.error("Error resolving query:", error);
       toast.error("Failed to resolve query. Please try again.");
+    }
+  };
+
+  // Refresh current chat to get any new messages
+  const refreshCurrentChat = async () => {
+    if (!activeChat) return;
+    
+    setRefreshing(true);
+    try {
+      await loadChatWithTeacher(
+        activeChat.teacherId, 
+        activeChat.teacherName, 
+        activeChat.subject
+      );
+      toast.success("Chat refreshed!");
+    } catch (error) {
+      console.error("Error refreshing chat:", error);
+      toast.error("Failed to refresh. Please try again.");
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -442,6 +466,17 @@ export default function StudentChatApp() {
                   >
                     Mark As Resolved
                     <CheckCircle size={16} />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      refreshCurrentChat();
+                    }}
+                    className={`p-2 rounded-md ${refreshing ? 'animate-spin' : ''}`}
+                    title="Refresh chat"
+                    disabled={refreshing}
+                  >
+                    <RefreshCw size={20} />
                   </button>
                   <button
                     onClick={() => setActiveChat(null)}

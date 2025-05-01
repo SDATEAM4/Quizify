@@ -92,6 +92,7 @@ export const StudentHomePage = () => {
                 key={course.id}
                 title={course.name}
                 imageUrl={course.imageUrl}
+                fallback={getRandomImage()}
                 description={course.description}
               />
             ))}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const CourseCard = ({ 
   title, 
@@ -6,6 +6,11 @@ export const CourseCard = ({
   imageUrl,
   fallback
 }) => {
+  useEffect(()=>{
+    if(imageUrl === null){
+      setImgSrc(fallback)
+    }
+  },[])
   const [imgSrc, setImgSrc] = useState(imageUrl);
 
   return (
