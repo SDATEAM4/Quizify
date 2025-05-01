@@ -103,16 +103,16 @@ public class UserController {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body(Map.of("error", "Invalid file type. Only JPEG, PNG, and WebP images are allowed."));
                 }
-                String imageUrl = cloudinaryService.uploadFile(profileImage);
-                user.setProfileImageUrl(imageUrl);
+              String imageUrl = cloudinaryService.uploadFile(profileImage);
+               user.setProfileImageUrl(imageUrl);
             }
             
-            User updatedUser = userService.saveUser(user);
-            return ResponseEntity.ok(updatedUser);
+           userService.saveUser(user);
+            return ResponseEntity.ok(Map.of("message", "User profile updated successfully"));
             
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to update user: " + e.getMessage()));
+                    .body(Map.of("error", "Failed to update user profile", "details", e.getMessage()));
         }
     }
 }
