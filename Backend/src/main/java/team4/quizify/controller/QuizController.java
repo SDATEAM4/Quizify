@@ -135,7 +135,6 @@ public class QuizController {
         }
     }
     
-    // Migrated from oldController - 2025-04
     @GetMapping("/{quizId}")
     public ResponseEntity<?> getQuizById(@PathVariable Integer quizId) {
         try {
@@ -187,12 +186,9 @@ public class QuizController {
         }
     }
     
-    // Other GET methods remain unchanged...
+   
     
-    /**
-     * Creates a quiz manually by selecting specific questions and adding random questions to reach the desired count
-     * This method now uses the Factory and Template patterns internally
-     */    @PostMapping("/create/manual")
+    @PostMapping("/create/manual")
     public ResponseEntity<?> createManualQuiz(@RequestBody Map<String, Object> requestBody) {
         try {
             // Extract basic information for validation
@@ -270,10 +266,8 @@ public class QuizController {
         }
     }
     
-    /**
-     * Creates a quiz automatically based on subject and difficulty level
-     * This method now uses the Factory and Template patterns internally
-     */    @PostMapping("/create/auto")
+     
+    @PostMapping("/create/auto")
     public ResponseEntity<?> createAutomaticQuiz(@RequestBody Map<String, Object> requestBody) {
         try {
             // Extract basic information for validation
@@ -348,7 +342,8 @@ public class QuizController {
             return handleInternalServerError(e, "creating automatic quiz");
         }
     }
-      // Migrated from oldController - 2025-04
+      
+    
     @GetMapping("/student/{studentId}")
     public ResponseEntity<?> getQuizzesWithQuestionsByStudent(@PathVariable Integer studentId) {
         try {
@@ -423,7 +418,6 @@ public class QuizController {
         }
     }
     
-    // Migrated from oldController - 2025-04
     @PostMapping("/{quizId}/remove-questions")
     public ResponseEntity<?> removeQuestionsFromQuiz(
             @PathVariable Integer quizId,
@@ -512,7 +506,7 @@ public class QuizController {
         }
     }
     
-    // Migrated from oldController - 2025-04
+    
     @PostMapping("/{quizId}/edit/manual")
     public ResponseEntity<?> editQuizManually(
             @PathVariable Integer quizId,
@@ -703,7 +697,7 @@ public class QuizController {
         }
     }
     
-    // Migrated from oldController - 2025-04
+    
     @PostMapping("/{quizId}/edit/auto")
     public ResponseEntity<?> editQuizAutomatically(
             @PathVariable Integer quizId,
@@ -880,10 +874,7 @@ public class QuizController {
         }
     }
     
-    /**
-     * Deletes a quiz by ID and updates the teacher's createdQuiz array
-     * This method ensures that only the teacher who created the quiz can delete it
-     */
+   
     @DeleteMapping("/{quizId}/delete/{teacherId}")
     public ResponseEntity<?> deleteQuiz(
             @PathVariable Integer quizId,
