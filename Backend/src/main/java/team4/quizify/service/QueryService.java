@@ -5,11 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team4.quizify.entity.Chat;
 import team4.quizify.entity.Query;
-import team4.quizify.entity.Subject;
 import team4.quizify.entity.User;
 import team4.quizify.repository.ChatRepository;
 import team4.quizify.repository.QueryRepository;
-import team4.quizify.repository.SubjectRepository;
 import team4.quizify.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -17,12 +15,9 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class QueryService {
-
-    private final QueryRepository queryRepository;
+public class QueryService {    private final QueryRepository queryRepository;
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
-    private final SubjectRepository subjectRepository;
     public List<Query> getUnresolvedQueriesForTeacher(int teacherId) {
         return queryRepository.findByReceiverIdAndResolveStatusFalse(teacherId);
     }
@@ -61,16 +56,11 @@ public class QueryService {
 
         List<Map<String, Object>> result = new ArrayList<>();
 
-        for (Query query : queries) {
-            int oppositeUserId = ("student".equalsIgnoreCase(user.getRole())) ? query.getReceiverId() : query.getSenderId();
+        for (Query query : queries) {            int oppositeUserId = ("student".equalsIgnoreCase(user.getRole())) ? query.getReceiverId() : query.getSenderId();
             Optional<User> oppositeUserOpt = userRepository.findById(oppositeUserId);
             if (oppositeUserOpt.isEmpty()) continue;
 
             User oppositeUser = oppositeUserOpt.get();
-
-            // Fetch subject name
-            Optional<Subject> subjectOpt = subjectRepository.findById(query.getSubjectId());
-            String subjectName = subjectOpt.map(Subject::getName).orElse("Unknown");
 
             // Fetch chats and get latest timestamp
             List<Chat> chats = chatRepository.findAllById(Arrays.asList(query.getChatIds()));
@@ -82,7 +72,6 @@ public class QueryService {
             Map<String, Object> map = new HashMap<>();
             map.put("userId", oppositeUser.getUserId());
             map.put("fullName", oppositeUser.getFname() + " " + oppositeUser.getLname());
-            map.put("subjectName", subjectName);
             map.put("latestTimestamp", latestTimestamp);
 
             result.add(map);
