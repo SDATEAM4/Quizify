@@ -11,8 +11,6 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     List<Chat> findByReceiverId(int receiverId);
 
-    List<Chat> findBySubjectId(Integer subjectId);
-
     @Query("SELECT c FROM Chat c WHERE (c.senderId = ?1 AND c.receiverId = ?2) OR (c.senderId = ?2 AND c.receiverId = ?1)")
     List<Chat> findByTeacherAndStudent(int teacherId, int studentId);
 }
