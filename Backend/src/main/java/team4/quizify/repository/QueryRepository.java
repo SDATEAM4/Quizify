@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface QueryRepository extends JpaRepository<Query, Long> {
     List<Query> findByReceiverIdAndResolveStatusFalse(int receiverId);
-
     Optional<Query> findBySenderIdAndReceiverIdAndResolveStatusFalse(int senderId, int receiverId);
+    List<Query> findBySenderIdAndResolveStatusFalse(int senderId);
 }

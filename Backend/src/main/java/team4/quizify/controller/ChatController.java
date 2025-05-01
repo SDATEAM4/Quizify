@@ -1,12 +1,21 @@
 package team4.quizify.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team4.quizify.entity.Chat;
+import team4.quizify.entity.Query;
+import team4.quizify.entity.User;
+import team4.quizify.repository.ChatRepository;
+import team4.quizify.repository.QueryRepository;
+import team4.quizify.repository.UserRepository;
 import team4.quizify.service.ChatService;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 @RestController
 @RequestMapping("/Quizify/chats")
 @RequiredArgsConstructor
@@ -14,80 +23,99 @@ public class ChatController {
 
     private final ChatService chatService;
 
-
-
-    //  Get all messages between two users (teacher and student)
     @GetMapping("/{userId1}/{userId2}")
-    public ResponseEntity<List<Chat>> getAllMessagesBetweenUsers(
+    public ResponseEntity<?> getAllMessagesBetweenUsers(
             @PathVariable int userId1,
             @PathVariable int userId2
     ) {
-        return ResponseEntity.ok(chatService.getMessagesBetweenUsers(userId1, userId2));
+        try {
+            return ResponseEntity.ok(chatService.getMessagesBetweenUsers(userId1, userId2));
+        } catch (Exception e) {
+            return handleException();
+        }
     }
 
-    // Post a message (sender -> receiver)
     @PostMapping("/{senderId}/{receiverId}/message")
-    public ResponseEntity<Chat> sendMessage(
+    public ResponseEntity<?> sendMessage(
             @PathVariable int senderId,
             @PathVariable int receiverId,
+            @RequestParam(required = false) Integer subjectId,
             @RequestBody Chat chat
     ) {
-        chatService.mapSenderReceiverToUserIds(chat, senderId, receiverId);
-        return ResponseEntity.ok(chatService.sendMessage(chat));
-    }
-
-    // Delete all messages between two users
-    @DeleteMapping("/{userId1}/{userId2}")
-    public ResponseEntity<String> deleteMessagesBetweenUsers(
-            @PathVariable int userId1,
-            @PathVariable int userId2
-    ) {
-        boolean deleted = chatService.deleteMessagesBetweenUsers(userId1, userId2);
-        if (!deleted) {
-            return ResponseEntity.status(404).body("No messages found between the given users.");
+        try {
+            chatService.mapSenderReceiverToUserIds(chat, senderId, receiverId);
+            return ResponseEntity.ok(chatService.sendMessage(chat, subjectId));
+        } catch (Exception e) {
+            return handleException();
         }
-        return ResponseEntity.ok("All messages deleted successfully.");
     }
 
-    //Get unresolved query status
-    @GetMapping("/{userId1}/{userId2}/unresolved")
-    public ResponseEntity<Boolean> isQueryUnresolved(
+    @DeleteMapping("/{userId1}/{userId2}")
+    public ResponseEntity<?> deleteMessagesBetweenUsers(
             @PathVariable int userId1,
             @PathVariable int userId2
     ) {
-        return ResponseEntity.ok(chatService.isQueryUnresolved(userId1, userId2));
+        try {
+            boolean deleted = chatService.deleteMessagesBetweenUsers(userId1, userId2);
+            if (!deleted) {
+                return ResponseEntity.status(404).body("No messages found between the given users.");
+            }
+            return ResponseEntity.ok("All messages deleted successfully.");
+        } catch (Exception e) {
+            return handleException();
+        }
     }
 
-    // Get all teachers by subject
-    @GetMapping("/subjects")
-    public ResponseEntity<List<String>> getTeachersBySubject(@RequestParam Integer subjectId) {
-        return ResponseEntity.ok(chatService.getTeachersBySubject(subjectId));
+    @GetMapping("/{userId1}/{userId2}/unresolved")
+    public ResponseEntity<?> isQueryUnresolved(
+            @PathVariable int userId1,
+            @PathVariable int userId2
+    ) {
+        try {
+            return ResponseEntity.ok(chatService.isQueryUnresolved(userId1, userId2));
+        } catch (Exception e) {
+            return handleException();
+        }
     }
 
-    // Mark unread by teacher
     @PatchMapping("/{senderId}/{receiverId}/unreadbyTeacher")
-    public ResponseEntity<Void> markUnreadByTeacher(
+    public ResponseEntity<?> markUnreadByTeacher(
             @PathVariable int senderId,
             @PathVariable int receiverId
     ) {
-        chatService.markUnreadByTeacher(senderId, receiverId);
-        return ResponseEntity.ok().build();
+        try {
+            chatService.markUnreadByTeacher(senderId, receiverId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return handleException();
+        }
     }
 
-    //  Mark unread by student
     @PatchMapping("/{senderId}/{receiverId}/unreadbyStudent")
-    public ResponseEntity<Void> markUnreadByStudent(
+    public ResponseEntity<?> markUnreadByStudent(
             @PathVariable int senderId,
             @PathVariable int receiverId
     ) {
-        chatService.markUnreadByStudent(senderId, receiverId);
-        return ResponseEntity.ok().build();
+        try {
+            chatService.markUnreadByStudent(senderId, receiverId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return handleException();
+        }
     }
-    // Get all opposite party names based on userId (student -> teachers or teacher -> students)
+
     @GetMapping("/{userId}/oppositeUsers")
-    public ResponseEntity<List<String>> getOppositeUsers(@PathVariable int userId) {
-        return ResponseEntity.ok(chatService.getOppositePartyNames(userId));
+    public ResponseEntity<?> getOppositeUsers(@PathVariable int userId) {
+        try {
+            return ResponseEntity.ok(chatService.getOppositePartyNames(userId));
+        } catch (Exception e) {
+            return handleException();
+        }
     }
 
-
+    private ResponseEntity<Map<String, String>> handleException() {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", "Request failed");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
 }
