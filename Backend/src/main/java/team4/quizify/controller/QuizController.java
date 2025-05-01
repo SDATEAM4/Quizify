@@ -30,10 +30,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/Quizify/quizzes")
-@CrossOrigin("*")
 public class QuizController {
 
     @Autowired
