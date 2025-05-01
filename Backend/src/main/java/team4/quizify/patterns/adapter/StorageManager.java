@@ -13,14 +13,14 @@ public class StorageManager {
     
     @Autowired
     private CloudinaryStorageAdapter cloudinaryStorageAdapter;
-
+    
     public StorageService getStorageService() {
             return cloudinaryStorageAdapter;
     }
     
- 
+   
     public String uploadFile(MultipartFile file) {
         return getStorageService().uploadFile(file);
     }
-    
+  
 }
