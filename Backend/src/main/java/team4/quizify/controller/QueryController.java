@@ -41,6 +41,16 @@ public class QueryController {
         }
     }
 
+    @GetMapping("/unresolved/users")
+    public ResponseEntity<?> getUnresolvedUserList(@RequestParam int userId) {
+        try {
+            List<Map<String, Object>> result = queryService.getUnresolvedUsersByRole(userId);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return handleException();
+        }
+    }
+
     private ResponseEntity<Map<String, String>> handleException() {
         Map<String, String> error = new HashMap<>();
         error.put("message", "Request failed");
