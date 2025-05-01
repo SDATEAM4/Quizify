@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Quizify/scores")
-@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ScoreController {
 
     @Autowired
