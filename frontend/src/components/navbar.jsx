@@ -20,7 +20,7 @@ export const NavBar = () => {
   const navItems = [
     { icon: <FaHome className="mr-2" />, label: "Home", route: "student/home", tab: "home" },
     { icon: <FaPencilAlt className="mr-2" />, label: "Attempt Quiz", route: "attemptQuiz", tab: "quiz" },
-    { icon: <FaQuestionCircle className="mr-2" />, label: "Queries", route: "queries", tab: "queries" },
+    { icon: <FaQuestionCircle className="mr-2" />, label: "Queries", route: "student/queries", tab: "queries" },
     { icon: <FaTrophy className="mr-2" />, label: "Leaderboard", route: "student/leaderboard", tab: "leaderboard" },
     { icon: <FaChartBar className="mr-2" />, label: "View Reports", route: "student/viewReports", tab: "reports" }
   ];

@@ -17,6 +17,8 @@ import { Toaster } from "react-hot-toast";
 import CustomizeProfile from "./pages/customizeProfile";
 import AddSubjectPage from "./pages/adminAddSubject";
 import StudentViewReport from "./pages/studentViewReports";
+import TeacherChatApp from "./pages/teacherChat";
+import StudentChatApp from "./pages/studentChat";
 import Leaderboard from "./pages/Leaderboard";
 function App() {
   return (
@@ -26,6 +28,7 @@ function App() {
       <Route path="/" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/student/home" element={<StudentHomePage />} />
+      <Route path="/student/queries" element={<StudentChatApp />} />
       <Route path="/attemptQuiz" element={<AttemptQuizPage />} />{" "}
       {/* Fixed usage */}
       <Route path="/admin/addUser" element={<AdminAddUserPage />} />
@@ -38,6 +41,7 @@ function App() {
       <Route path="/teacher/addQuestion" element={<AddNewQuestion />} />
       <Route path="/teacher/editQuiz" element={<TeacherEditQuiz />} />
       <Route path="/teacher/home" element={<TeacherHomePage />} />
+      <Route path="/teacher/queries" element={<TeacherChatApp />} />
       <Route path="/teacher/createQuiz" element={<TeacherAddQuiz />} />
       <Route path="/customizeProfile" element={<CustomizeProfile />} />
       <Route path="/student/leaderboard" element={<Leaderboard />} />

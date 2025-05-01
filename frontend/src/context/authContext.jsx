@@ -122,6 +122,7 @@ const login = async (identifier, password) => {
       response = await axios.post(
         `http://localhost:8080/Quizify/login?username=${identifier}&password=${password}`
       );
+
       // If successful, fetch user details by username
       userDetailsResponse = await axios.get(
         `http://localhost:8080/Quizify/admin/user/username/${identifier}`
@@ -184,14 +185,19 @@ const login = async (identifier, password) => {
       toast.success("Logged in successfully!");
       // Return the user role along with success status
       return { success: true, role: userData.role };
-    } else {
-      throw new Error("Failed to fetch user details");
     }
   } catch (error) {
-    console.error("Error in login: ", error.message);
-    toast.error(error.message || "Login failed");
+    console.error("Error in login: ", error);
+  
+    if (error.response?.status === 401) {
+      toast.error("Invalid credentials. Please check your username/email and password.");
+    } else {
+      toast.error("Login failed. Please try again.");
+    }
     return { success: false };
-  } finally {
+  }
+  
+  finally {
     setIsLoading(false);
   }
 };

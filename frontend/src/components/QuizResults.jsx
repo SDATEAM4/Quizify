@@ -3,26 +3,30 @@ import { Save, Home } from 'lucide-react';
 import AnswerKey from './AnswerKey';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/authContext';
+import toast from "react-hot-toast";
+
 
 const QuizResults = ({ quizName, stats, dataSet, quizType, isCorrect,quiz_id }) => {
+  const [isSaved, setIsSaved] = useState(false);
+
   const { percentage, correctCount, incorrectCount, totalQuestions, formattedTime, obtainedMarks, totalMarks, points } = stats;
   const [viewAnswerKey, setViewAnswerKey] = useState(false);
   const { user } = useAuth();
-  const userid = user?.Uid; // ✅ your Uid is now in 'uid' variable
+  const userid = user?.Uid; 
   const handleSaveResults = async () => {
-    try {
-     
-      console.log("quiz ID:", quiz_id); // Check the userId value
-      
+    if (isSaved) {
+      toast("Result already saved.");
+      return;
+    }
   
+    try {
       const response = await fetch('http://localhost:8080/Quizify/scores', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        
         },
-        body: JSON.stringify( {
-          userId: userid, 
+        body: JSON.stringify({
+          userId: userid,
           obtainMarks: obtainedMarks,
           quizId: quiz_id,
           points: points
@@ -30,17 +34,17 @@ const QuizResults = ({ quizName, stats, dataSet, quizType, isCorrect,quiz_id }) 
       });
   
       if (!response.ok) {
-        throw new Error('Failed to save results1');
+        throw new Error('Failed to save results');
       }
   
-      const data = await response.json();
-      alert("Result saved successfully!");
-      
+      setIsSaved(true); // Mark as saved
+      toast.success("Result saved successfully!");
     } catch (error) {
       console.error('Error saving results:', error);
-      alert("Failed to save results. Please try again.");
+      toast.error("Failed to save results. Please try again.");
     }
   };
+  
   const navigate = useNavigate();
 
   return viewAnswerKey === false ? (

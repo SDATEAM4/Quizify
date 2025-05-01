@@ -44,7 +44,8 @@ export const ForgotPassword = ({ onOtpSent, onBackToLogin,setUserId }) => {
         }
         
       } else {
-        setError("Failed to send OTP. Please try again.");
+        setError("User not found with the provided email address.");
+        setIsSubmitting(false);
       }
       
     } catch (error) {
