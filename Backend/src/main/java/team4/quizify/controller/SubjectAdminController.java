@@ -23,8 +23,9 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/Quizify/admin/subjects")
-@CrossOrigin(origins = "http://localhost:5173")
-public class SubjectAdminController {    @Autowired
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+public class SubjectAdminController {   
+    @Autowired
     private SubjectService subjectService;
     
     @Autowired
