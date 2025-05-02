@@ -184,7 +184,7 @@ function App() {
         <Route 
           path="/quizGenerator" 
           element={
-            <ProtectedRoute allowedRoles={["Teacher", "Admin"]}>
+            <ProtectedRoute allowedRoles={["Student"]}>
               <QuizGenerator />
             </ProtectedRoute>
           } 
