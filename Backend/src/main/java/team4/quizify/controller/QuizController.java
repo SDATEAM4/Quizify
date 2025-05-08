@@ -289,7 +289,6 @@ public class QuizController {
                 return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
             }
             
-            // Check if there are questions available for this subject
             List<QuestionBank> questionBanks = questionBankService.getQuestionBanksBySubjectId(subjectId);
             if (questionBanks.isEmpty() || questionBanks.get(0).getQuestionIds() == null || 
                     questionBanks.get(0).getQuestionIds().length == 0) {
@@ -332,13 +331,11 @@ public class QuizController {
             Quiz quiz;
             try {
                 quiz = autoQuizGenerationTemplate.generateQuiz(requestBody);
-                
-                // Check if the quiz has questions, if not, return an error
+               
                 if (quiz.getQuestionIds() == null || quiz.getQuestionIds().length == 0) {
                     Map<String, String> errorResponse = new HashMap<>();
                     errorResponse.put("message", "Could not create quiz: no questions available for the selected level");
-                    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-                }
+                    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST); }
             } catch (IllegalArgumentException e) {
                 Map<String, String> errorResponse = new HashMap<>();
                 errorResponse.put("message", e.getMessage());

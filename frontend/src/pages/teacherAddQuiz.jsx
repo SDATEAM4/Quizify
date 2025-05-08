@@ -48,6 +48,7 @@ const TeacherAddQuiz = () => {
     } catch (err) {
       console.error('Error fetching questions:', err);
       toast.error("Failed to load questions");
+       setAvailableQuestions([]);
     } finally {
       setQuestionsLoading(false);
     }
