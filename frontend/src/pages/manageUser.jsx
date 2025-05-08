@@ -142,7 +142,7 @@ export default function ManageUserComponent() {
   const handleDelete = async () => {
     try {
       // Example API call to delete user
-      // await axios.delete(`http://localhost:8080/Quizify/admin/user/delete/${userData.id}`);
+      await axios.delete(`http://localhost:8080/Quizify/admin/user/${userData.id}`);
 
       setSuccessMessage("User deleted successfully!");
       setShowUserCard(false);
