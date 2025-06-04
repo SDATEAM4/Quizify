@@ -1,0 +1,11 @@
+[env]
+NIXPACKS_JDK_VERSION = "21"
+
+[phases.setup]
+nixPkgs = ["jdk21"]
+
+[phases.build]
+cmd = "source verify-java.sh && ./mvnw clean package -DskipTests"
+
+[start]
+cmd = "java -jar target/quizify-0.0.1-SNAPSHOT.jar"
