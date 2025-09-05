@@ -13,11 +13,6 @@ export const LoginPage = () => {
   useEffect(() => {
     document.title = 'Quizify - Login';
   }, []);
-
-  useEffect(()=>{
-    console.log(currentView)
-  },[currentView])
-
   const handleShowForgotPassword = () => {
     setCurrentView("forgotPassword");
   };
@@ -27,7 +22,6 @@ export const LoginPage = () => {
   };
 
   const handleOtpSent = (userEmail) => {
-    console.log("OTP sent - Email:", userEmail, "UserID:");
     setEmail(userEmail);
 
     setCurrentView("otpVerification");
@@ -38,7 +32,6 @@ export const LoginPage = () => {
   };
 
   const handlePasswordReset = () => {
-    console.log("Password reset successfully");
     setCurrentView("login");
     // Could show a success toast/message here
   };
@@ -47,13 +40,13 @@ export const LoginPage = () => {
     <div className="relative min-h-screen flex justify-center items-center bg-gray-50 overflow-hidden">
       {/* Background Typography */}
       <BackgroundTypography />
-      
+
       {/* Main Content */}
       <div className="relative z-10 min-w-1/3">
         {currentView === "login" && (
           <LoginForm onForgotPasswordClick={handleShowForgotPassword} />
         )}
-        
+
         {currentView === "forgotPassword" && (
           <ForgotPassword
             onOtpSent={handleOtpSent}
@@ -61,7 +54,7 @@ export const LoginPage = () => {
             setUserId={setUserId}
           />
         )}
-        
+
         {currentView === "otpVerification" && (
           <OTPVerification
             email={email}
@@ -71,7 +64,7 @@ export const LoginPage = () => {
             setCurrentView={setCurrentView}
           />
         )}
-        
+
         {currentView === "resetPassword" && (
           <ResetPassword
             email={email}

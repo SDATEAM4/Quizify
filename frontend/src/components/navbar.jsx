@@ -56,13 +56,15 @@ export const NavBar = () => {
 
         {/* Profile */}
         <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 rounded-full bg-gray-300 overflow-hidden hover:cursor-pointer">
-            <img
-              src={user.profileImageUrl || "img/fallback.png"} alt="Profile"
-              className="h-full w-full object-cover"
-              onClick={() => navigate("/customizeProfile")}
-            />
-          </div>
+          {!mobileMenuOpen && (
+            < div className="h-8 w-8 rounded-full bg-gray-300 overflow-hidden hover:cursor-pointer">
+              <img
+                src={user.profileImageUrl || "img/fallback.png"} alt="Profile"
+                className="h-full w-full object-cover"
+                onClick={() => navigate("/customizeProfile")}
+              />
+            </div>
+          )}
           <span className="hidden lg:inline text-sm xl:text-base">
             {user?.fname} {user?.lname}
           </span>
@@ -98,7 +100,7 @@ export const NavBar = () => {
             <div className="py-3 px-2 flex items-center border-t border-gray-700">
               <div className="h-8 w-8 rounded-full bg-gray-300 overflow-hidden mr-2">
                 <img
-                  src="https://readdy.ai/api/search-image?query=professional%20headshot%20portrait%20of%20a%20person%20with%20neutral%20expression%2C%20high%20quality%2C%20realistic%2C%20professional%20photography%2C%20soft%20lighting%2C%20clean%20background%2C%20minimalist%20style%2C%20business%20attire&width=100&height=100&seq=1&orientation=squarish"
+                  src={user?.profileImageUrl}
                   alt="Profile"
                   className="h-full w-full object-cover"
                   onClick={() => navigate("/customizeProfile")}

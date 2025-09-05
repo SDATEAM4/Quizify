@@ -13,10 +13,6 @@ import {
 import { scoreRangeColors } from "./reportDataUtil";
 
 const ScoreDistributionChart = ({ data, totalAttempts }) => {
-  useEffect(() => {
-    console.log(totalAttempts);
-    console.log(data);
-  });
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -42,7 +38,7 @@ const ScoreDistributionChart = ({ data, totalAttempts }) => {
                   value: "Marks",
                   position: "insideBottom",
                   dy: 40,
-                  dx:-20,
+                  dx: -20,
                   style: { fontSize: 14 },
                 }}
               />

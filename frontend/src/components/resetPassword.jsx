@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IoLockClosed, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 
-export const ResetPassword = ({ onPasswordReset, onBackToLogin,email }) => {
+export const ResetPassword = ({ onPasswordReset, onBackToLogin, email }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -14,43 +14,43 @@ export const ResetPassword = ({ onPasswordReset, onBackToLogin,email }) => {
       setError("Password must be at least 8 characters long.");
       return false;
     }
-    
+
     if (!/\d/.test(password)) {
       setError("Password must contain at least one number.");
       return false;
     }
-    
+
     if (!/[A-Z]/.test(password)) {
       setError("Password must contain at least one uppercase letter.");
       return false;
     }
-    
+
     if (!/[a-z]/.test(password)) {
       setError("Password must contain at least one lowercase letter.");
       return false;
     }
-    
+
     if (!/[^A-Za-z0-9]/.test(password)) {
       setError("Password must contain at least one special character.");
       return false;
     }
-    
+
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
+
     if (!validatePassword()) {
       return;
     }
-    
+
     setIsSubmitting(true);
     try {
       const response = await fetch(
@@ -63,23 +63,21 @@ export const ResetPassword = ({ onPasswordReset, onBackToLogin,email }) => {
           // ❌ no body
         }
       );
-    
-      
+
+
       const data = await response.json();
-      
+
       if (response.ok) {
-        console.log("Password reset successfully:", data);
         if (onPasswordReset) onPasswordReset();
       } else {
         setError(data.message || "Failed to reset password. Please try again.");
       }
     } catch (error) {
-      console.error("Error resetting password:", error);
       setError("Network error. Please check your connection and try again.");
     } finally {
       setIsSubmitting(false);
     }
-    
+
   };
 
   const toggleShowPassword = () => {
@@ -120,8 +118,8 @@ export const ResetPassword = ({ onPasswordReset, onBackToLogin,email }) => {
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xl flex">
               <IoLockClosed className="mr-2" />
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={toggleShowPassword}
                 className="focus:outline-none"
               >
@@ -140,8 +138,8 @@ export const ResetPassword = ({ onPasswordReset, onBackToLogin,email }) => {
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xl flex">
               <IoLockClosed className="mr-2" />
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={toggleShowConfirmPassword}
                 className="focus:outline-none"
               >

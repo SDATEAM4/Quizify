@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-export const OTPVerification = ({ email, userId, onVerified,setCurrentView, onBackToLogin }) => {
+export const OTPVerification = ({ email, userId, onVerified, setCurrentView, onBackToLogin }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -34,7 +34,7 @@ export const OTPVerification = ({ email, userId, onVerified,setCurrentView, onBa
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-    
+
     // Auto-focus to next input
     if (value && index < 5 && inputRefs.current[index + 1]) {
       inputRefs.current[index + 1].focus();
@@ -66,9 +66,8 @@ export const OTPVerification = ({ email, userId, onVerified,setCurrentView, onBa
       );
 
       const data = await response.json();
-      
+
       if (response.ok) {
-        console.log("OTP verified successfully:", data);
         setCurrentView("resetPassword")
       } else {
         setError(data.message || "Invalid OTP. Please try again.");
@@ -84,18 +83,17 @@ export const OTPVerification = ({ email, userId, onVerified,setCurrentView, onBa
     } finally {
       setIsSubmitting(false);
     }
-    
+
   };
 
   const handleResendOtp = async () => {
     if (!canResend) return;
-    
+
     setIsResending(true);
     setError("");
-    
+
     // For development/testing - simulate API call
     setTimeout(() => {
-      console.log("Resending OTP to:", email);
       // Reset timer
       setTimer(60);
       setCanResend(false);
@@ -106,7 +104,7 @@ export const OTPVerification = ({ email, userId, onVerified,setCurrentView, onBa
       }
       setIsResending(false);
     }, 1500);
-    
+
     try {
       const response = await fetch(
         `http://localhost:8080/Quizify/forgot-password/send-otp?email=${encodeURIComponent(email)}`,
@@ -117,11 +115,10 @@ export const OTPVerification = ({ email, userId, onVerified,setCurrentView, onBa
           },
         }
       );
-      
+
       const data = await response.json();
-      
+
       if (response.ok && data.status === "success") {
-        console.log("OTP resent successfully:", data);
         // Reset timer
         setTimer(60);
         setCanResend(false);
@@ -145,12 +142,12 @@ export const OTPVerification = ({ email, userId, onVerified,setCurrentView, onBa
   const handlePaste = (e) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').trim();
-    
+
     // Check if pasted content is a 6-digit number
     if (/^\d{6}$/.test(pastedData)) {
       const digits = pastedData.split('');
       setOtp(digits);
-      
+
       // Focus the last input
       if (inputRefs.current[5]) {
         inputRefs.current[5].focus();
@@ -207,10 +204,10 @@ export const OTPVerification = ({ email, userId, onVerified,setCurrentView, onBa
           disabled={!canResend || isResending}
           className={`relative ${canResend ? 'text-gray-600 hover:text-gray-900' : 'text-gray-400'} cursor-pointer transition-colors duration-200 group`}
         >
-          {isResending 
-            ? "Resending..." 
-            : canResend 
-              ? "Resend OTP" 
+          {isResending
+            ? "Resending..."
+            : canResend
+              ? "Resend OTP"
               : `Resend OTP in ${timer}s`}
           {canResend && (
             <span className="absolute bottom-0 left-0 h-[1.5px] w-full scale-x-0 bg-gray-900 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>

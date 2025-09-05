@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useAuth } from "../context/authContext";
 export const LoginForm = ({ onForgotPasswordClick }) => {
   const navigate = useNavigate();
-  const {login ,isLoading} = useAuth();
+  const { login, isLoading } = useAuth();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -16,13 +16,12 @@ export const LoginForm = ({ onForgotPasswordClick }) => {
       toast.error('Please enter both identifier and password');
       return;
     }
-    
+
     try {
       const result = await login(identifier, password);
-      
+
       if (result.success) {
-        console.log('Login successful, role:', result.role);
-        
+
         // Navigate based on the returned role
         if (result.role === 'Teacher') {
           navigate('/teacher/home');
@@ -36,11 +35,11 @@ export const LoginForm = ({ onForgotPasswordClick }) => {
       console.error(error.message);
     }
   };
-  
+
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
-  
+
   return (
     <div className="min-h-screen  bg-transparent flex items-center justify-center relative overflow-hidden ">
       {/* Login card */}
@@ -50,7 +49,7 @@ export const LoginForm = ({ onForgotPasswordClick }) => {
           <p className="text-gray-600">Your Smart Quiz Platform</p>
         </div>
 
-        
+
 
         {/* Login form */}
         <form onSubmit={handleSubmit}>
@@ -60,7 +59,7 @@ export const LoginForm = ({ onForgotPasswordClick }) => {
                 type="text"
                 placeholder="Username Or Email"
                 value={identifier}
-                onChange={(e) => {setIdentifier(e.target.value)}}
+                onChange={(e) => { setIdentifier(e.target.value) }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
               />
             </div>
@@ -71,7 +70,7 @@ export const LoginForm = ({ onForgotPasswordClick }) => {
                 type={passwordVisible ? "text" : "password"}
                 placeholder="Password"
                 value={password}
-                onChange={(e) => {setPassword(e.target.value)}}
+                onChange={(e) => { setPassword(e.target.value) }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
               />
               <button
@@ -79,7 +78,7 @@ export const LoginForm = ({ onForgotPasswordClick }) => {
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer text-2xl"
                 onClick={togglePasswordVisibility}
               >
-                {passwordVisible? <IoEye/>:<IoMdEyeOff/>}
+                {passwordVisible ? <IoEye /> : <IoMdEyeOff />}
               </button>
             </div>
           </div>
@@ -87,7 +86,7 @@ export const LoginForm = ({ onForgotPasswordClick }) => {
             type="submit"
             className="w-full bg-black text-white py-3 rounded-md font-medium cursor-pointer whitespace-nowrap !rounded-button"
           >
-           {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 

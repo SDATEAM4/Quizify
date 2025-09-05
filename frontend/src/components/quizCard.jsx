@@ -23,7 +23,6 @@ export const QuizCard = ({ data, subject_name }) => {
   const handleclick = async (quiz_id) => {
     try {
       setLoading(true); // start loading
-      console.log(`Quiz quiz_id: ${quiz_id}`);
 
       const res = await fetch(`http://localhost:8080/Quizify/quizzes/${quiz_id}`);
       if (!res.ok) {
@@ -38,7 +37,7 @@ export const QuizCard = ({ data, subject_name }) => {
       const totalMarks = response.marks;
 
       navigate("/quizGenerator", {
-        state: {quiz_id, quizName, quizTopic, timeDuration, dataset, totalMarks, quizType: "NormalQuiz" } 
+        state: { quiz_id, quizName, quizTopic, timeDuration, dataset, totalMarks, quizType: "NormalQuiz" }
       });
     } catch (error) {
       console.error("Error fetching quiz:", error);
@@ -68,7 +67,7 @@ export const QuizCard = ({ data, subject_name }) => {
             <div className="flex items-center justify-between mb-4 text-gray-600">
               <div className="flex items-center space-x-2">
                 <i className="ri-time-line"></i>
-                <span>{(quiz.timelimit)/60} Minutes</span>
+                <span>{(quiz.timelimit) / 60} Minutes</span>
               </div>
               <div className="flex items-center space-x-2">
                 <i className="ri-question-line"></i>

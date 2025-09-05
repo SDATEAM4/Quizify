@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { TeacherNavbar } from '../components/teacherNavbar';
 import axios from 'axios';
@@ -48,7 +48,7 @@ const TeacherAddQuiz = () => {
     } catch (err) {
       console.error('Error fetching questions:', err);
       toast.error("Failed to load questions");
-       setAvailableQuestions([]);
+      setAvailableQuestions([]);
     } finally {
       setQuestionsLoading(false);
     }
@@ -93,13 +93,13 @@ const TeacherAddQuiz = () => {
       setSelectedQuestions([]);
     }
   }, [quizConfig.subject]);
-  
+
   useEffect(() => {
     if (quizConfig.mode === 'manual' && quizConfig.subjectId !== 0) {
       fetchQuestions(quizConfig.subjectId);
     }
   }, [quizConfig.mode]);
-  
+
 
   // Calculated difficulty based on selected questions
   const [calculatedDifficulty, setCalculatedDifficulty] = useState({
@@ -109,7 +109,7 @@ const TeacherAddQuiz = () => {
 
   useEffect(() => {
     document.title = 'Quizify - Teacher Add Quiz';
-    
+
     // Auto-select the first subject if only one is available
     if (taughtSubjects && taughtSubjects.length === 1) {
       const singleSubject = taughtSubjects[0];
@@ -121,7 +121,7 @@ const TeacherAddQuiz = () => {
     }
   }, [taughtSubjects]);
 
-  
+
 
   const handleConfigChange = (field, value) => {
     setQuizConfig(prev => ({
@@ -129,7 +129,7 @@ const TeacherAddQuiz = () => {
       [field]: value
     }));
   };
-  
+
 
   // Calculate difficulty based on selected questions
   const calculateDifficulty = (questions) => {
@@ -205,8 +205,6 @@ const TeacherAddQuiz = () => {
         timeLimit: quizConfig.timeLimit// Convert seconds to minutes
       };
 
-      console.log(payload)
-
       // Send request to create automatic quiz
       const response = await axios.post('http://localhost:8080/Quizify/quizzes/create/auto', payload);
 
@@ -266,7 +264,6 @@ const TeacherAddQuiz = () => {
           calculatedDifficulty.label.toLowerCase() === "hard" ? "3" : '1'
       };
 
-      console.log(payload)
 
       // Send request to create manual quiz
       const response = await axios.post('http://localhost:8080/Quizify/quizzes/create/manual', payload);
@@ -320,15 +317,15 @@ const TeacherAddQuiz = () => {
   // Auto-fill remaining question slots
   const autoFillQuestions = () => {
     if (selectedQuestions.length >= quizConfig.questionCount) return;
-    
+
     const remainingCount = quizConfig.questionCount - selectedQuestions.length;
     const selectedIds = new Set(selectedQuestions.map(q => q.questionId));
-    
+
     // Get target difficulty level
     const targetLevel = calculatedDifficulty.label.toLowerCase() === "n/a"
       ? quizConfig.difficulty.toLowerCase()
       : calculatedDifficulty.label.toLowerCase();
-    
+
     // Map difficulty label to numeric level
     const getNumericLevel = (label) => {
       switch (label) {
@@ -338,10 +335,10 @@ const TeacherAddQuiz = () => {
         default: return 2;
       }
     };
-    
+
     // Filter out already selected questions
     const candidateQuestions = availableQuestions.filter(q => !selectedIds.has(q.questionId));
-    
+
     // Sort questions by level proximity to target level
     const targetNumericLevel = getNumericLevel(targetLevel);
     candidateQuestions.sort((a, b) => {
@@ -349,7 +346,7 @@ const TeacherAddQuiz = () => {
       const bDiff = Math.abs(b.level - targetNumericLevel);
       return aDiff - bDiff;
     });
-    
+
     // Select additional questions
     const additionalQuestions = candidateQuestions.slice(0, remainingCount);
     const newSelectedQuestions = [...selectedQuestions, ...additionalQuestions];
@@ -394,8 +391,8 @@ const TeacherAddQuiz = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <TeacherNavbar/>
-      <BackgroundTypography/>
+      <TeacherNavbar />
+      <BackgroundTypography />
       <div className="flex-1 flex justify-center items-center z-20">
         <div className="w-full max-w-4xl p-6">
           {/* Quiz Configuration Section */}
@@ -404,10 +401,10 @@ const TeacherAddQuiz = () => {
             taughtSubjects={taughtSubjects}
             handleConfigChange={handleConfigChange}
           />
-          
+
           {/* Quiz Creation Status */}
           <QuizCreationStatus status={quizCreationStatus} />
-          
+
           {/* Questions Selection Section - Only show in manual mode */}
           {quizConfig.mode === "manual" && (
             <QuestionSelectionSection
@@ -420,7 +417,7 @@ const TeacherAddQuiz = () => {
               removeQuestion={removeQuestion}
             />
           )}
-          
+
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 mt-4">
             <button
@@ -430,7 +427,7 @@ const TeacherAddQuiz = () => {
               Cancel
               <span className="bg-gray-800 hover-underline-animation"></span>
             </button>
-            
+
             {quizConfig.mode === 'manual' && selectedQuestions.length > 0 && selectedQuestions.length < quizConfig.questionCount && (
               <button
                 className="px-4 py-2 rounded-md bg-blue-600 text-white"
@@ -439,7 +436,7 @@ const TeacherAddQuiz = () => {
                 Auto Fill Remaining
               </button>
             )}
-            
+
             <button
               className="cursor-pointer p-2 flex items-center relative group shadow-sm rounded-lg bg-green-50 text-green-700 hover:bg-green-100"
               onClick={generateQuiz}
@@ -451,7 +448,7 @@ const TeacherAddQuiz = () => {
           </div>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };

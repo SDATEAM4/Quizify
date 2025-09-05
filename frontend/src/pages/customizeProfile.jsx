@@ -6,10 +6,9 @@ import { TeacherNavbar } from "../components/teacherNavbar";
 import axios from "axios";
 export default function CustomizeProfileContainer() {
   const navigate = useNavigate();
-  const {user,refreshUser} = useAuth();
+  const { user, refreshUser } = useAuth();
   const handleSaveProfile = async (formData) => {
-    console.log(formData);
-  
+
     const form = new FormData();
     form.append("fname", formData.fname);
     form.append("lname", formData.lname);
@@ -20,9 +19,8 @@ export default function CustomizeProfileContainer() {
     if (formData.profileImage instanceof File) {
       form.append("profileImage", formData.profileImage); // actual file
     }
-  
+
     try {
-      console.log(user.Uid)
       const response = await axios.put(
         `http://localhost:8080/Quizify/user/customizeProfile/${user.Uid}`,
         form,
@@ -33,21 +31,20 @@ export default function CustomizeProfileContainer() {
         }
       );
       await refreshUser();
-      console.log("Profile updated:", response.data);
     } catch (error) {
       console.error("Error updating profile:", error);
     }
   };
-  
+
 
   const handleCancelEdit = () => {
-      if(user.role === 'Teacher') navigate('/teacher/home')
-        else navigate('/student/home')
-    };
+    if (user.role === 'Teacher') navigate('/teacher/home')
+    else navigate('/student/home')
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
-      {user.role==='Teacher'? <TeacherNavbar/>: <NavBar/>}
+      {user.role === 'Teacher' ? <TeacherNavbar /> : <NavBar />}
       <div className="flex justify-center items-center flex-grow">
         <div className="w-full max-w-4xl px-4 py-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Edit Profile</h1>
@@ -55,11 +52,11 @@ export default function CustomizeProfileContainer() {
             Update your personal information and customize your profile
           </p>
 
-              <CustomizeProfile
-                userData={user}
-                onSave={handleSaveProfile}
-                onCancel={handleCancelEdit}
-              />
+          <CustomizeProfile
+            userData={user}
+            onSave={handleSaveProfile}
+            onCancel={handleCancelEdit}
+          />
 
         </div>
       </div>

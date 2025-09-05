@@ -5,11 +5,6 @@ const QuizStatsSummary = ({ reportData }) => {
   if (!reportData || reportData.totalAttempts === 0) {
     return null;
   }
-
-  useEffect(()=>{
-    console.log(reportData.timeLimit)
-  })
-
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
       <h3 className="text-xl font-semibold text-gray-800 mb-4">Quiz Statistics</h3>

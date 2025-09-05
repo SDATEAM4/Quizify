@@ -36,7 +36,6 @@ export default function ManageUserComponent() {
         `http://localhost:8080/Quizify/admin/user/username/${searchUsername}`
       );
 
-      console.log("User Data Response:", response.data);
 
       // Process the response data
       if (response.data) {
@@ -120,9 +119,7 @@ export default function ManageUserComponent() {
       // setting courses now
       try {
         const idsString = subjects.map(course => course.id).join(',');
-        console.log(idsString)
         await axios.put(`http://localhost:8080/Quizify/admin/subjects/overwrite-user-subjects?userId=${userData.id}&subjects=${idsString}`)
-        console.log(userData.id)
         toast.success("Courses updated successfully")
       }
       catch (error) {

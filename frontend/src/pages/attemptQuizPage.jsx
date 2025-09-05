@@ -9,7 +9,6 @@ import { useAuth } from '../context/authContext';
 export const AttemptQuizPage = () => {
 
   const { user, studentId } = useAuth();
-  console.log("Student ID:", studentId);
   const [response, setResponse] = useState([]);
   const [activePage, setActivePage] = useState("attemptQuiz");
   const [activesubject_name, setActivesubject_name] = useState("");
@@ -21,7 +20,7 @@ export const AttemptQuizPage = () => {
         setLoading(true);
         const res = await fetch(`http://localhost:8080/Quizify/quizzes/student/${studentId}`);
         const json = await res.json();
-        
+
 
         const filtered = json.filter((quiz) => quiz.attemptedQuiz === false);
         setResponse(filtered);

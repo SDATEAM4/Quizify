@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IoMail } from "react-icons/io5";
 
-export const ForgotPassword = ({ onOtpSent, onBackToLogin,setUserId }) => {
+export const ForgotPassword = ({ onOtpSent, onBackToLogin, setUserId }) => {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -10,10 +10,9 @@ export const ForgotPassword = ({ onOtpSent, onBackToLogin,setUserId }) => {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
-    
+
     try {
-      console.log(email)
-       const response = await fetch(
+      const response = await fetch(
         `http://localhost:8080/Quizify/forgot-password/send-otp?email=${encodeURIComponent(email)}`,
         {
           method: "POST",
@@ -22,32 +21,28 @@ export const ForgotPassword = ({ onOtpSent, onBackToLogin,setUserId }) => {
           },
         }
       );
-      
+
       if (response.ok) {
-        console.log("OTP sent successfully:");
         if (onOtpSent) onOtpSent(email);
         try {
           const response = await fetch(`http://localhost:8080/Quizify/admin/user/email/${encodeURIComponent(email)}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json", // optional for GET, but safe to include
-              // You can add Authorization header here if needed:
-              // "Authorization": `Bearer ${yourToken}`
             }
           });
-        
+
           const data = await response.json();
-          console.log("User data:", data);
           setUserId(data.user.userId)
         } catch (error) {
           console.error("Failed to fetch user:", error);
         }
-        
+
       } else {
         setError("User not found with the provided email address.");
         setIsSubmitting(false);
       }
-      
+
     } catch (error) {
       console.error("Error sending OTP:", error);
       setError("Network error. Please check your connection and try again.");
